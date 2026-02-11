@@ -2,10 +2,11 @@ import { render } from "../render.js";
 import { constrainNumber } from "../helper.js";
 
 export default class Rock {
-  constructor(x, y, r, velocity, id, size, rotationRate) {
+  static rockIDCounter = 0;
+  constructor(x, y, r, velocity, size, rotationRate) {
     this.rotation = 0;
     this.rotationRate = rotationRate;
-    this.id = id;
+    this.id = "rock" + Rock.rockIDCounter++;
     this.x = x;
     this.y = y;
     this.r = r;

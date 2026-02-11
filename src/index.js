@@ -64,8 +64,6 @@ let rocks = {
       value: 300,
     },
   },
-  rockCount: 0,
-  totalCreated: 0,
   rockList: {},
 };
 let ship;
@@ -101,7 +99,6 @@ function getRandomNumber(min, max) {
 
 function initRock(size, pos) {
   let rockProps = rocks.type[size];
-  let id = "rocks" + rocks.totalCreated++;
   let speed = getRandomNumber(rockProps.minSpeed, rockProps.maxSpeed);
   let r = getRandomNumber(rockProps.minRadius, rockProps.maxRadius);
   let radians = getRandomNumber(0, Math.PI * 2);
@@ -111,10 +108,10 @@ function initRock(size, pos) {
   const dy = speed * Math.cos(radians);
   let velocity = { dx, dy };
 
-  const rock = new Rock(pos.x, pos.y, r, velocity, id, size, rotationRate);
-  rocks.rockList[id] = rock;
+  const rock = new Rock(pos.x, pos.y, r, velocity, size, rotationRate);
+  rocks.rockList[rock.id] = rock;
   let rockStyle = `height:${2 * rock.r}px; width:${2 * rock.r}px; margin-left:-${rock.r}px; margin-top:-${rock.r}px;`;
-  createGameElement(id, "rock", rockStyle, asteroid1SVG(rock));
+  createGameElement(rock.id, "rock", rockStyle, asteroid1SVG(rock));
 }
 
 function initShip() {
