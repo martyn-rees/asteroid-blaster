@@ -17,13 +17,13 @@ export const renderShip = (id, x, y, shipAngle, shipThrust) => {
   render(id, x, y, degrees);
 };
 
-export function renderScreen(ship, rocks, bullets) {
+export function renderScreen(ship, rocks, bullets, gameScreen) {
   ship.render();
   for (var rock in rocks.rockList) {
     rocks.rockList[rock].render();
   }
   for (var bullet in bullets.bulletList) {
-    bullets.bulletList[bullet].update(screen.width, screen.height);
+    bullets.bulletList[bullet].update(gameScreen.width, gameScreen.height);
     bullets.bulletList[bullet].render();
   }
 }

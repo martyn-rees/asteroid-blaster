@@ -5,10 +5,13 @@
     <style>
     .rock {
       position:absolute;
-      opacity: 0.7;
-      background-color: blue;
-      border-radius: 50%;
     }
+    .rock svg path {
+      vector-effect: non-scaling-stroke;
+      stroke-width: 1px;
+      stroke: white;
+    }
+
     .ship {
       position:absolute;
       width: 12px;
@@ -20,7 +23,7 @@
       position: absolute;
       width: 4px;
       height: 4px;
-      background-color: red;
+      background-color: white;
       border-radius: 50%;
       margin-left: -2px;
       margin-top: -2px;
@@ -33,6 +36,8 @@
     	left:5%;
     	border: 1px solid black;
     	overflow: hidden;
+      background: black;
+      background-image: url(https://media.istockphoto.com/id/1732963074/photo/starry-night-sky-in-space.jpg?s=612x612&w=0&k=20&c=AHcmpswk3g3toHSFt5yCV_1uzMZUaJl95p3UIgm8euo=);
     }
 </style>
   </head>

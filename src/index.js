@@ -14,27 +14,33 @@ var ACTIONS = {
   shipRight: false,
 };
 
+let gameState = {
+  ship: null,
+  rocksList: {},
+  bulletsList: {},
+};
+
 let gameScreen = new GameScreen("gameScreen", 800, 400);
 let score = { bonus: 0, damage: 0 };
 let rocks = {
   type: {
     LARGE: {
-      minRadius: 25,
-      maxRadius: 30,
+      minRadius: 30,
+      maxRadius: 40,
       minSpeed: 1,
       maxSpeed: 2,
       value: 100,
     },
     MEDIUM: {
-      minRadius: 15,
-      maxRadius: 20,
+      minRadius: 20,
+      maxRadius: 25,
       minSpeed: 1.5,
       maxSpeed: 2.5,
       value: 200,
     },
     SMALL: {
-      minRadius: 8,
-      maxRadius: 10,
+      minRadius: 12,
+      maxRadius: 15,
       minSpeed: 2,
       maxSpeed: 3,
       value: 300,
@@ -72,12 +78,31 @@ const createGameElement = (id, className, style, graphicSVG) => {
   gameScreen.addToGameWindow(elContainer);
 };
 
+function getRandomNumber(min, max) {
+  return min + Math.random() * (max - min);
+}
+
 function initRock(size, pos) {
   let rockProps = rocks.type[size];
   let id = "rocks" + rocks.totalCreated++;
-  let speed = rockProps.minSpeed + Math.random() * rockProps.maxSpeed;
-  let r = rockProps.minRadius + Math.random() * rockProps.maxRadius;
-  const rock = new Rock(pos.x, pos.y, r, speed, id, size);
+  let speed = getRandomNumber(rockProps.minSpeed, rockProps.maxSpeed);
+  let r = getRandomNumber(rockProps.minRadius, rockProps.maxRadius);
+  let radians = getRandomNumber(0, Math.PI * 2);
+  let rotationRate = getRandomNumber(-2, 2);
+  console.log(
+    "initRock",
+    "speed",
+    speed,
+    rockProps.minSpeed,
+    rockProps.maxSpeed,
+  );
+  console.log("initRock", "r", r, rockProps.minRadius, rockProps.maxRadius);
+  console.log("initRock", "radians", radians);
+  const dx = speed * Math.sin(radians);
+  const dy = speed * Math.cos(radians);
+  let velocity = { dx, dy };
+
+  const rock = new Rock(pos.x, pos.y, r, velocity, id, size, rotationRate);
   rocks.rockList[id] = rock;
   let rockStyle = `height:${2 * rock.r}px; width:${2 * rock.r}px; margin-left:-${rock.r}px; margin-top:-${rock.r}px;`;
   createGameElement(id, "rock", rockStyle, asteroid1SVG(rock));
@@ -194,10 +219,9 @@ function gameLoop() {
     }
   }
 
-  renderScreen(ship, rocks, bullets);
+  renderScreen(ship, rocks, bullets, gameScreen);
 
   globalID = window.requestAnimationFrame(step);
-  console.log("gameloop complete");
 }
 
 function updateScore(value) {

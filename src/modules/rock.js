@@ -1,37 +1,38 @@
 import { render } from "../render.js";
+import { constrainNumber } from "../helper.js";
 
 export default class Rock {
-  constructor(x, y, r, speed, id, size) {
+  constructor(x, y, r, velocity, id, size, rotationRate) {
     this.rotation = 0;
-    this.dr = 2 * Math.random() - 1;
+    this.rotationRate = rotationRate;
     this.id = id;
     this.x = x;
     this.y = y;
     this.r = r;
-    let radians = Math.random() * Math.PI * 2;
-    this.dx = speed * Math.sin(radians);
-    this.dy = speed * Math.cos(radians);
+    this.velocity = velocity;
     this.size = size;
   }
 
   update(SCREEN_X, SCREEN_Y) {
-    if (this.x - this.r < 0) {
-      this.dx = Math.abs(this.dx);
+    // bounce off walls
+    /*if (this.x - this.r < 0) {
+      this.velocity.dx = Math.abs(this.velocity.dx);
     } else if (this.x + this.r > SCREEN_X) {
-      this.dx = -Math.abs(this.dx);
+      this.velocity.dx = -Math.abs(this.velocity.dx);
     }
     if (this.y - this.r < 0) {
-      this.dy = Math.abs(this.dy);
+      this.velocity.dy = Math.abs(this.velocity.dy);
     } else if (this.y + this.r > SCREEN_Y) {
-      this.dy = -Math.abs(this.dy);
-    }
-    let newX = this.x + this.dx;
-    let newY = this.y + this.dy;
+      this.velocity.dy = -Math.abs(this.velocity.dy);
+    }*/
+    // warp to other side of screen
+    let newX = this.x + this.velocity.dx;
+    let newY = this.y + this.velocity.dy;
     this.x = newX;
     this.y = newY;
-    this.rotation += this.dr;
-    //this.x = constrainNumber(newX, 0, SCREEN_X)
-    //this.y = constrainNumber(newY, 0, SCREEN_Y)
+    this.rotation += this.rotationRate;
+    this.x = constrainNumber(newX, 0, SCREEN_X);
+    this.y = constrainNumber(newY, 0, SCREEN_Y);
   }
 
   render() {
