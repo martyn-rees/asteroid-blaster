@@ -22,24 +22,42 @@ let gameState = {
 
 let gameScreen = new GameScreen("gameScreen", 800, 400);
 let score = { bonus: 0, damage: 0 };
+let bulletSpecs = {
+  r: 2,
+  endurance: 90,
+  power: 1,
+};
+let shipSpecs = {
+  maxSpeed: 4.0,
+  drag: 0.005,
+  thrust: 0.1,
+  radius: 6,
+  rotationSpeed: Math.PI / 90, // radians per frame
+};
+let gunSpec = {
+  barrelLocation: { x: 0, y: 6 },
+  speed: 6,
+  reloadTime: 10,
+};
+
 let rocks = {
   type: {
     LARGE: {
-      minRadius: 30,
-      maxRadius: 40,
+      minRadius: 60,
+      maxRadius: 80,
       minSpeed: 1,
       maxSpeed: 2,
       value: 100,
     },
     MEDIUM: {
-      minRadius: 20,
-      maxRadius: 25,
+      minRadius: 25,
+      maxRadius: 40,
       minSpeed: 1.5,
       maxSpeed: 2.5,
       value: 200,
     },
     SMALL: {
-      minRadius: 12,
+      minRadius: 10,
       maxRadius: 15,
       minSpeed: 2,
       maxSpeed: 3,
@@ -55,12 +73,11 @@ let bullets = {
   MIN_RELOD_TIME: 10,
   countdownToReload: 0,
   bulletList: {},
-  bulletCount: 0,
 };
 
 function initRocks(amount) {
   for (let i = 0; i < amount; i++) {
-    initRock("LARGE", gameScreen.getRandomScreenPosition());
+    initRock("LARGE", gameScreen.getRandomEdgePosition());
   }
 }
 
@@ -89,15 +106,7 @@ function initRock(size, pos) {
   let r = getRandomNumber(rockProps.minRadius, rockProps.maxRadius);
   let radians = getRandomNumber(0, Math.PI * 2);
   let rotationRate = getRandomNumber(-2, 2);
-  console.log(
-    "initRock",
-    "speed",
-    speed,
-    rockProps.minSpeed,
-    rockProps.maxSpeed,
-  );
-  console.log("initRock", "r", r, rockProps.minRadius, rockProps.maxRadius);
-  console.log("initRock", "radians", radians);
+
   const dx = speed * Math.sin(radians);
   const dy = speed * Math.cos(radians);
   let velocity = { dx, dy };
@@ -110,7 +119,8 @@ function initRock(size, pos) {
 
 function initShip() {
   const pos = gameScreen.getScreenCentre();
-  ship = new Ship(pos, "ship");
+  ship = new Ship(pos, "ship", shipSpecs);
+  ship.attachGun(gunSpec);
   console.log("init ship", ship);
 }
 
@@ -142,18 +152,12 @@ function gameLoop() {
       // create new bullet - needs ship position, rotation and speed to calculate bullet velocity and position
       // could i just add ID to rendering list and then the rendering function coud create the game element
 
-      bullets.bulletCount++;
-      let bulletId = "bullet" + bullets.bulletCount;
       const gunPosition = ship.getGunPosition();
       const bulletVelocity = ship.getBulletVelocity();
 
-      bullets.bulletList[bulletId] = new Bullet(
-        bulletId,
-        gunPosition,
-        bulletVelocity,
-      );
-
-      createGameElement(bulletId, "bullet", null, null);
+      const newBullet = new Bullet(gunPosition, bulletVelocity, bulletSpecs);
+      bullets.bulletList[newBullet.id] = newBullet;
+      createGameElement(newBullet.id, "bullet", null, null);
       // reset time to fire next bullet
       // this should be included with ship that gun is attached to so that if we add power ups to the game that decrease the time between shots then we can just decrease the gun's reload time and it will affect all bullets fired from that gun. That way we don't have to change any of the bullet code when we add power ups to the game.
       bullets.countdownToReload = bullets.MIN_RELOD_TIME;

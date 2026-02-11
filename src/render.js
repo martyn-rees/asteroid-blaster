@@ -9,11 +9,11 @@ export const render = (id, x, y, rotation) => {
   }
 };
 
-export const renderShip = (id, x, y, shipAngle, shipThrust) => {
+export const renderShip = (id, x, y, rotation, shipThrust) => {
   const thrustDisplay = shipThrust ? "block" : "none";
   document.getElementById("thrust").style.display = thrustDisplay;
 
-  let degrees = (shipAngle * 180) / Math.PI;
+  let degrees = (rotation * 180) / Math.PI;
   render(id, x, y, degrees);
 };
 

@@ -16,6 +16,22 @@ export default class GameScreen {
     };
   }
 
+  getRandomEdgePosition() {
+    let { x, y } = this.getRandomScreenPosition();
+    // Randomly choose an edge (0=top, 1=right, 2=bottom, 3=left)
+    let edge = Math.floor(Math.random() * 4);
+    switch (edge) {
+      case 0: // top
+        return { x: x, y: 0 };
+      case 1: // right
+        return { x: this.width, y: y };
+      case 2: // bottom
+        return { x: x, y: this.height };
+      case 3: // left
+        return { x: 0, y: y };
+    }
+  }
+
   resizeGameScreenSize() {
     let gameScreen = document.getElementById(this.id);
     this.width = gameScreen.offsetWidth;
