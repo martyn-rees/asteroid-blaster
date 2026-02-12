@@ -19,7 +19,7 @@ const asteroid3SVG = () => `
 export const asteroidsSVG = [asteroid1SVG, asteroid2SVG, asteroid3SVG];
 
 export const shipSVG = () => `
-<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1">
+<svg viewBox="0 0 12 12" version="1.1">
 	<path d="M6,0 L12,12 L6,6 L0,12 L6,0 Z" fill="#FFFFFF" fill-rule="nonzero"></path>
 	<path id="thrust" d="M6,8 L7,11 L5,11 L6,8 Z" fill="#FFFFFF" fill-rule="nonzero"></path>
 </svg>
