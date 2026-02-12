@@ -5,6 +5,8 @@ import GameScreen from "./modules/gamescreen.js";
 import { renderScreen } from "./render.js";
 import { doCirclesCollide } from "./helper.js";
 import { asteroid1SVG, shipSVG } from "./graphics.js";
+import { bulletSpecs, shipSpecs, gunSpec, rocks } from "./gamedata.js";
+
 var globalID;
 let isGamePlaying = false;
 var ACTIONS = {
@@ -14,62 +16,12 @@ var ACTIONS = {
   shipRight: false,
 };
 
-let gameElements = {
-  ship: null,
-  rocks: [],
-  bullets: [],
-};
-
 let gameScreen = new GameScreen("gameScreen", 800, 400);
 let score = { bonus: 0, damage: 0 };
-let bulletSpecs = {
-  r: 2,
-  endurance: 90,
-  power: 1,
-};
-let shipSpecs = {
-  maxSpeed: 4.0,
-  drag: 0.005,
-  thrust: 0.1,
-  radius: 6,
-  rotationSpeed: Math.PI / 90, // radians per frame
-};
-let gunSpec = {
-  barrelLocation: { x: 0, y: 6 },
-  speed: 6,
-  reloadTime: 10,
-};
 
-let rocks = {
-  type: {
-    LARGE: {
-      minRadius: 60,
-      maxRadius: 80,
-      minSpeed: 1,
-      maxSpeed: 2,
-      value: 100,
-    },
-    MEDIUM: {
-      minRadius: 25,
-      maxRadius: 40,
-      minSpeed: 1.5,
-      maxSpeed: 2.5,
-      value: 200,
-    },
-    SMALL: {
-      minRadius: 10,
-      maxRadius: 15,
-      minSpeed: 2,
-      maxSpeed: 3,
-      value: 300,
-    },
-  },
-  rockList: {},
-};
 let ship;
-let bullets = {
-  bulletList: {},
-};
+let rockList = {};
+let bulletList = {};
 
 function initRocks(amount) {
   for (let i = 0; i < amount; i++) {
@@ -107,7 +59,7 @@ function initRock(size, pos) {
   let velocity = { dx, dy };
 
   const rock = new Rock(pos.x, pos.y, r, velocity, size, rotationRate);
-  rocks.rockList[rock.id] = rock;
+  rockList[rock.id] = rock;
   let rockStyle = `height:${2 * rock.r}px; width:${2 * rock.r}px; margin-left:-${rock.r}px; margin-top:-${rock.r}px;`;
   createGameElement(rock.id, "rock", rockStyle, asteroid1SVG(rock));
 }
@@ -144,7 +96,8 @@ function gameLoop() {
     const bulletVelocity = ship.getBulletVelocity();
     const newBullet = new Bullet(gunPosition, bulletVelocity, bulletSpecs);
     // add bullet to list of bullets
-    bullets.bulletList[newBullet.id] = newBullet;
+    bulletList[newBullet.id] = newBullet;
+    // TODO: replace above line with this-->  gameElements.bullets.push(newBullet);
     // create game element for bullet
     createGameElement(newBullet.id, "bullet", null, null);
     // reload ships gun
@@ -154,65 +107,69 @@ function gameLoop() {
   ship.update(gameScreen.width, gameScreen.height);
 
   // remove dead bullets
-  for (var bullet in bullets.bulletList) {
-    if (bullets.bulletList[bullet].bulletPower == 0) {
+  for (var bullet in bulletList) {
+    if (bulletList[bullet].bulletPower == 0) {
       // remove bullet from gameScreen
-      const nodeId = bullets.bulletList[bullet].id;
+      const nodeId = bulletList[bullet].id;
       gameScreen.removeNode(nodeId);
       // remove bullet from list
-      delete bullets.bulletList[bullet];
+      delete bulletList[bullet];
     }
   }
 
-  for (var rock in rocks.rockList) {
-    rocks.rockList[rock].update(gameScreen.width, gameScreen.height);
-    if (doCirclesCollide(rocks.rockList[rock], ship)) {
-      updateDamage(4 * rocks.type[rocks.rockList[rock].size].value);
+  for (var rock in rockList) {
+    rockList[rock].update(gameScreen.width, gameScreen.height);
+    if (doCirclesCollide(rockList[rock], ship)) {
+      updateDamage(4 * rocks.type[rockList[rock].size].value);
       const nodeId = rock;
       gameScreen.removeNode(nodeId);
-      delete rocks.rockList[rock];
+      delete rockList[rock];
     }
   }
 
   let destroyedRockSizes = [];
   // test rocks to bullets
-  for (var rock in rocks.rockList) {
+  for (var rock in rockList) {
     let haveCollision = false;
-    for (var bullet in bullets.bulletList) {
+    for (var bullet in bulletList) {
       if (!haveCollision) {
-        const thisBullet = bullets.bulletList[bullet];
+        const thisBullet = bulletList[bullet];
         const bulletPosition = {
           x: thisBullet.position.x,
           y: thisBullet.position.y,
           r: thisBullet.r,
         };
-        if (doCirclesCollide(rocks.rockList[rock], bulletPosition)) {
+        if (doCirclesCollide(rockList[rock], bulletPosition)) {
           const pos = {
-            x: rocks.rockList[rock].x,
-            y: rocks.rockList[rock].y,
+            x: rockList[rock].x,
+            y: rockList[rock].y,
           };
-          if (rocks.rockList[rock].size == "LARGE") {
+          // explode rock in to smaller rocks and remove rock and bullet
+          if (rockList[rock].size == "LARGE") {
             initRock("MEDIUM", pos);
             initRock("MEDIUM", pos);
-          } else if (rocks.rockList[rock].size == "MEDIUM") {
+          } else if (rockList[rock].size == "MEDIUM") {
             initRock("SMALL", pos);
             initRock("SMALL", pos);
             initRock("SMALL", pos);
           }
-          destroyedRockSizes.push(rocks.rockList[rock].size);
 
-          gameScreen.removeNode(rocks.rockList[rock].id);
-          delete rocks.rockList[rock];
-          gameScreen.removeNode(bullets.bulletList[bullet].id);
-          delete bullets.bulletList[bullet];
-
+          console.dir(rockList);
           haveCollision = true;
+          updateScore(rocks.type[rockList[rock].size].value);
+
+          destroyedRockSizes.push(rockList[rock].size);
+
+          gameScreen.removeNode(rockList[rock].id);
+          delete rockList[rock];
+          gameScreen.removeNode(bulletList[bullet].id);
+          delete bulletList[bullet];
         }
       }
     }
   }
 
-  renderScreen(ship, rocks, bullets, gameScreen);
+  renderScreen(ship, rockList, bulletList, gameScreen);
 
   globalID = window.requestAnimationFrame(step);
 }
