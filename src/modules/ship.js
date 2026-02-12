@@ -14,9 +14,6 @@ rotationSpeed: Math.PI / 90, // radians per frame
 /* gun specs */
 //const gunSpecs = { barrelLocation: { x: 0, y: 6 }, speed: 6, reloadTime: 10 };
 
-const GUN_RELOAD_SPEED = 10;
-let gunReloadTimer = GUN_RELOAD_SPEED;
-
 // add gunposition and gun power (gunSpeed)
 // add helper functions to calculate gun position and bullet velocity based on ship position, rotation and speed. That way the bullet class doesn't have to know anything about the ship at all and is more reusable. We can also add different types of bullets with different speeds and just pass in the bullet type when we create the bullet and then calculate the bullet speed based on the bullet type. That way we can easily add new types of bullets to the game without having to change any of the existing code.
 export default class Ship {
@@ -43,6 +40,7 @@ export default class Ship {
     this.id = id;
 
     this.gunSpecs = { barrelLocation: { x: 0, y: 0 }, speed: 0, reloadTime: 0 };
+    this.gunReloadTimer = 0;
   }
 
   attachGun(gunSpecs) {
@@ -60,6 +58,7 @@ export default class Ship {
   }
 
   update(SCREEN_WIDTH, SCREEN_HEIGHT) {
+    this.gunReloadTimer--;
     // calculate x,y components of speed, thrust and drag
     /*let currentSpeedX = this.shipSpeed * Math.sin(this.directionOfTravel);
     let currentSpeedY = this.shipSpeed * Math.cos(this.directionOfTravel);
@@ -151,6 +150,14 @@ export default class Ship {
       initialSpeed: this.gunSpecs.speed,
       initialDirection: this.shipRotation,
     };
+  }
+
+  reloadGun() {
+    this.gunReloadTimer = this.gunSpecs.reloadTime;
+  }
+
+  isGunLoaded() {
+    return this.gunReloadTimer <= 0;
   }
 
   render() {

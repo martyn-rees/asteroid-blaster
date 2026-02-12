@@ -14,10 +14,10 @@ var ACTIONS = {
   shipRight: false,
 };
 
-let gameState = {
+let gameElements = {
   ship: null,
-  rocksList: {},
-  bulletsList: {},
+  rocks: [],
+  bullets: [],
 };
 
 let gameScreen = new GameScreen("gameScreen", 800, 400);
@@ -68,8 +68,6 @@ let rocks = {
 };
 let ship;
 let bullets = {
-  MIN_RELOD_TIME: 10,
-  countdownToReload: 0,
   bulletList: {},
 };
 
@@ -118,7 +116,6 @@ function initShip() {
   const pos = gameScreen.getScreenCentre();
   ship = new Ship(pos, "ship", shipSpecs);
   ship.attachGun(gunSpec);
-  console.log("init ship", ship);
 }
 
 function step(timestamp) {
@@ -138,28 +135,23 @@ function gameLoop() {
     ACTIONS.shipLeft,
     ACTIONS.shipRight,
   );
+
+  // test if bullet fired
+  // test if SHOOT KEY is pressed and ship's gun is loaded
+  if (ACTIONS.shoot == true && ship.isGunLoaded()) {
+    // create new bullet - needs ship position, rotation and speed to calculate bullet velocity and position
+    const gunPosition = ship.getGunPosition();
+    const bulletVelocity = ship.getBulletVelocity();
+    const newBullet = new Bullet(gunPosition, bulletVelocity, bulletSpecs);
+    // add bullet to list of bullets
+    bullets.bulletList[newBullet.id] = newBullet;
+    // create game element for bullet
+    createGameElement(newBullet.id, "bullet", null, null);
+    // reload ships gun
+    ship.reloadGun();
+  }
   // update ship position
   ship.update(gameScreen.width, gameScreen.height);
-  // test if bullet fired
-  if (bullets.countdownToReload > 0) {
-    bullets.countdownToReload--;
-  } else {
-    // test if SHOOT KEY is pressed
-    if (ACTIONS.shoot == true) {
-      // create new bullet - needs ship position, rotation and speed to calculate bullet velocity and position
-      // could i just add ID to rendering list and then the rendering function coud create the game element
-
-      const gunPosition = ship.getGunPosition();
-      const bulletVelocity = ship.getBulletVelocity();
-
-      const newBullet = new Bullet(gunPosition, bulletVelocity, bulletSpecs);
-      bullets.bulletList[newBullet.id] = newBullet;
-      createGameElement(newBullet.id, "bullet", null, null);
-      // reset time to fire next bullet
-      // this should be included with ship that gun is attached to so that if we add power ups to the game that decrease the time between shots then we can just decrease the gun's reload time and it will affect all bullets fired from that gun. That way we don't have to change any of the bullet code when we add power ups to the game.
-      bullets.countdownToReload = bullets.MIN_RELOD_TIME;
-    }
-  }
 
   // remove dead bullets
   for (var bullet in bullets.bulletList) {
