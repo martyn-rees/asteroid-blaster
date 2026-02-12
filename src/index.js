@@ -7,7 +7,7 @@ import { doCirclesCollide } from "./helper.js";
 import { asteroidsSVG, shipSVG } from "./graphics.js";
 import { bulletSpecs, shipSpecs, gunSpec, rocks } from "./gamedata.js";
 
-var globalID;
+var animationId;
 let isGamePlaying = false;
 var ACTIONS = {
   shipThrust: false,
@@ -23,25 +23,12 @@ let ship;
 let rockList = {};
 let bulletList = {};
 
+// ----  Rock code ----
 function initRocks(amount) {
   for (let i = 0; i < amount; i++) {
     initRock("LARGE", gameScreen.getRandomEdgePosition());
   }
 }
-
-const createGameElement = (id, className, style, graphicSVG) => {
-  let elContainer = document.createElement("div");
-  elContainer.setAttribute("id", id);
-  elContainer.setAttribute("class", className);
-  if (style) {
-    elContainer.setAttribute("style", style);
-  }
-  if (graphicSVG) {
-    elContainer.innerHTML = graphicSVG;
-  }
-  //return elContainer;
-  gameScreen.addToGameWindow(elContainer);
-};
 
 function getRandomNumber(min, max) {
   return min + Math.random() * (max - min);
@@ -52,29 +39,111 @@ const getAsteroidGraphic = () => {
   return asteroidsSVG[n]();
 };
 
-function initRock(size, pos) {
+function createNewAsteroid(size, initialPosition) {
   let rockProps = rocks.type[size];
   let speed = getRandomNumber(rockProps.minSpeed, rockProps.maxSpeed);
   let r = getRandomNumber(rockProps.minRadius, rockProps.maxRadius);
   let radians = getRandomNumber(0, Math.PI * 2);
   let rotationRate = getRandomNumber(-2, 2);
-
   const dx = speed * Math.sin(radians);
   const dy = speed * Math.cos(radians);
   let velocity = { dx, dy };
-
-  const rock = new Rock(pos.x, pos.y, r, velocity, size, rotationRate);
-  rockList[rock.id] = rock;
-  let rockStyle = `height:${2 * rock.r}px; width:${2 * rock.r}px; margin-left:-${rock.r}px; margin-top:-${rock.r}px;`;
-  createGameElement(rock.id, "rock", rockStyle, getAsteroidGraphic());
+  const rock = new Rock(
+    initialPosition.x,
+    initialPosition.y,
+    r,
+    velocity,
+    size,
+    rotationRate,
+  );
+  return rock;
 }
 
+// this function does several things - creates a rock with random properties, adds it to the rock list, creates a game element for the rock and adds it to the game screen
+function initRock(size, pos) {
+  // create rock with random properties
+  const rock = createNewAsteroid(size, pos);
+
+  // add rock to rocklist
+  rockList[rock.id] = rock;
+
+  // create game element for rock
+  let rockStyle = `height:${2 * rock.r}px; width:${2 * rock.r}px; margin-left:-${rock.r}px; margin-top:-${rock.r}px;`;
+  const el = gameScreen.createGameElement(
+    rock.id,
+    "rock",
+    rockStyle,
+    getAsteroidGraphic(),
+  );
+  // add game element to screen
+  gameScreen.addToGameWindow(el);
+}
+// end of Rock code
+
+// ---- Ship code ----
 function initShip() {
   const pos = gameScreen.getScreenCentre();
   ship = new Ship(pos, "ship", shipSpecs);
   ship.attachGun(gunSpec);
 }
+// end of Ship code
 
+function updateScore(value) {
+  score.bonus += value;
+  document.getElementById("gameScore").innerHTML = "SCORE: " + score.bonus;
+}
+
+function updateDamage(value) {
+  score.damage += value;
+  document.getElementById("gameScoreDamage").innerHTML =
+    "DAMAGE :" + score.damage;
+}
+
+// events code
+function keyEvent(ev, isKeyDown) {
+  var keyCode = ev == null ? window.ev.keyCode : ev.keyCode;
+
+  if (keyCode == 37) {
+    ACTIONS.shipLeft = isKeyDown;
+  }
+  if (keyCode == 39) {
+    ACTIONS.shipRight = isKeyDown;
+  }
+  if (keyCode == 38) {
+    ACTIONS.shipThrust = isKeyDown;
+  }
+  if (keyCode == 83) {
+    ACTIONS.shoot = isKeyDown;
+  }
+}
+
+function addEvents() {
+  window.addEventListener("resize", function (event) {
+    gameScreen.resizeGameScreenSize();
+  });
+
+  window.addEventListener("keydown", function (ev) {
+    keyEvent(ev, true);
+  });
+
+  window.addEventListener("keyup", function (ev) {
+    keyEvent(ev, false);
+  });
+
+  document.getElementById("start").addEventListener("click", function () {
+    isGamePlaying = true;
+    cancelAnimationFrame(animationId);
+    animationId = requestAnimationFrame(step);
+  });
+
+  document.getElementById("stop").addEventListener("click", function () {
+    isGamePlaying = false;
+    cancelAnimationFrame(animationId);
+  });
+}
+// end of events code
+
+// GAME loop code
 function step(timestamp) {
   gameLoop();
 }
@@ -104,7 +173,8 @@ function gameLoop() {
     bulletList[newBullet.id] = newBullet;
     // TODO: replace above line with this-->  gameElements.bullets.push(newBullet);
     // create game element for bullet
-    createGameElement(newBullet.id, "bullet", null, null);
+    const el = gameScreen.createGameElement(newBullet.id, "bullet", null, null);
+    gameScreen.addToGameWindow(el);
     // reload ships gun
     ship.reloadGun();
   }
@@ -132,7 +202,6 @@ function gameLoop() {
     }
   }
 
-  let destroyedRockSizes = [];
   // test rocks to bullets
   for (var rock in rockList) {
     let haveCollision = false;
@@ -163,8 +232,6 @@ function gameLoop() {
           haveCollision = true;
           updateScore(rocks.type[rockList[rock].size].value);
 
-          destroyedRockSizes.push(rockList[rock].size);
-
           gameScreen.removeNode(rockList[rock].id);
           delete rockList[rock];
           gameScreen.removeNode(bulletList[bullet].id);
@@ -176,35 +243,7 @@ function gameLoop() {
 
   renderScreen(ship, rockList, bulletList, gameScreen);
 
-  globalID = window.requestAnimationFrame(step);
-}
-
-function updateScore(value) {
-  score.bonus += value;
-  document.getElementById("gameScore").innerHTML = "SCORE: " + score.bonus;
-}
-
-function updateDamage(value) {
-  score.damage += value;
-  document.getElementById("gameScoreDamage").innerHTML =
-    "DAMAGE :" + score.damage;
-}
-
-function keyEvent(ev, isKeyDown) {
-  var keyCode = ev == null ? window.ev.keyCode : ev.keyCode;
-
-  if (keyCode == 37) {
-    ACTIONS.shipLeft = isKeyDown;
-  }
-  if (keyCode == 39) {
-    ACTIONS.shipRight = isKeyDown;
-  }
-  if (keyCode == 38) {
-    ACTIONS.shipThrust = isKeyDown;
-  }
-  if (keyCode == 83) {
-    ACTIONS.shoot = isKeyDown;
-  }
+  animationId = window.requestAnimationFrame(step);
 }
 
 function startGame() {
@@ -218,31 +257,8 @@ function startGame() {
 
 function startLevel(level) {
   initRocks(4);
-  createGameElement("ship", "ship", null, shipSVG());
-}
-
-function addEvents() {
-  window.addEventListener("resize", function (event) {
-    gameScreen.resizeGameScreenSize();
-  });
-
-  window.addEventListener("keydown", function (ev) {
-    keyEvent(ev, true);
-  });
-
-  window.addEventListener("keyup", function (ev) {
-    keyEvent(ev, false);
-  });
-
-  document.getElementById("start").addEventListener("click", function () {
-    cancelAnimationFrame(globalID);
-    globalID = requestAnimationFrame(step);
-  });
-
-  document.getElementById("stop").addEventListener("click", function () {
-    isGamePlaying = false;
-    cancelAnimationFrame(globalID);
-  });
+  const el = gameScreen.createGameElement("ship", "ship", null, shipSVG());
+  gameScreen.addToGameWindow(el);
 }
 
 function init() {
@@ -250,3 +266,4 @@ function init() {
 }
 
 init();
+// end of GAME loop code

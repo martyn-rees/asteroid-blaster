@@ -32,6 +32,7 @@ export default class GameScreen {
     }
   }
 
+  // DOM functions
   resizeGameScreenSize() {
     let gameScreen = document.getElementById(this.id);
     this.width = gameScreen.offsetWidth;
@@ -43,8 +44,23 @@ export default class GameScreen {
     gameScreen.appendChild(newEl);
   };
 
+  // createGameElement and removeNode do not use any properties of GameScreen, so they could be moved outside the class if desired
+  createGameElement = (id, className, style, graphicSVG) => {
+    let elContainer = document.createElement("div");
+    elContainer.setAttribute("id", id);
+    elContainer.setAttribute("class", className);
+    if (style) {
+      elContainer.setAttribute("style", style);
+    }
+    if (graphicSVG) {
+      elContainer.innerHTML = graphicSVG;
+    }
+    return elContainer;
+  };
+
   removeNode = (elId) => {
     let elNode = document.getElementById(elId);
     elNode.parentNode.removeChild(elNode);
   };
 }
+// end of DOM functions

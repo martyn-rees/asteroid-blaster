@@ -131,6 +131,7 @@ export default class Ship {
     shipThrust = bool;
   }
 
+  /* GUN functions */
   // gun position should be added to ship. If a ship gets upgraded then it could have multiple guns and we can just pass in the gun position that we want to fire from when we create the bullet. That way the bullet class doesn't have to know anything about the ship at all and is more reusable.
   getGunPosition() {
     const gunlength = this.gunSpecs.barrelLocation.y;
@@ -159,6 +160,7 @@ export default class Ship {
   isGunLoaded() {
     return this.gunReloadTimer <= 0;
   }
+  /* end of GUN functions */
 
   render() {
     renderShip(this.id, this.x, this.y, this.shipRotation, this.shipThrust);
