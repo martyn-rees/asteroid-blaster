@@ -4,7 +4,7 @@ import Bullet from "./modules/bullet.js";
 import GameScreen from "./modules/gamescreen.js";
 import { renderScreen } from "./render.js";
 import { doCirclesCollide } from "./helper.js";
-import { asteroid1SVG, shipSVG } from "./graphics.js";
+import { asteroidsSVG, shipSVG } from "./graphics.js";
 import { bulletSpecs, shipSpecs, gunSpec, rocks } from "./gamedata.js";
 
 var globalID;
@@ -47,6 +47,11 @@ function getRandomNumber(min, max) {
   return min + Math.random() * (max - min);
 }
 
+const getAsteroidGraphic = () => {
+  const n = Math.floor(Math.random() * 3);
+  return asteroidsSVG[n]();
+};
+
 function initRock(size, pos) {
   let rockProps = rocks.type[size];
   let speed = getRandomNumber(rockProps.minSpeed, rockProps.maxSpeed);
@@ -61,7 +66,7 @@ function initRock(size, pos) {
   const rock = new Rock(pos.x, pos.y, r, velocity, size, rotationRate);
   rockList[rock.id] = rock;
   let rockStyle = `height:${2 * rock.r}px; width:${2 * rock.r}px; margin-left:-${rock.r}px; margin-top:-${rock.r}px;`;
-  createGameElement(rock.id, "rock", rockStyle, asteroid1SVG(rock));
+  createGameElement(rock.id, "rock", rockStyle, getAsteroidGraphic());
 }
 
 function initShip() {
