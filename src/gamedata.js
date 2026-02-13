@@ -15,28 +15,26 @@ export const gunSpec = {
   speed: 6,
   reloadTime: 10,
 };
-export const rocks = {
-  type: {
-    LARGE: {
-      minRadius: 60,
-      maxRadius: 80,
-      minSpeed: 1,
-      maxSpeed: 2,
-      value: 100,
-    },
-    MEDIUM: {
-      minRadius: 25,
-      maxRadius: 40,
-      minSpeed: 1.5,
-      maxSpeed: 2.5,
-      value: 200,
-    },
-    SMALL: {
-      minRadius: 10,
-      maxRadius: 15,
-      minSpeed: 2,
-      maxSpeed: 3,
-      value: 300,
-    },
+export const rockType = {
+  LARGE: {
+    minRadius: 60,
+    maxRadius: 80,
+    minSpeed: 1,
+    maxSpeed: 2,
+    value: 100,
+  },
+  MEDIUM: {
+    minRadius: 25,
+    maxRadius: 40,
+    minSpeed: 1.5,
+    maxSpeed: 2.5,
+    value: 200,
+  },
+  SMALL: {
+    minRadius: 10,
+    maxRadius: 15,
+    minSpeed: 2,
+    maxSpeed: 3,
+    value: 300,
   },
 };

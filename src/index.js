@@ -5,7 +5,7 @@ import GameScreen from "./modules/gamescreen.js";
 import { renderScreen } from "./render.js";
 import { doCirclesCollide } from "./helper.js";
 import { asteroidsSVG, shipSVG } from "./graphics.js";
-import { bulletSpecs, shipSpecs, gunSpec, rocks } from "./gamedata.js";
+import { bulletSpecs, shipSpecs, gunSpec, rockType } from "./gamedata.js";
 
 var animationId;
 let isGamePlaying = false;
@@ -40,22 +40,13 @@ const getAsteroidGraphic = () => {
 };
 
 function createNewAsteroid(size, initialPosition) {
-  let rockProps = rocks.type[size];
+  let rockProps = rockType[size];
   let speed = getRandomNumber(rockProps.minSpeed, rockProps.maxSpeed);
   let r = getRandomNumber(rockProps.minRadius, rockProps.maxRadius);
   let radians = getRandomNumber(0, Math.PI * 2);
   let rotationRate = getRandomNumber(-2, 2);
-  const dx = speed * Math.sin(radians);
-  const dy = speed * Math.cos(radians);
-  let velocity = { dx, dy };
-  const rock = new Rock(
-    initialPosition.x,
-    initialPosition.y,
-    r,
-    velocity,
-    size,
-    rotationRate,
-  );
+  let velocity = { speed: speed, directionOfTravel: radians };
+  const rock = new Rock(initialPosition, r, velocity, size, rotationRate);
   return rock;
 }
 
@@ -192,17 +183,18 @@ function gameLoop() {
     }
   }
 
+  // test rocks to ship collision
   for (var rock in rockList) {
     rockList[rock].update(gameScreen.width, gameScreen.height);
     if (doCirclesCollide(rockList[rock], ship)) {
-      updateDamage(4 * rocks.type[rockList[rock].size].value);
+      updateDamage(4 * rockType[rockList[rock].size].value);
       const nodeId = rock;
       gameScreen.removeNode(nodeId);
       delete rockList[rock];
     }
   }
 
-  // test rocks to bullets
+  // test rocks to bullets collision
   for (var rock in rockList) {
     let haveCollision = false;
     for (var bullet in bulletList) {
@@ -230,7 +222,7 @@ function gameLoop() {
 
           console.dir(rockList);
           haveCollision = true;
-          updateScore(rocks.type[rockList[rock].size].value);
+          updateScore(rockType[rockList[rock].size].value);
 
           gameScreen.removeNode(rockList[rock].id);
           delete rockList[rock];
