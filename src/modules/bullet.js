@@ -4,26 +4,44 @@ import {
 } from "../helper.js";
 import { render } from "../render.js";
 
-// bulletLife (lifeLeft) - a bullet only lasts for a short time after being fired. Count this down every frame (or time if using time based animation)
+// bullet specifications
+// endurance - a bullet only lasts for a short time after being fired. Count this down every frame (or time if using time based animation)
 // when this time is up the bulletPower becomes 0 signifying that the bullet can be removed
 // bulletPower can be any number and can be used to indicate damage it can inflict
 // r is radius of bullet. larger bullets have a larger hit area
+/*
+    r: number = 2,
+    endurance: number = 90,
+    power: number = 1,
+*/
+
 // position is the x,y location on the game screen
 // velocity is the dx,dy change in position every frame. This is calculated when the bullet is created based on the ship's position, rotation and speed and the bullet's speed.
+// velocity should be speed and direction from which dx and dy can be calcualted
 export default class Bullet {
-  constructor(id, position, velocity, r = 2, bulletLife = 90, bulletPower) {
-    this.id = id;
-    this.bulletPower = bulletPower;
-    this.velocity = { dx: velocity.dx, dy: velocity.dy };
-    this.position = { x: position.x, y: position.y };
+  static bulletIDCounter = 0;
 
-    this.lifeLeft = bulletLife;
-    this.r = r;
+  constructor(initialPosition, initialVelocity, bulletSpecs) {
+    Bullet.bulletIDCounter++;
+    this.id = "bullet" + Bullet.bulletIDCounter;
+    this.bulletPower = bulletSpecs.power;
+    this.velocity = { dx: initialVelocity.dx, dy: initialVelocity.dy };
+    this.position = { x: initialPosition.x, y: initialPosition.y };
+    this.endurance = bulletSpecs.endurance;
+    this.r = bulletSpecs.r;
+  }
+
+  getPositionChange() {
+    let newX = this.position.x + this.velocity.dx;
+    let newY = this.position.y - this.velocity.dy;
+
+    // const dx = this.velocity.dx + this.gunSpecs.speed * Math.sin(this.shipRotation);
+    // const dy = this.velocity.dy + this.gunSpecs.speed * Math.cos(this.shipRotation);
   }
 
   update(SCREEN_WIDTH, SCREEN_HEIGHT) {
-    this.lifeLeft--;
-    if (this.lifeLeft <= 0) {
+    this.endurance--;
+    if (this.endurance <= 0) {
       this.bulletPower = 0;
     } else {
       let newX = this.position.x + this.velocity.dx;
