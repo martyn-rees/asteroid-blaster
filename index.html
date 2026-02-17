@@ -2,52 +2,18 @@
 <html>
   <head>
     <title>Asteroids rendered using html elements and css</title>
-    <style>
-    .rock {
-      position:absolute;
-    }
-    .rock svg path {
-      vector-effect: non-scaling-stroke;
-      stroke-width: 1px;
-      stroke: white;
-    }
-
-    .ship {
-      position:absolute;
-      width: 12px;
-      height: 12px;
-      margin-top: -6px;
-      margin-left: -6px;
-    }
-    .bullet {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background-color: white;
-      border-radius: 50%;
-      margin-left: -2px;
-      margin-top: -2px;
-    }
-    .game-screen {
-    	position: absolute;
-    	width: 90%;
-      height: calc( 90vh - 100px);
-    	top:100px;
-    	left:5%;
-    	border: 1px solid black;
-    	overflow: hidden;
-      background: black;
-      background-image: url(https://media.istockphoto.com/id/1732963074/photo/starry-night-sky-in-space.jpg?s=612x612&w=0&k=20&c=AHcmpswk3g3toHSFt5yCV_1uzMZUaJl95p3UIgm8euo=);
-    }
-</style>
+    <link rel="stylesheet" href="/src/index.css">
   </head>
-  <body>
-    <button id="start">start</button>
-    <button id="stop">stop</button>
+  <body class="press-start-2p-regular background">
+    <h1 class="heading">Asteroid Blaster</h1>
     <div id="gameScore" class="game-screen__score"></div>
     <div id="gameScoreDamage" class="game-screen__damage"></div>
     <div class="game-screen" id="gameScreen">
+      <button id="startButton" class="start-button press-start-2p-regular">start</button>
+      <button id="pause" class="pause-button press-start-2p-regular">pause</button>
     </div>
+    
+    
     <script type="module" src="/src/index.js"></script>
   </body>
 </html>

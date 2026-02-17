@@ -20,8 +20,8 @@ let gameScreen = new GameScreen("gameScreen", 800, 400);
 let score = { bonus: 0, damage: 0 };
 
 let ship;
-let rockList = {};
-let bulletList = {};
+let rockList = [];
+let bulletList = [];
 
 // ----  Rock code ----
 function initRocks(amount) {
@@ -121,13 +121,12 @@ function addEvents() {
     keyEvent(ev, false);
   });
 
-  document.getElementById("start").addEventListener("click", function () {
+  document.getElementById("startButton").addEventListener("click", function () {
     isGamePlaying = true;
-    cancelAnimationFrame(animationId);
-    animationId = requestAnimationFrame(step);
+    startGame();
   });
 
-  document.getElementById("stop").addEventListener("click", function () {
+  document.getElementById("pause").addEventListener("click", function () {
     isGamePlaying = false;
     cancelAnimationFrame(animationId);
   });
@@ -238,23 +237,29 @@ function gameLoop() {
   animationId = window.requestAnimationFrame(step);
 }
 
+function hideStartButton() {
+  document.getElementById("startButton").style.display = "none";
+}
+
 function startGame() {
-  addEvents();
-  gameScreen.resizeGameScreenSize();
+  hideStartButton();
   initShip();
   startLevel(1);
-  updateScore(0);
-  updateDamage(0);
+  cancelAnimationFrame(animationId);
+  animationId = requestAnimationFrame(step);
 }
 
 function startLevel(level) {
-  initRocks(4);
-  const el = gameScreen.createGameElement("ship", "ship", null, shipSVG());
-  gameScreen.addToGameWindow(el);
+  const shipEl = gameScreen.createGameElement("ship", "ship", null, shipSVG());
+  gameScreen.addToGameWindow(shipEl);
+  setTimeout(() => initRocks(4), 1000);
 }
 
 function init() {
-  startGame();
+  addEvents();
+  gameScreen.resizeGameScreenSize();
+  updateScore(0);
+  updateDamage(0);
 }
 
 init();
