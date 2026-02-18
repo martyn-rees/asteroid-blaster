@@ -167,6 +167,7 @@ function gameLoop() {
     gameScreen.addToGameWindow(el);
     // reload ships gun
     ship.reloadGun();
+    playSound("shoot");
   }
   // update ship position
   ship.update(gameScreen.width, gameScreen.height);
@@ -210,6 +211,7 @@ function gameLoop() {
             y: rockList[rock].y,
           };
           // explode rock in to smaller rocks and remove rock and bullet
+          playSound("explosion");
           if (rockList[rock].size == "LARGE") {
             initRock("MEDIUM", pos);
             initRock("MEDIUM", pos);
@@ -235,6 +237,21 @@ function gameLoop() {
   renderScreen(ship, rockList, bulletList, gameScreen);
 
   animationId = window.requestAnimationFrame(step);
+}
+
+function playSound(soundDescription) {
+  let soundurl;
+  if (soundDescription == "shoot") {
+    soundurl = "/sounds/shoot.wav";
+  } else if (soundDescription == "explosion") {
+    soundurl = "/sounds/explosion.wav";
+  } else {
+    console.error(`sound description ${soundDescription} not recognised`);
+    return;
+  }
+  const sound = new Audio(soundurl);
+  sound.load();
+  sound.play();
 }
 
 function hideStartButton() {
