@@ -242,14 +242,15 @@ function gameLoop() {
 function playSound(soundDescription) {
   let soundurl;
   if (soundDescription == "shoot") {
-    soundurl = "/sounds/shoot.wav";
+    soundurl = "./sounds/shoot.wav";
   } else if (soundDescription == "explosion") {
-    soundurl = "/sounds/explosion.wav";
+    soundurl = "./sounds/explosion.wav";
   } else {
     console.error(`sound description ${soundDescription} not recognised`);
     return;
   }
   const sound = new Audio(soundurl);
+  sound.volume = 0.1;
   sound.load();
   sound.play();
 }
