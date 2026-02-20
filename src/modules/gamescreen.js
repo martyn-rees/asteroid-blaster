@@ -5,6 +5,11 @@ export default class GameScreen {
     this.height = h;
   }
 
+  setGameScreenDimensions(w, h) {
+    this.width = w;
+    this.height = h;
+  }
+
   getScreenCentre() {
     return { x: this.width / 2, y: this.height / 2 };
   }
@@ -31,36 +36,4 @@ export default class GameScreen {
         return { x: 0, y: y };
     }
   }
-
-  // DOM functions
-  resizeGameScreenSize() {
-    let gameScreen = document.getElementById(this.id);
-    this.width = gameScreen.offsetWidth;
-    this.height = gameScreen.offsetHeight;
-  }
-
-  addToGameWindow = (newEl) => {
-    let gameScreen = document.getElementById(this.id);
-    gameScreen.appendChild(newEl);
-  };
-
-  // createGameElement and removeNode do not use any properties of GameScreen, so they could be moved outside the class if desired
-  createGameElement = (id, className, style, graphicSVG) => {
-    let elContainer = document.createElement("div");
-    elContainer.setAttribute("id", id);
-    elContainer.setAttribute("class", className);
-    if (style) {
-      elContainer.setAttribute("style", style);
-    }
-    if (graphicSVG) {
-      elContainer.innerHTML = graphicSVG;
-    }
-    return elContainer;
-  };
-
-  removeNode = (elId) => {
-    let elNode = document.getElementById(elId);
-    elNode.parentNode.removeChild(elNode);
-  };
 }
-// end of DOM functions
