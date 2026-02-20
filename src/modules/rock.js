@@ -27,21 +27,25 @@ export default class Rock {
       this.velocity.dy = -Math.abs(this.velocity.dy);
     }
   }
+  convertDegreestoRadians(degrees) {
+    return 0.0174533 * degrees;
+  }
 
   update(screenWidth, screenHeight) {
     // update new location of rock based on velocity
-    const dx = this.velocity.speed * Math.sin(this.velocity.directionOfTravel);
-    const dy = this.velocity.speed * Math.cos(this.velocity.directionOfTravel);
+    const radians = this.convertDegreestoRadians(this.velocity.direction);
+    const dx = this.velocity.speed * Math.sin(radians);
+    const dy = this.velocity.speed * Math.cos(radians);
     let newX = this.x + dx;
     let newY = this.y + dy;
     // check if newX or NewY have collided with screen edge
     /* if (newX < 0 || newX > screenWidth) {
-      this.velocity.directionOfTravel =
-        Math.PI - this.velocity.directionOfTravel;
+      this.velocity.direction =
+        Math.PI - this.velocity.direction;
       //this.x = constrainNumber(newX, 0, screenWidth);
     }
     if (newY < 0 || newY > screenHeight) {
-      this.velocity.directionOfTravel = -this.velocity.directionOfTravel;
+      this.velocity.direction = -this.velocity.direction;
       //this.y = constrainNumber(newY, 0, screenHeight);
     }*/
     this.rotation += this.rotationRate;

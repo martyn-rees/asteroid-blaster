@@ -48,12 +48,12 @@ function createNewAsteroid(size, initialPosition) {
   let rockProps = rockType[size];
   let speed = getRandomNumber(rockProps.minSpeed, rockProps.maxSpeed);
   let r = getRandomNumber(rockProps.minRadius, rockProps.maxRadius);
-  let radians = getRandomNumber(0, Math.PI * 2); // TODO use degrees and translate to radians when needed
+  let direction = getRandomNumber(0, 360);
   // TODO: change min/max to be a positive number and use another function for rotation direction
   // don't want 0 rotation so use  getRandomNumber(1, 2) with getRotation Direction() {return +1 or -1}
   // could add this to gameSpec so different size rocks rotate at different speeds. e.g. larger rocks slower rotation
   let rotationRate = getRandomNumber(-2, 2);
-  let velocity = { speed: speed, directionOfTravel: radians };
+  let velocity = { speed, direction };
   const rock = new Rock(initialPosition, r, velocity, size, rotationRate);
   return rock;
 }

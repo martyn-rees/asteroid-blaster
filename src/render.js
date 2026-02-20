@@ -18,9 +18,7 @@ export const render = (id, x, y, rotation) => {
 export const renderShip = (id, x, y, rotation, shipThrust) => {
   const thrustDisplay = shipThrust ? "block" : "none";
   document.getElementById("thrust").style.display = thrustDisplay;
-
-  let degrees = (rotation * 180) / Math.PI; // this should be degrees not radians
-  render(id, x, y, degrees);
+  render(id, x, y, rotation);
 };
 
 // disply game elements, ship, rocks and bullets
