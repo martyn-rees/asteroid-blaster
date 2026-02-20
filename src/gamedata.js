@@ -8,7 +8,7 @@ export const shipSpecs = {
   drag: 0.005,
   thrust: 0.1,
   radius: 6,
-  rotationSpeed: Math.PI / 90, // radians per frame
+  rotationSpeed: Math.PI / 90, // radians per frame //TODO change to degrees.  Can translate to Radians when needed for Maths
 };
 export const gunSpec = {
   barrelLocation: { x: 0, y: 6 },

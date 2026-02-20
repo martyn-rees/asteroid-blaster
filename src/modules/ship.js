@@ -72,6 +72,7 @@ export default class Ship {
 
     let thrustX = 0;
     let thrustY = 0;
+    // TODO: use degrees and convert to radians
     if (this.shipThrust) {
       thrustX = this.thrust * Math.sin(this.shipRotation);
       thrustY = this.thrust * Math.cos(this.shipRotation);
@@ -118,6 +119,7 @@ export default class Ship {
     }
   }
 
+  // TODO: keep this as degrees 0-360
   changeShipRotation(dRot) {
     this.shipRotation += dRot;
     if (this.shipRotation < 0) {
@@ -135,6 +137,7 @@ export default class Ship {
   // gun position should be added to ship. If a ship gets upgraded then it could have multiple guns and we can just pass in the gun position that we want to fire from when we create the bullet. That way the bullet class doesn't have to know anything about the ship at all and is more reusable.
   getGunPosition() {
     const gunlength = this.gunSpecs.barrelLocation.y;
+    // TODO: use degrees and convert to radians
     const x = this.x + gunlength * Math.sin(this.shipRotation);
     const y = this.y - gunlength * Math.cos(this.shipRotation);
     return { x, y };
@@ -143,6 +146,7 @@ export default class Ship {
     // bullet velocity is bullet speed in the direction of shipRotation plus velocity of ship
     // bullet speed should be related to gun power so that if we add power ups to the game then we can just increase the gun power and the bullet speed will increase accordingly. That way we don't have to change any of the bullet code when we add power ups to the game. We can also add different types of bullets with different speeds and just pass in the bullet type when we create the bullet and then calculate the bullet speed based on the bullet type. That way we can easily add new types of bullets to the game without having to change any of the existing code.
     // shipSpeed
+    // TODO: use degrees and convert to radians
     const dx = this.dx + this.gunSpecs.speed * Math.sin(this.shipRotation);
     const dy = this.dy + this.gunSpecs.speed * Math.cos(this.shipRotation);
     return {
@@ -162,6 +166,7 @@ export default class Ship {
   }
   /* end of GUN functions */
 
+  // TODO: use gegrees
   render() {
     renderShip(this.id, this.x, this.y, this.shipRotation, this.shipThrust);
   }

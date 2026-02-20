@@ -31,14 +31,6 @@ export default class Bullet {
     this.r = bulletSpecs.r;
   }
 
-  getPositionChange() {
-    let newX = this.position.x + this.velocity.dx;
-    let newY = this.position.y - this.velocity.dy;
-
-    // const dx = this.velocity.dx + this.gunSpecs.speed * Math.sin(this.shipRotation);
-    // const dy = this.velocity.dy + this.gunSpecs.speed * Math.cos(this.shipRotation);
-  }
-
   update(SCREEN_WIDTH, SCREEN_HEIGHT) {
     this.endurance--;
     if (this.endurance <= 0) {

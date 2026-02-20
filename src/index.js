@@ -2,7 +2,12 @@ import Rock from "./modules/rock.js";
 import Ship from "./modules/ship.js";
 import Bullet from "./modules/bullet.js";
 import GameScreen from "./modules/gamescreen.js";
-import { renderScreen } from "./render.js";
+import {
+  renderScreen,
+  addElementToGameWindow,
+  removeNode,
+  createGameElement,
+} from "./render.js";
 import { doCirclesCollide } from "./helper.js";
 import { asteroidsSVG, shipSVG } from "./graphics.js";
 import { bulletSpecs, shipSpecs, gunSpec, rockType } from "./gamedata.js";
@@ -43,7 +48,10 @@ function createNewAsteroid(size, initialPosition) {
   let rockProps = rockType[size];
   let speed = getRandomNumber(rockProps.minSpeed, rockProps.maxSpeed);
   let r = getRandomNumber(rockProps.minRadius, rockProps.maxRadius);
-  let radians = getRandomNumber(0, Math.PI * 2);
+  let radians = getRandomNumber(0, Math.PI * 2); // TODO use degrees and translate to radians when needed
+  // TODO: change min/max to be a positive number and use another function for rotation direction
+  // don't want 0 rotation so use  getRandomNumber(1, 2) with getRotation Direction() {return +1 or -1}
+  // could add this to gameSpec so different size rocks rotate at different speeds. e.g. larger rocks slower rotation
   let rotationRate = getRandomNumber(-2, 2);
   let velocity = { speed: speed, directionOfTravel: radians };
   const rock = new Rock(initialPosition, r, velocity, size, rotationRate);
@@ -60,14 +68,14 @@ function initRock(size, pos) {
 
   // create game element for rock
   let rockStyle = `height:${2 * rock.r}px; width:${2 * rock.r}px; margin-left:-${rock.r}px; margin-top:-${rock.r}px;`;
-  const el = gameScreen.createGameElement(
+  const el = createGameElement(
     rock.id,
     "rock",
     rockStyle,
     getAsteroidGraphic(),
   );
   // add game element to screen
-  gameScreen.addToGameWindow(el);
+  addElementToGameWindow(el, gameScreen.id);
 }
 // end of Rock code
 
@@ -108,9 +116,17 @@ function keyEvent(ev, isKeyDown) {
   }
 }
 
+export function resizeGameScreenSize() {
+  let screenNode = document.getElementById(gameScreen.id);
+  gameScreen.setGameScreenDimensions(
+    screenNode.offsetWidth,
+    screenNode.offsetHeight,
+  );
+}
+
 function addEvents() {
   window.addEventListener("resize", function (event) {
-    gameScreen.resizeGameScreenSize();
+    resizeGameScreenSize();
   });
 
   window.addEventListener("keydown", function (ev) {
@@ -163,8 +179,8 @@ function gameLoop() {
     bulletList[newBullet.id] = newBullet;
     // TODO: replace above line with this-->  gameElements.bullets.push(newBullet);
     // create game element for bullet
-    const el = gameScreen.createGameElement(newBullet.id, "bullet", null, null);
-    gameScreen.addToGameWindow(el);
+    const el = createGameElement(newBullet.id, "bullet", null, null);
+    addElementToGameWindow(el, gameScreen.id);
     // reload ships gun
     ship.reloadGun();
     playSound("shoot");
@@ -177,7 +193,7 @@ function gameLoop() {
     if (bulletList[bullet].bulletPower == 0) {
       // remove bullet from gameScreen
       const nodeId = bulletList[bullet].id;
-      gameScreen.removeNode(nodeId);
+      removeNode(nodeId);
       // remove bullet from list
       delete bulletList[bullet];
     }
@@ -189,7 +205,7 @@ function gameLoop() {
     if (doCirclesCollide(rockList[rock], ship)) {
       updateDamage(4 * rockType[rockList[rock].size].value);
       const nodeId = rock;
-      gameScreen.removeNode(nodeId);
+      removeNode(nodeId);
       delete rockList[rock];
     }
   }
@@ -225,9 +241,9 @@ function gameLoop() {
           haveCollision = true;
           updateScore(rockType[rockList[rock].size].value);
 
-          gameScreen.removeNode(rockList[rock].id);
+          removeNode(rockList[rock].id);
           delete rockList[rock];
-          gameScreen.removeNode(bulletList[bullet].id);
+          removeNode(bulletList[bullet].id);
           delete bulletList[bullet];
         }
       }
@@ -268,14 +284,14 @@ function startGame() {
 }
 
 function startLevel(level) {
-  const shipEl = gameScreen.createGameElement("ship", "ship", null, shipSVG());
-  gameScreen.addToGameWindow(shipEl);
+  const shipEl = createGameElement("ship", "ship", null, shipSVG());
+  addElementToGameWindow(shipEl, gameScreen.id);
   setTimeout(() => initRocks(4), 1000);
 }
 
 function init() {
   addEvents();
-  gameScreen.resizeGameScreenSize();
+  resizeGameScreenSize();
   updateScore(0);
   updateDamage(0);
 }
