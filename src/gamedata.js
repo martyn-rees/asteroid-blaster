@@ -26,15 +26,15 @@ export const rockType = {
   MEDIUM: {
     minRadius: 25,
     maxRadius: 40,
-    minSpeed: 1.5,
-    maxSpeed: 2.5,
+    minSpeed: 2.5,
+    maxSpeed: 3,
     value: 200,
   },
   SMALL: {
     minRadius: 10,
     maxRadius: 15,
-    minSpeed: 2,
-    maxSpeed: 3,
+    minSpeed: 4,
+    maxSpeed: 5,
     value: 300,
   },
 };
