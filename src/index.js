@@ -2,12 +2,7 @@ import Rock from "./modules/rock.js";
 import Ship from "./modules/ship.js";
 import Bullet from "./modules/bullet.js";
 import GameScreen from "./modules/gamescreen.js";
-import {
-  renderScreen,
-  addElementToGameWindow,
-  removeNode,
-  createGameElement,
-} from "./render.js";
+import { addElement, deleteElement, createElement } from "./render.js";
 import { doCirclesCollide } from "./helper.js";
 import { asteroidsSVG, shipSVG } from "./graphics.js";
 import { bulletSpecs, shipSpecs, gunSpec, rockType } from "./gamedata.js";
@@ -68,14 +63,9 @@ function initRock(size, pos) {
 
   // create game element for rock
   let rockStyle = `height:${2 * rock.r}px; width:${2 * rock.r}px; margin-left:-${rock.r}px; margin-top:-${rock.r}px;`;
-  const el = createGameElement(
-    rock.id,
-    "rock",
-    rockStyle,
-    getAsteroidGraphic(),
-  );
+  const el = createElement(rock.id, "rock", rockStyle, getAsteroidGraphic());
   // add game element to screen
-  addElementToGameWindow(el, gameScreen.id);
+  addElement(el, gameScreen.id);
 }
 // end of Rock code
 
@@ -116,9 +106,10 @@ function keyEvent(ev, isKeyDown) {
   }
 }
 
-export function resizeGameScreenSize() {
-  let screenNode = document.getElementById(gameScreen.id);
-  gameScreen.setGameScreenDimensions(
+// TODO: there are now container size options instead of offsetWidth
+export function resizeGameScreenSize(screen) {
+  let screenNode = document.getElementById(screen.id);
+  screen.setGameScreenDimensions(
     screenNode.offsetWidth,
     screenNode.offsetHeight,
   );
@@ -126,7 +117,7 @@ export function resizeGameScreenSize() {
 
 function addEvents() {
   window.addEventListener("resize", function (event) {
-    resizeGameScreenSize();
+    resizeGameScreenSize(gameScreen);
   });
 
   window.addEventListener("keydown", function (ev) {
@@ -137,11 +128,13 @@ function addEvents() {
     keyEvent(ev, false);
   });
 
+  // TODO: create a start button component and add this
   document.getElementById("startButton").addEventListener("click", function () {
     isGamePlaying = true;
     startGame();
   });
 
+  // TODO: create a pause button component and add this
   document.getElementById("pause").addEventListener("click", function () {
     isGamePlaying = false;
     cancelAnimationFrame(animationId);
@@ -179,8 +172,8 @@ function gameLoop() {
     bulletList[newBullet.id] = newBullet;
     // TODO: replace above line with this-->  gameElements.bullets.push(newBullet);
     // create game element for bullet
-    const el = createGameElement(newBullet.id, "bullet", null, null);
-    addElementToGameWindow(el, gameScreen.id);
+    const el = createElement(newBullet.id, "bullet", null, null);
+    addElement(el, gameScreen.id);
     // reload ships gun
     ship.reloadGun();
     playSound("shoot");
@@ -193,7 +186,7 @@ function gameLoop() {
     if (bulletList[bullet].bulletPower == 0) {
       // remove bullet from gameScreen
       const nodeId = bulletList[bullet].id;
-      removeNode(nodeId);
+      deleteElement(nodeId);
       // remove bullet from list
       delete bulletList[bullet];
     }
@@ -205,7 +198,7 @@ function gameLoop() {
     if (doCirclesCollide(rockList[rock], ship)) {
       updateDamage(4 * rockType[rockList[rock].size].value);
       const nodeId = rock;
-      removeNode(nodeId);
+      deleteElement(nodeId);
       delete rockList[rock];
     }
   }
@@ -241,9 +234,9 @@ function gameLoop() {
           haveCollision = true;
           updateScore(rockType[rockList[rock].size].value);
 
-          removeNode(rockList[rock].id);
+          deleteElement(rockList[rock].id);
           delete rockList[rock];
-          removeNode(bulletList[bullet].id);
+          deleteElement(bulletList[bullet].id);
           delete bulletList[bullet];
         }
       }
@@ -253,6 +246,20 @@ function gameLoop() {
   renderScreen(ship, rockList, bulletList, gameScreen);
 
   animationId = window.requestAnimationFrame(step);
+}
+
+// disply game elements, ship, rocks and bullets
+// TODO: pass in gameElelemtns object with single items and arrays which get displayed using generic functions
+// TODO - why does ony bullets use the update function
+export function renderScreen(ship, rockList, bulletList, gameScreen) {
+  ship.render(); // this calls render method in ship class which calls renderShip above whch calls render
+  for (var rock in rockList) {
+    rockList[rock].render(); // this calls render method in rock class which calls render above
+  }
+  for (var bullet in bulletList) {
+    bulletList[bullet].update(gameScreen.width, gameScreen.height);
+    bulletList[bullet].render();
+  }
 }
 
 function playSound(soundDescription) {
@@ -271,6 +278,7 @@ function playSound(soundDescription) {
   sound.play();
 }
 
+// TODO: create a start button component and add this
 function hideStartButton() {
   document.getElementById("startButton").style.display = "none";
 }
@@ -284,14 +292,14 @@ function startGame() {
 }
 
 function startLevel(level) {
-  const shipEl = createGameElement("ship", "ship", null, shipSVG());
-  addElementToGameWindow(shipEl, gameScreen.id);
-  setTimeout(() => initRocks(4), 1000);
+  const shipEl = createElement("ship", "ship", null, shipSVG());
+  addElement(shipEl, gameScreen.id);
+  setTimeout(() => initRocks(8), 1000);
 }
 
 function init() {
   addEvents();
-  resizeGameScreenSize();
+  resizeGameScreenSize(gameScreen);
   updateScore(0);
   updateDamage(0);
 }

@@ -1,4 +1,4 @@
-import { render } from "../render.js";
+import { updateElement } from "../render.js";
 import { constrainNumber } from "../helper.js";
 
 export default class Rock {
@@ -49,6 +49,6 @@ export default class Rock {
   }
 
   render() {
-    render(this.id, this.x, this.y, this.rotation);
+    updateElement(this.id, this.x, this.y, this.rotation);
   }
 }

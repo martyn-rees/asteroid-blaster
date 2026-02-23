@@ -1,4 +1,4 @@
-import { renderShip } from "../render.js";
+import { renderThrust, updateElement } from "../render.js";
 
 const FULLDEGREE = 360;
 
@@ -179,6 +179,7 @@ export default class Ship {
   /* end of GUN functions */
 
   render() {
-    renderShip(this.id, this.x, this.y, this.shipRotation, this.shipThrust);
+    updateElement(this.id, this.x, this.y, this.shipRotation);
+    renderThrust(this.shipThrust);
   }
 }

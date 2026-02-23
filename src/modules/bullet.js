@@ -2,7 +2,7 @@ import {
   constrainNumber,
   translateToOppositeSideIfOutside,
 } from "../helper.js";
-import { render } from "../render.js";
+import { updateElement } from "../render.js";
 
 // bullet specifications
 // endurance - a bullet only lasts for a short time after being fired. Count this down every frame (or time if using time based animation)
@@ -49,6 +49,6 @@ export default class Bullet {
   }
 
   render() {
-    render(this.id, this.position.x, this.position.y);
+    updateElement(this.id, this.position.x, this.position.y);
   }
 }
