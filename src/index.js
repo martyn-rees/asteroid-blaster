@@ -1,5 +1,6 @@
 import Rock from "./modules/rock.js";
 import Ship from "./modules/ship.js";
+import Gun from "./modules/gun.js";
 import Bullet from "./modules/bullet.js";
 import GameScreen from "./modules/gamescreen.js";
 import { addElement, deleteElement, createElement } from "./render.js";
@@ -18,7 +19,6 @@ var ACTIONS = {
 
 let gameScreen = new GameScreen("gameScreen", 800, 400);
 let score = { bonus: 0, damage: 0 };
-
 let ship;
 let rockList = [];
 let bulletList = [];
@@ -73,7 +73,8 @@ function initRock(size, pos) {
 function initShip() {
   const pos = gameScreen.getScreenCentre();
   ship = new Ship(pos, "ship", shipSpecs);
-  ship.attachGun(gunSpec);
+  const gun = new Gun(gunSpec);
+  ship.attachGun(gun);
 }
 // end of Ship code
 
@@ -163,18 +164,9 @@ function gameLoop() {
 
   // test if bullet fired
   // test if SHOOT KEY is pressed and ship's gun is loaded
-  if (ACTIONS.shoot == true && ship.isGunLoaded()) {
-    // create new bullet - needs ship position, rotation and speed to calculate bullet velocity and position
-    const shipLocation = { x: ship.x, y: ship.y };
-    const shipRotation = ship.rotation.radians;
-    const shipVelocity = {
-      speed: ship.shipSpeed,
-      direction: ship.direction.radians,
-    };
-
-    const gunPosition = ship.getGunPosition(shipLocation, shipRotation);
-    const bulletVelocity = ship.getBulletVelocity(shipVelocity, shipRotation);
-    const newBullet = new Bullet(gunPosition, bulletVelocity, bulletSpecs);
+  if (ACTIONS.shoot == true && ship.gun.isGunLoaded()) {
+    const { bulletPosition, bulletVelocity } = ship.gunFired();
+    const newBullet = new Bullet(bulletPosition, bulletVelocity, bulletSpecs);
     // add bullet to list of bullets
     bulletList[newBullet.id] = newBullet;
     // TODO: replace above line with this-->  gameElements.bullets.push(newBullet);
@@ -182,7 +174,7 @@ function gameLoop() {
     const el = createElement(newBullet.id, "bullet", null, null);
     addElement(el, gameScreen.id);
     // reload ships gun
-    ship.reloadGun();
+    ship.gun.reloadGun();
     playSound("shoot");
   }
   // update ship position
