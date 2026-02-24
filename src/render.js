@@ -12,10 +12,9 @@ export const updateElement = (id, x, y, rotation) => {
   }
 };
 
-export const renderThrust = (shipThrust) => {
-  document.getElementById("thrust").style.display = shipThrust
-    ? "block"
-    : "none";
+export const renderThrust = (thrustPower) => {
+  const thrustStyle = thrustPower > 0 ? "block" : "none";
+  document.getElementById("thrust").style.display = thrustStyle;
 };
 
 // DOM functions

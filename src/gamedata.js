@@ -4,9 +4,9 @@ export const bulletSpecs = {
   power: 1,
 };
 export const shipSpecs = {
-  maxSpeed: 4.0,
+  speedMax: 4.0,
   drag: 0.005,
-  thrust: 0.1,
+  thrustMax: 0.1,
   radius: 6,
   rotationSpeed: 2,
 };
@@ -37,4 +37,10 @@ export const rockType = {
     maxSpeed: 5,
     value: 300,
   },
+};
+export const keyBindings = {
+  rotateLeft: 37,
+  rotateRight: 39,
+  thrust: 38,
+  shoot: 83,
 };

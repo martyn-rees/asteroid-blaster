@@ -1,44 +1,25 @@
 import { renderThrust, updateElement } from "../render.js";
 
 const FULLDEGREE = 360;
-
-// spaceShip specifications
-/*
-maxSpeed: 4.0,
-drag: 0.005,
-thrust (acceleration): 0.1,
-radius (size): 6,
-rotationSpeed: Math.PI / 90, // radians per frame
-*/
-
-/* gun specs */
-//const gunSpecs = { barrelLocation: { x: 0, y: 6 }, speed: 6, reloadTime: 10 };
-
-// add gunposition and gun power (gunSpeed)
-// add helper functions to calculate gun position and bullet velocity based on ship position, rotation and speed. That way the bullet class doesn't have to know anything about the ship at all and is more reusable. We can also add different types of bullets with different speeds and just pass in the bullet type when we create the bullet and then calculate the bullet speed based on the bullet type. That way we can easily add new types of bullets to the game without having to change any of the existing code.
 export default class Ship {
   constructor(pos, id, shipSpecs) {
-    // ship specifications - this can be passed in for different ships
-    this.maxSpeed = shipSpecs.maxSpeed;
-    this.drag = shipSpecs.drag;
-    this.thrust = shipSpecs.thrust;
-    this.r = shipSpecs.radius;
-    this.dr = shipSpecs.rotationSpeed;
-    // ship state
-    this.shipRotation = 0;
-    // velocity
-    this.directionOfTravel = 0.0;
-    this.shipSpeed = 0; // shipSpeed and direction are the velocity
-    this.dx = 0;
-    this.dy = 0;
+    this.id = id;
     // position
     this.x = pos.x;
     this.y = pos.y;
-
-    this.shipThrust = false;
-
-    this.id = id;
-
+    // ship specifications - this can be passed in for different ships
+    this.speedMax = shipSpecs.speedMax;
+    this.drag = shipSpecs.drag;
+    this.thrustMax = shipSpecs.thrustMax;
+    this.r = shipSpecs.radius;
+    this.rotationSpeed = shipSpecs.rotationSpeed;
+    // ship state
+    this.rotation = { degrees: 0, radians: 0 };
+    this.thrustPower = 0;
+    // velocity
+    this.direction = { degrees: 0, radians: 0 };
+    this.shipSpeed = 0;
+    // gun specifications - this can be passed in for different gunpower and position. Need to use array if more than one gun
     this.gunSpecs = { barrelLocation: { x: 0, y: 0 }, speed: 0, reloadTime: 0 };
     this.gunReloadTimer = 0;
   }
@@ -48,12 +29,12 @@ export default class Ship {
   }
 
   updateShipActions(thrust, rotateCounterClockwise, rotateClockwise) {
-    this.shipThrust = thrust ? true : false;
+    this.thrustPower = thrust ? this.thrustMax : 0;
     if (rotateCounterClockwise) {
-      this.changeShipRotation(-this.dr);
+      this.changeShipRotation(-this.rotationSpeed);
     }
     if (rotateClockwise) {
-      this.changeShipRotation(this.dr);
+      this.changeShipRotation(this.rotationSpeed);
     }
   }
 
@@ -63,60 +44,46 @@ export default class Ship {
   convertRadiansToDegrees(radians) {
     return 57.2958 * radians;
   }
-
-  update(SCREEN_WIDTH, SCREEN_HEIGHT) {
-    this.gunReloadTimer--;
-    // calculate x,y components of speed, thrust and drag
-    /*let currentSpeedX = this.shipSpeed * Math.sin(this.directionOfTravel);
-    let currentSpeedY = this.shipSpeed * Math.cos(this.directionOfTravel);
-    let dragX = this.drag * Math.sin(this.directionOfTravel);
-    let dragY = this.drag * Math.cos(this.directionOfTravel);
-*/
+  // calculate new speed and direction
+  calculateNewVelocity() {
     const driftSpeed =
       this.shipSpeed > this.drag ? this.shipSpeed - this.drag : 0;
-    const directionRadians = this.convertDegreestoRadians(
-      this.directionOfTravel,
-    );
-    const driftX = driftSpeed * Math.sin(directionRadians);
-    const driftY = driftSpeed * Math.cos(directionRadians);
+    const driftX = driftSpeed * Math.sin(this.direction.radians);
+    const driftY = driftSpeed * Math.cos(this.direction.radians);
 
-    let thrustX = 0;
-    let thrustY = 0;
-    if (this.shipThrust) {
-      const radians = this.convertDegreestoRadians(this.shipRotation);
-      thrustX = this.thrust * Math.sin(radians);
-      thrustY = this.thrust * Math.cos(radians);
-    }
+    const thrustX = this.thrustPower * Math.sin(this.rotation.radians);
+    const thrustY = this.thrustPower * Math.cos(this.rotation.radians);
 
     let dx = driftX + thrustX;
     let dy = driftY + thrustY;
 
     // shipSpeed
     this.shipSpeed = Math.sqrt(dx * dx + dy * dy);
-    let travelRadians = 0;
     if (dy == 0) {
-      travelRadians = Math.atan(dx / 0.01);
-    } else {
-      travelRadians = Math.atan(dx / dy); // directionOfTravel in radians
+      dy = -0.001;
     }
-    this.directionOfTravel = this.convertRadiansToDegrees(travelRadians);
+    this.direction.radians = Math.atan(dx / dy);
+    this.direction.degrees = this.convertRadiansToDegrees(
+      this.direction.radians,
+    );
 
     if (dy < 0) {
       // Add PI radians or 180 degrees
-      this.directionOfTravel += 180;
-      travelRadians += Math.PI;
+      this.direction.degrees += 180;
+      this.direction.radians += Math.PI;
     }
 
-    if (this.shipSpeed > this.maxSpeed) {
-      this.shipSpeed = this.maxSpeed;
-      dx = this.shipSpeed * Math.sin(travelRadians);
-      dy = this.shipSpeed * Math.cos(travelRadians);
+    if (this.shipSpeed > this.speedMax) {
+      this.shipSpeed = this.speedMax;
     }
+  }
 
-    this.x += dx; //(shipSpeed*sin(shipRotation))
-    this.y -= dy; //(shipSpeed*cos(shipRotation))
-    this.dx = dx;
-    this.dy = dy;
+  update(SCREEN_WIDTH, SCREEN_HEIGHT) {
+    this.gunReloadTimer--;
+
+    this.calculateNewVelocity();
+    this.x += this.shipSpeed * Math.sin(this.direction.radians);
+    this.y -= this.shipSpeed * Math.cos(this.direction.radians);
 
     //amend x,y values to keep ship on screen
     if (this.x < 0) {
@@ -133,39 +100,41 @@ export default class Ship {
   }
 
   changeShipRotation(dRot) {
-    this.shipRotation += dRot;
-    if (this.shipRotation < 0) {
-      this.shipRotation += FULLDEGREE;
-    } else if (this.shipRotation > FULLDEGREE) {
-      this.shipRotation -= FULLDEGREE;
+    this.rotation.degrees += dRot;
+    if (this.rotation.degrees < 0) {
+      this.rotation.degrees += FULLDEGREE;
+    } else if (this.rotation.degrees > FULLDEGREE) {
+      this.rotation.degrees -= FULLDEGREE;
     }
-  }
-
-  setShipThrust(bool) {
-    shipThrust = bool;
+    this.rotation.radians = this.convertDegreestoRadians(this.rotation.degrees);
   }
 
   /* GUN functions */
-  // gun position should be added to ship. If a ship gets upgraded then it could have multiple guns and we can just pass in the gun position that we want to fire from when we create the bullet. That way the bullet class doesn't have to know anything about the ship at all and is more reusable.
+  // If a ship gets upgraded then it could have multiple guns and we can just pass in the gun position that we want to fire from when we create the bullet.
   getGunPosition() {
     const gunlength = this.gunSpecs.barrelLocation.y;
-    const radians = this.convertDegreestoRadians(this.shipRotation);
-    const x = this.x + gunlength * Math.sin(radians);
-    const y = this.y - gunlength * Math.cos(radians);
+    const x = this.x + gunlength * Math.sin(this.rotation.radians);
+    const y = this.y - gunlength * Math.cos(this.rotation.radians);
     return { x, y };
   }
   getBulletVelocity() {
-    // bullet velocity is bullet speed in the direction of shipRotation plus velocity of ship
-    // bullet speed should be related to gun power so that if we add power ups to the game then we can just increase the gun power and the bullet speed will increase accordingly. That way we don't have to change any of the bullet code when we add power ups to the game. We can also add different types of bullets with different speeds and just pass in the bullet type when we create the bullet and then calculate the bullet speed based on the bullet type. That way we can easily add new types of bullets to the game without having to change any of the existing code.
+    // bullet velocity is bullet speed in the direction of ship rotation plus velocity of ship
+    // bullet speed should be related to gun power so that if we add power ups to the game then we can just increase the gun power and the bullet speed will increase accordingly.
+    // That way we don't have to change any of the bullet code when we add power ups to the game.
+    // We can also add different types of bullets with different speeds and just pass in the bullet type when we create the bullet and then calculate the bullet speed based on the bullet type. That way we can easily add new types of bullets to the game without having to change any of the existing code.
     // shipSpeed
-    const radians = this.convertDegreestoRadians(this.shipRotation);
-    const dx = this.dx + this.gunSpecs.speed * Math.sin(radians);
-    const dy = this.dy + this.gunSpecs.speed * Math.cos(radians);
+    const shipVelocityX = this.shipSpeed * Math.sin(this.direction.radians);
+    const shipVelocityY = this.shipSpeed * Math.cos(this.direction.radians);
+
+    const dx =
+      shipVelocityX + this.gunSpecs.speed * Math.sin(this.rotation.radians);
+    const dy =
+      shipVelocityY + this.gunSpecs.speed * Math.cos(this.rotation.radians);
     return {
       dx,
       dy,
       initialSpeed: this.gunSpecs.speed,
-      initialDirection: this.shipRotation,
+      initialDirection: this.rotation,
     };
   }
 
@@ -179,7 +148,7 @@ export default class Ship {
   /* end of GUN functions */
 
   render() {
-    updateElement(this.id, this.x, this.y, this.shipRotation);
-    renderThrust(this.shipThrust);
+    updateElement(this.id, this.x, this.y, this.rotation.degrees);
+    renderThrust(this.thrustPower);
   }
 }

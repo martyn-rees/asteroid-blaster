@@ -165,8 +165,15 @@ function gameLoop() {
   // test if SHOOT KEY is pressed and ship's gun is loaded
   if (ACTIONS.shoot == true && ship.isGunLoaded()) {
     // create new bullet - needs ship position, rotation and speed to calculate bullet velocity and position
-    const gunPosition = ship.getGunPosition();
-    const bulletVelocity = ship.getBulletVelocity();
+    const shipLocation = { x: ship.x, y: ship.y };
+    const shipRotation = ship.rotation.radians;
+    const shipVelocity = {
+      speed: ship.speed,
+      direction: ship.direction.radians,
+    };
+
+    const gunPosition = ship.getGunPosition(shipLocation, shipRotation);
+    const bulletVelocity = ship.getBulletVelocity(shipVelocity, shipRotation);
     const newBullet = new Bullet(gunPosition, bulletVelocity, bulletSpecs);
     // add bullet to list of bullets
     bulletList[newBullet.id] = newBullet;
