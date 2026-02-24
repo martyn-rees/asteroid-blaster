@@ -168,7 +168,7 @@ function gameLoop() {
     const shipLocation = { x: ship.x, y: ship.y };
     const shipRotation = ship.rotation.radians;
     const shipVelocity = {
-      speed: ship.speed,
+      speed: ship.shipSpeed,
       direction: ship.direction.radians,
     };
 

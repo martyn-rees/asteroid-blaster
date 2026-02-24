@@ -111,25 +111,22 @@ export default class Ship {
 
   /* GUN functions */
   // If a ship gets upgraded then it could have multiple guns and we can just pass in the gun position that we want to fire from when we create the bullet.
-  getGunPosition() {
+  getGunPosition(shipLocation, shipRotation) {
     const gunlength = this.gunSpecs.barrelLocation.y;
-    const x = this.x + gunlength * Math.sin(this.rotation.radians);
-    const y = this.y - gunlength * Math.cos(this.rotation.radians);
+    const x = shipLocation.x + gunlength * Math.sin(shipRotation);
+    const y = shipLocation.y - gunlength * Math.cos(shipRotation);
     return { x, y };
   }
-  getBulletVelocity() {
-    // bullet velocity is bullet speed in the direction of ship rotation plus velocity of ship
-    // bullet speed should be related to gun power so that if we add power ups to the game then we can just increase the gun power and the bullet speed will increase accordingly.
-    // That way we don't have to change any of the bullet code when we add power ups to the game.
-    // We can also add different types of bullets with different speeds and just pass in the bullet type when we create the bullet and then calculate the bullet speed based on the bullet type. That way we can easily add new types of bullets to the game without having to change any of the existing code.
-    // shipSpeed
-    const shipVelocityX = this.shipSpeed * Math.sin(this.direction.radians);
-    const shipVelocityY = this.shipSpeed * Math.cos(this.direction.radians);
-
-    const dx =
-      shipVelocityX + this.gunSpecs.speed * Math.sin(this.rotation.radians);
-    const dy =
-      shipVelocityY + this.gunSpecs.speed * Math.cos(this.rotation.radians);
+  // bullet velocity is bullet speed in the direction of ship rotation plus velocity of ship
+  // bullet speed should be related to gun power so that if we add power ups to the game then we can just increase the gun power and the bullet speed will increase accordingly.
+  // That way we don't have to change any of the bullet code when we add power ups to the game.
+  // We can also add different types of bullets with different speeds and just pass in the bullet type when we create the bullet and then calculate the bullet speed based on the bullet type. That way we can easily add new types of bullets to the game without having to change any of the existing code.
+  // shipSpeed
+  getBulletVelocity(shipVelocity, shipRotation) {
+    const shipVelocityX = shipVelocity.speed * Math.sin(shipVelocity.direction);
+    const shipVelocityY = shipVelocity.speed * Math.cos(shipVelocity.direction);
+    const dx = shipVelocityX + this.gunSpecs.speed * Math.sin(shipRotation);
+    const dy = shipVelocityY + this.gunSpecs.speed * Math.cos(shipRotation);
     return {
       dx,
       dy,
