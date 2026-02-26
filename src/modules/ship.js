@@ -1,5 +1,3 @@
-import { renderThrust, updateElement } from "../render.js";
-
 const FULLDEGREE = 360;
 export default class Ship {
   constructor(pos, id, shipSpecs) {
@@ -44,6 +42,7 @@ export default class Ship {
     return { bulletPosition, bulletVelocity };
   }
 
+  //TODO: ACTIONS should be moved in to update(ACTIONS)
   updateShipActions(thrust, rotateCounterClockwise, rotateClockwise) {
     this.thrustPower = thrust ? this.thrustMax : 0;
     if (rotateCounterClockwise) {
@@ -94,6 +93,10 @@ export default class Ship {
     }
   }
 
+  // TODO: consider moving screen dimensions out of here
+  // instead create a function to get and set ship location
+  // in index.js get ship location and if needed reset location if off screen
+  // this ship shouldn't care about screen dimensions to give it the option of adding a scrolling screen
   update(SCREEN_WIDTH, SCREEN_HEIGHT) {
     if (this.gun !== null) {
       this.gun.update();
@@ -104,16 +107,17 @@ export default class Ship {
     this.y -= this.shipSpeed * Math.cos(this.direction.radians);
 
     //amend x,y values to keep ship on screen
+    // this moves to screen edge but should move the amount it's past the screen boundary e.g. this.x -= SCREEN_WIDTH
     if (this.x < 0) {
-      this.x = SCREEN_WIDTH;
+      this.x += SCREEN_WIDTH;
     } else if (this.x > SCREEN_WIDTH) {
-      this.x = 0;
+      this.x -= SCREEN_WIDTH;
     }
 
     if (this.y < 0) {
-      this.y = SCREEN_HEIGHT;
+      this.y += SCREEN_HEIGHT;
     } else if (this.y > SCREEN_HEIGHT) {
-      this.y = 0;
+      this.y -= SCREEN_HEIGHT;
     }
   }
 
@@ -121,14 +125,14 @@ export default class Ship {
     this.rotation.degrees += dRot;
     if (this.rotation.degrees < 0) {
       this.rotation.degrees += FULLDEGREE;
-    } else if (this.rotation.degrees > FULLDEGREE) {
+    } else if (this.rotation.degrees >= FULLDEGREE) {
       this.rotation.degrees -= FULLDEGREE;
     }
     this.rotation.radians = this.convertDegreestoRadians(this.rotation.degrees);
   }
 
-  render() {
-    updateElement(this.id, this.x, this.y, this.rotation.degrees);
-    renderThrust(this.thrustPower);
+  render(renderCallback, renderThrustCallback) {
+    renderCallback(this.id, this.x, this.y, this.rotation.degrees);
+    renderThrustCallback(this.thrustPower);
   }
 }

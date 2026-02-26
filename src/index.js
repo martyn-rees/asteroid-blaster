@@ -8,6 +8,7 @@ import {
   deleteElement,
   createElement,
   updateElement,
+  renderThrust,
 } from "./render.js";
 import { doCirclesCollide } from "./helper.js";
 import { asteroidsSVG, shipSVG } from "./graphics.js";
@@ -270,7 +271,7 @@ function gameLoop() {
 // TODO: pass in gameElelemtns object with single items and arrays which get displayed using generic functions
 // TODO - why does ony bullets use the update function
 export function renderScreen(ship, rockList, bulletList, gameScreen) {
-  ship.render(); // this calls render method in ship class which calls renderShip above whch calls render
+  ship.render(updateElement, renderThrust); // this calls render method in ship class which calls renderShip above whch calls render
   for (var rock in rockList) {
     rockList[rock].render(updateElement); // this calls render method in rock class which calls render above
   }
