@@ -21,18 +21,16 @@ export default class GameScreen {
     };
   }
 
-  getRandomEdgePosition() {
+  getRandomEdgePosition(edge) {
     let { x, y } = this.getRandomScreenPosition();
-    // Randomly choose an edge (0=top, 1=right, 2=bottom, 3=left)
-    let edge = Math.floor(Math.random() * 4);
     switch (edge) {
-      case 0: // top
+      case "top":
         return { x: x, y: 0 };
-      case 1: // right
+      case "right":
         return { x: this.width, y: y };
-      case 2: // bottom
+      case "bottom":
         return { x: x, y: this.height };
-      case 3: // left
+      case "left":
         return { x: 0, y: y };
     }
   }

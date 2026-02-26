@@ -31,7 +31,9 @@ let bulletList = [];
 // ----  Rock code ----
 function initRocks(amount) {
   for (let i = 0; i < amount; i++) {
-    initRock("LARGE", gameScreen.getRandomEdgePosition());
+    const borders = ["top", "right", "bottom", "left"];
+    const edge = borders[Math.floor(Math.random() * 4)];
+    initRock("LARGE", gameScreen.getRandomEdgePosition(edge));
   }
 }
 
