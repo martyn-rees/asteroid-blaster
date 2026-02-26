@@ -1,3 +1,4 @@
+// TODO: rewrite so this accepts location and screen coords and returns new location if off edge of screen
 export const constrainNumber = (n, min, max) => {
   let constrainedNumber = n;
   if (n < min) {
@@ -10,7 +11,7 @@ export const constrainNumber = (n, min, max) => {
 
 // position: {x,y} - the position of the object that has gone off the screen
 // boundingBox: {w,h} - the width and height of the game screen
-export const translateToOppositeSideIfOutside = (position, boundingBox) => {
+/*export const translateToOppositeSideIfOutside = (position, boundingBox) => {
   let newPosition = { x: position.x, y: position.y };
   if (newPosition.x < 0) {
     newPosition.x = boundingBox.w + newPosition.x;
@@ -23,10 +24,10 @@ export const translateToOppositeSideIfOutside = (position, boundingBox) => {
     newPosition.y = newPosition.y - boundingBox.h;
   }
   return newPosition;
-};
+};*/
 
 // p1 and p2 are objects with x and y properties
-export const distanceBetweenPoints = (p1, p2) => {
+const distanceBetweenPoints = (p1, p2) => {
   let dx = p1.x - p2.x;
   let dy = p1.y - p2.y;
   return Math.sqrt(dx * dx + dy * dy);

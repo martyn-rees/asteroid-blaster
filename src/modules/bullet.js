@@ -1,8 +1,4 @@
-import {
-  constrainNumber,
-  translateToOppositeSideIfOutside,
-} from "../helper.js";
-import { updateElement } from "../render.js";
+import { constrainNumber } from "../helper.js";
 
 // bullet specifications
 // endurance - a bullet only lasts for a short time after being fired. Count this down every frame (or time if using time based animation)
@@ -40,15 +36,10 @@ export default class Bullet {
       let newY = this.position.y - this.velocity.dy;
       this.position.x = constrainNumber(newX, 0, SCREEN_WIDTH);
       this.position.y = constrainNumber(newY, 0, SCREEN_HEIGHT);
-
-      /*this.position = translateToOppositeSideIfOutside(this.position, {
-        w: SCREEN_WIDTH,
-        h: SCREEN_HEIGHT,
-      });*/
     }
   }
 
-  render() {
-    updateElement(this.id, this.position.x, this.position.y);
+  render(renderCallback) {
+    renderCallback(this.id, this.position.x, this.position.y);
   }
 }

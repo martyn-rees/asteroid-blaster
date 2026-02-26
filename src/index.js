@@ -3,7 +3,12 @@ import Ship from "./modules/ship.js";
 import Gun from "./modules/gun.js";
 import Bullet from "./modules/bullet.js";
 import GameScreen from "./modules/gamescreen.js";
-import { addElement, deleteElement, createElement } from "./render.js";
+import {
+  addElement,
+  deleteElement,
+  createElement,
+  updateElement,
+} from "./render.js";
 import { doCirclesCollide } from "./helper.js";
 import { asteroidsSVG, shipSVG } from "./graphics.js";
 import { bulletSpecs, shipSpecs, gunSpec, rockType } from "./gamedata.js";
@@ -49,7 +54,12 @@ function createNewAsteroid(size, initialPosition) {
   // could add this to gameSpec so different size rocks rotate at different speeds. e.g. larger rocks slower rotation
   let rotationRate = getRandomNumber(-2, 2);
   let velocity = { speed, direction };
-  const rock = new Rock(initialPosition, r, velocity, size, rotationRate);
+  const rockSpecs = {
+    size,
+    r,
+    rotationRate,
+  };
+  const rock = new Rock(initialPosition, velocity, rockSpecs);
   return rock;
 }
 
@@ -192,9 +202,16 @@ function gameLoop() {
   }
 
   // test rocks to ship collision
+  const shipBoundingArea = { x: ship.x, y: ship.y, r: ship.r };
+
   for (var rock in rockList) {
     rockList[rock].update(gameScreen.width, gameScreen.height);
-    if (doCirclesCollide(rockList[rock], ship)) {
+    const rockBoundingArea = {
+      x: rockList[rock].x,
+      y: rockList[rock].y,
+      r: rockList[rock].r,
+    };
+    if (doCirclesCollide(rockBoundingArea, shipBoundingArea)) {
       updateDamage(4 * rockType[rockList[rock].size].value);
       const nodeId = rock;
       deleteElement(nodeId);
@@ -253,11 +270,11 @@ function gameLoop() {
 export function renderScreen(ship, rockList, bulletList, gameScreen) {
   ship.render(); // this calls render method in ship class which calls renderShip above whch calls render
   for (var rock in rockList) {
-    rockList[rock].render(); // this calls render method in rock class which calls render above
+    rockList[rock].render(updateElement); // this calls render method in rock class which calls render above
   }
   for (var bullet in bulletList) {
     bulletList[bullet].update(gameScreen.width, gameScreen.height);
-    bulletList[bullet].render();
+    bulletList[bullet].render(updateElement);
   }
 }
 

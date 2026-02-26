@@ -1,14 +1,13 @@
-import { updateElement } from "../render.js";
 import { constrainNumber } from "../helper.js";
 
 export default class Rock {
   static rockIDCounter = 0;
-  constructor(initialPosition, r, velocity, size, rotationRate) {
+  constructor(initialPosition, velocity, rockSpecs) {
     // constant values for life of this rock
     this.id = "rock" + Rock.rockIDCounter++;
-    this.size = size;
-    this.r = r;
-    this.rotationRate = rotationRate;
+    this.size = rockSpecs.size;
+    this.r = rockSpecs.r;
+    this.rotationRate = rockSpecs.rotationRate;
 
     // these values change per frame
     this.velocity = velocity;
@@ -18,7 +17,7 @@ export default class Rock {
   }
 
   // alternatrive to warping to other side of screen
-  bounceOffWalls(screenWidth, screenHeight) {
+  /*bounceOffWalls(screenWidth, screenHeight) {
     if (this.x - this.r < 0) {
       this.velocity.dx = Math.abs(this.velocity.dx);
     } else if (this.x + this.r > screenWidth) {
@@ -29,7 +28,7 @@ export default class Rock {
     } else if (this.y + this.r > screenHeight) {
       this.velocity.dy = -Math.abs(this.velocity.dy);
     }
-  }
+  }*/
 
   convertDegreestoRadians(degrees) {
     return 0.0174533 * degrees;
@@ -48,7 +47,7 @@ export default class Rock {
     this.y = constrainNumber(newY, 0, screenHeight);
   }
 
-  render() {
-    updateElement(this.id, this.x, this.y, this.rotation);
+  render(renderCallback) {
+    renderCallback(this.id, this.x, this.y, this.rotation);
   }
 }
