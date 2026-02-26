@@ -1,5 +1,9 @@
 // TODO: rewrite so this accepts location and screen coords and returns new location if off edge of screen
-export const constrainNumber = (n, min, max) => {
+export const constrainNumber = (
+  n: number,
+  min: number,
+  max: number,
+): number => {
   let constrainedNumber = n;
   if (n < min) {
     constrainedNumber = max + n;
@@ -27,14 +31,20 @@ export const constrainNumber = (n, min, max) => {
 };*/
 
 // p1 and p2 are objects with x and y properties
-const distanceBetweenPoints = (p1, p2) => {
+const distanceBetweenPoints = (
+  p1: { x: number; y: number },
+  p2: { x: number; y: number },
+) => {
   let dx = p1.x - p2.x;
   let dy = p1.y - p2.y;
   return Math.sqrt(dx * dx + dy * dy);
 };
 
 // c1 and c2 are objects with x, y and r properties
-export const doCirclesCollide = (c1, c2) => {
+export const doCirclesCollide = (
+  c1: { x: number; y: number; r: number },
+  c2: { x: number; y: number; r: number },
+) => {
   let minDistance = c1.r + c2.r;
   return distanceBetweenPoints(c1, c2) < minDistance ? true : false;
 };

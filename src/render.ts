@@ -3,8 +3,13 @@ const renderType = "css";
 // change position and rotation to element already on screen
 // TODO maybe provide additonalCLass property which could be used for examples such as ships thrust
 // could be Display.update
-export const updateElement = (id, x, y, rotation) => {
-  let el = document.getElementById(id);
+export const updateElement = (
+  id: string,
+  x: number,
+  y: number,
+  rotation: number,
+) => {
+  let el: HTMLElement = document.getElementById(id)!;
   el.style.left = x + "px";
   el.style.top = y + "px";
   if (rotation) {
@@ -12,20 +17,25 @@ export const updateElement = (id, x, y, rotation) => {
   }
 };
 
-export const renderThrust = (thrustPower) => {
+export const renderThrust = (thrustPower: number) => {
   const thrustStyle = thrustPower > 0 ? "block" : "none";
-  document.getElementById("thrust").style.display = thrustStyle;
+  document.getElementById("thrust")!.style.display = thrustStyle;
 };
 
 // DOM functions
-export function addElement(newEl, screenId) {
+export function addElement(newEl: HTMLElement, screenId: string) {
   let screenNode = document.getElementById(screenId);
-  screenNode.appendChild(newEl);
+  screenNode!.appendChild(newEl);
 }
 
 // create a div with id and class and internal style as parent for SVG graphic
 // could be Display.add
-export function createElement(id, className, style, graphicSVG) {
+export function createElement(
+  id: string,
+  className: string,
+  style: string,
+  graphicSVG: string,
+) {
   let elContainer = document.createElement("div");
   elContainer.setAttribute("id", id);
   elContainer.setAttribute("class", className);
@@ -40,8 +50,8 @@ export function createElement(id, className, style, graphicSVG) {
 
 // remove DOM element with matching ID
 // could be Display.remove
-export function deleteElement(elId) {
-  let elNode = document.getElementById(elId);
-  elNode.parentNode.removeChild(elNode);
+export function deleteElement(elId: string) {
+  let elNode: HTMLElement = document.getElementById(elId)!;
+  elNode.parentNode!.removeChild(elNode);
 }
 // end of DOM functions
