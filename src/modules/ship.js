@@ -1,111 +1,138 @@
-import {constrainNumber} from '../helper.js';
-import {renderShip} from '../render.js'
-
+const FULLDEGREE = 360;
 export default class Ship {
-  constructor(x, y, id) {
-    this.maxSpeed = 4.0
-    this.friction = 0.005
-    this.thrust = 0.1
-    this.shipAngle = 0.0
-    this.directionAngle = 0.0
-    this.shipSpeed = 0
-    this.x = x
-    this.y = y
-    this.shipRotation = 0
-    this.shipThrust = false
+  constructor(pos, id, shipSpecs) {
     this.id = id;
-    this.r = 6;
-    this.dr = Math.PI / 90
-    this.FULLRADIAN = 2 * Math.PI
-    this.dx = 0
-    this.dy = 0
+    // position
+    this.x = pos.x;
+    this.y = pos.y;
+    // ship specifications - this can be passed in for different ships
+    this.speedMax = shipSpecs.speedMax;
+    this.drag = shipSpecs.drag;
+    this.thrustMax = shipSpecs.thrustMax;
+    this.r = shipSpecs.radius;
+    this.rotationSpeed = shipSpecs.rotationSpeed;
+    // ship state
+    this.rotation = { degrees: 0, radians: 0 };
+    this.thrustPower = 0;
+    // velocity
+    this.direction = { degrees: 0, radians: 0 };
+    this.shipSpeed = 0;
+    // gun specifications - this can be passed in for different gunpower and position. Need to use array if more than one gun
+    this.gun = null;
   }
 
-updateState(thrust, rotateCounterClockwise, rotateClockwise) {
-  this.shipThrust = thrust ? true : false;
-  if (rotateCounterClockwise){ this.changeShipRotation( -this.dr ); }
-  if (rotateClockwise){ this.changeShipRotation( this.dr ); }
-}
-
-update (SCREEN_WIDTH, SCREEN_HEIGHT){
-  // calculate x,y components of speed, thrust and friction
-  let currentSpeedX = this.shipSpeed * Math.sin(this.directionAngle)
-  let currentSpeedY = this.shipSpeed * Math.cos(this.directionAngle)
-  let frictionX = this.friction * Math.sin(this.directionAngle)
-  let frictionY = this.friction * Math.cos(this.directionAngle)
-  let thrustX = 0
-  let thrustY = 0
-  if ( this.shipThrust){
-    thrustX = this.thrust * Math.sin(this.shipAngle)
-    thrustY = this.thrust * Math.cos(this.shipAngle)
+  attachGun(gun) {
+    this.gun = gun;
   }
 
-  let dx = currentSpeedX - frictionX + thrustX
-  let dy = currentSpeedY - frictionY + thrustY
+  // calculate iniital position and velocity of bullet when ship's gun is fired
+  gunFired() {
+    const shipLocation = { x: this.x, y: this.y };
+    const shipRotation = this.rotation.radians;
+    const shipVelocity = {
+      speed: this.shipSpeed,
+      direction: this.direction.radians,
+    };
 
-  // calculate x,y components of speed 
-  if ( Math.abs(frictionX) > Math.abs(currentSpeedX) ){
-    dx = thrustX
+    const bulletPosition = this.gun.getGunPosition(shipLocation, shipRotation);
+    const bulletVelocity = this.gun.getBulletVelocity(
+      shipVelocity,
+      shipRotation,
+    );
+    return { bulletPosition, bulletVelocity };
   }
 
-  if ( Math.abs(frictionY) > Math.abs(currentSpeedY) ){
-    dy = thrustY
-  }
-
-  // shipSpeed
-  this.shipSpeed = Math.sqrt( (dx * dx) + (dy * dy) )
-  if ( dy == 0) {
-    this.directionAngle = Math.atan( dx / 0.01 )
-  } else {
-    this.directionAngle = Math.atan( dx / dy ) // directionAngle in radians
-  }
-
-  if ( dy < 0) {
-    // Add PI radians or 180 degrees
-    this.directionAngle = this.directionAngle + 3.1415;
-  }
-
-  if ( this.shipSpeed > this.maxSpeed ){
-    this.shipSpeed = this.maxSpeed
-    dx = this.shipSpeed * Math.sin( this.directionAngle )
-    dy = this.shipSpeed * Math.cos( this.directionAngle )
-  }
-
-  this.x += dx //(shipSpeed*sin(shipAngle))
-  this.y -= dy //(shipSpeed*cos(shipAngle))
-  this.dx = dx
-  this.dy = dy
-
-  //amend x,y values to keep ship on screen
-  if (this.x < 0) {
-    this.x = SCREEN_WIDTH
-  }else if ( this.x > SCREEN_WIDTH) {
-    this.x = 0
-  }
-
-  if ( this.y < 0 ){
-    this.y = SCREEN_HEIGHT
-  } else if ( this.y > SCREEN_HEIGHT) {
-    this.y = 0
-  }
-  
-}
-
-  changeShipRotation( dRot ){
-    this.shipRotation += dRot
-    if ( this.shipRotation < 0) {
-      this.shipRotation = this.FULLRADIAN
-    } else if ( this.shipRotation > this.FULLRADIAN ){
-      this.shipRotation = 0
+  //TODO: ACTIONS should be moved in to update(ACTIONS)
+  updateShipActions(thrust, rotateCounterClockwise, rotateClockwise) {
+    this.thrustPower = thrust ? this.thrustMax : 0;
+    if (rotateCounterClockwise) {
+      this.changeShipRotation(-this.rotationSpeed);
     }
-    this.shipAngle = this.shipRotation
+    if (rotateClockwise) {
+      this.changeShipRotation(this.rotationSpeed);
+    }
   }
 
-  setShipThrust(bool){
-    shipThrust = bool
+  convertDegreestoRadians(degrees) {
+    return 0.0174533 * degrees;
+  }
+  convertRadiansToDegrees(radians) {
+    return 57.2958 * radians;
+  }
+  // calculate new speed and direction
+  calculateNewVelocity() {
+    const driftSpeed =
+      this.shipSpeed > this.drag ? this.shipSpeed - this.drag : 0;
+    const driftX = driftSpeed * Math.sin(this.direction.radians);
+    const driftY = driftSpeed * Math.cos(this.direction.radians);
+
+    const thrustX = this.thrustPower * Math.sin(this.rotation.radians);
+    const thrustY = this.thrustPower * Math.cos(this.rotation.radians);
+
+    let dx = driftX + thrustX;
+    let dy = driftY + thrustY;
+
+    // shipSpeed
+    this.shipSpeed = Math.sqrt(dx * dx + dy * dy);
+    if (this.shipSpeed > this.speedMax) {
+      this.shipSpeed = this.speedMax;
+    }
+
+    if (dy == 0) {
+      dy = -0.001;
+    }
+    this.direction.radians = Math.atan(dx / dy);
+    this.direction.degrees = this.convertRadiansToDegrees(
+      this.direction.radians,
+    );
+
+    if (dy < 0) {
+      // Add PI radians or 180 degrees
+      this.direction.degrees += 180;
+      this.direction.radians += Math.PI;
+    }
   }
 
-  render() {
-    renderShip(this.id, this.x, this.y, this.shipAngle, this.shipThrust)
+  // TODO: consider moving screen dimensions out of here
+  // instead create a function to get and set ship location
+  // in index.js get ship location and if needed reset location if off screen
+  // this ship shouldn't care about screen dimensions to give it the option of adding a scrolling screen
+  update(SCREEN_WIDTH, SCREEN_HEIGHT) {
+    if (this.gun !== null) {
+      this.gun.update();
+    }
+
+    this.calculateNewVelocity();
+    this.x += this.shipSpeed * Math.sin(this.direction.radians);
+    this.y -= this.shipSpeed * Math.cos(this.direction.radians);
+
+    //amend x,y values to keep ship on screen
+    // this moves to screen edge but should move the amount it's past the screen boundary e.g. this.x -= SCREEN_WIDTH
+    if (this.x < 0) {
+      this.x += SCREEN_WIDTH;
+    } else if (this.x > SCREEN_WIDTH) {
+      this.x -= SCREEN_WIDTH;
+    }
+
+    if (this.y < 0) {
+      this.y += SCREEN_HEIGHT;
+    } else if (this.y > SCREEN_HEIGHT) {
+      this.y -= SCREEN_HEIGHT;
+    }
+  }
+
+  changeShipRotation(dRot) {
+    this.rotation.degrees += dRot;
+    if (this.rotation.degrees < 0) {
+      this.rotation.degrees += FULLDEGREE;
+    } else if (this.rotation.degrees >= FULLDEGREE) {
+      this.rotation.degrees -= FULLDEGREE;
+    }
+    this.rotation.radians = this.convertDegreestoRadians(this.rotation.degrees);
+  }
+
+  render(renderCallback, renderThrustCallback) {
+    renderCallback(this.id, this.x, this.y, this.rotation.degrees);
+    renderThrustCallback(this.thrustPower);
   }
 }

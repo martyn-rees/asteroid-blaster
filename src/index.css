@@ -1,0 +1,102 @@
+@font-face {
+    font-family: "Press Start 2P";
+    src: url(/fonts/Press_Start_2P/PressStart2P-Regular.ttf) format("truetype");
+}
+    
+.press-start-2p-regular {
+    font-family: "Press Start 2P", system-ui;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.rock {
+    position:absolute;
+}
+
+.rock svg path {
+    vector-effect: non-scaling-stroke;
+    stroke-width: 1px;
+    stroke: white;
+}
+
+.ship {
+    position:absolute;
+    width: 12px;
+    height: 12px;
+    margin-top: -6px;
+    margin-left: -6px;
+    fill: white;
+}
+
+.bullet {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background-color: white;
+    border-radius: 50%;
+    margin-left: -2px;
+    margin-top: -2px;
+}
+
+.game-screen {
+    position: relative;
+    width: 90%;
+    height: calc( 90vh - 100px);
+    top:24px;
+    left:5%;
+    border: 1px solid black;
+    border-image: linear-gradient(to right, #999999 0%, #666666 100%) 1;
+    overflow: hidden;
+    background: black;
+    background-image: url(/images/background.jpg);
+}
+
+.background {
+    background: black;
+    background-image: url(/images/background.jpg);
+}
+
+.game-screen__score {
+    color: white;
+    text-align: center;
+}
+
+.game-screen__damage {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: white;
+    display: none;
+}
+
+.heading {
+    text-align: center  ;
+    color: white; 
+}
+
+.gameover-end {
+    position: relative;
+    height: 100%;
+    border: 16px solid white;
+    border-radius: 16px;
+    transform: rotate(-26deg);
+}
+
+.start-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 12px 114px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 24px;
+    border: 2px white solid;
+    background: black;
+    color: white;
+}
+
+.start-button:hover {
+    background: white;
+    color: black;
+}
