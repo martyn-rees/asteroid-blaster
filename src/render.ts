@@ -33,8 +33,8 @@ export function addElement(newEl: HTMLElement, screenId: string) {
 export function createElement(
   id: string,
   className: string,
-  style: string,
-  graphicSVG: string,
+  style: string | null,
+  graphicSVG: string | null,
 ) {
   let elContainer = document.createElement("div");
   elContainer.setAttribute("id", id);

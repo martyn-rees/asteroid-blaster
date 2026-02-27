@@ -15,7 +15,18 @@ export const gunSpec = {
   speed: 6,
   reloadTime: 10,
 };
-export const rockType = {
+export type RockSpec = {
+  minRadius: number;
+  maxRadius: number;
+  minSpeed: number;
+  maxSpeed: number;
+  value: number;
+};
+export type RockType = {
+  [key: string]: RockSpec;
+};
+
+export const rockType: RockType = {
   LARGE: {
     minRadius: 60,
     maxRadius: 80,
