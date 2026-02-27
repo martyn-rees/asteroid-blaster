@@ -41,7 +41,8 @@ function initRocks(amount: number) {
   for (let i = 0; i < amount; i++) {
     const borders = ["top", "right", "bottom", "left"];
     const edge = borders[Math.floor(Math.random() * 4)];
-    initRock("LARGE", gameScreen.getRandomEdgePosition(edge));
+    const startPosition = gameScreen.getRandomEdgePosition(edge);
+    initRock("LARGE", startPosition);
   }
 }
 
@@ -51,7 +52,7 @@ function getRandomNumber(min: number, max: number): number {
 
 const getAsteroidGraphic = () => {
   const n = Math.floor(Math.random() * 3);
-  return asteroidsSVG[n]();
+  return asteroidsSVG[n];
 };
 
 function createNewAsteroid(
