@@ -1,8 +1,27 @@
 import { constrainNumber } from "../helper.js";
 
+type RockSpec = {
+  size: string;
+  r: number;
+  rotationRate: number;
+};
+
 export default class Rock {
   static rockIDCounter = 0;
-  constructor(initialPosition, velocity, rockSpecs) {
+  public id: string;
+  public size: string;
+  public r: number;
+  public rotationRate: number;
+  public velocity: { speed: number; direction: number };
+  public x: number;
+  public y: number;
+  public rotation: number;
+
+  constructor(
+    initialPosition: { x: number; y: number },
+    velocity: { speed: number; direction: number },
+    rockSpecs: RockSpec,
+  ) {
     // constant values for life of this rock
     this.id = "rock" + Rock.rockIDCounter++;
     this.size = rockSpecs.size;
@@ -30,11 +49,11 @@ export default class Rock {
     }
   }*/
 
-  convertDegreestoRadians(degrees) {
+  convertDegreestoRadians(degrees: number) {
     return 0.0174533 * degrees;
   }
 
-  update(screenWidth, screenHeight) {
+  update(screenWidth: number, screenHeight: number) {
     // update new location of rock based on velocity
     const radians = this.convertDegreestoRadians(this.velocity.direction);
     const dx = this.velocity.speed * Math.sin(radians);
@@ -47,7 +66,7 @@ export default class Rock {
     this.y = constrainNumber(newY, 0, screenHeight);
   }
 
-  render(renderCallback) {
+  render(renderCallback: Function) {
     renderCallback(this.id, this.x, this.y, this.rotation);
   }
 }

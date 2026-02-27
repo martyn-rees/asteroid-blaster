@@ -1,6 +1,36 @@
 const FULLDEGREE = 360;
+type Directions = { degrees: number; radians: number };
+type ShipSpecs = {
+  speedMax: number;
+  drag: number;
+  thrustMax: number;
+  radius: number;
+  rotationSpeed: number;
+};
+type GunType = {
+  getGunPosition: Function;
+  getBulletVelocity: Function;
+  update: Function;
+  isGunLoaded: Function;
+  reloadGun: Function;
+};
+
 export default class Ship {
-  constructor(pos, id, shipSpecs) {
+  public id: string;
+  public x: number;
+  public y: number;
+  private speedMax: number;
+  private drag: number;
+  private thrustMax: number;
+  public r: number;
+  private rotationSpeed: number;
+  public rotation: Directions;
+  public thrustPower: number;
+  public direction: Directions;
+  public shipSpeed: number;
+  public gun: GunType | null;
+
+  constructor(pos: { x: number; y: number }, id: string, shipSpecs: ShipSpecs) {
     this.id = id;
     // position
     this.x = pos.x;
@@ -21,7 +51,7 @@ export default class Ship {
     this.gun = null;
   }
 
-  attachGun(gun) {
+  attachGun(gun: GunType) {
     this.gun = gun;
   }
 
@@ -34,8 +64,8 @@ export default class Ship {
       direction: this.direction.radians,
     };
 
-    const bulletPosition = this.gun.getGunPosition(shipLocation, shipRotation);
-    const bulletVelocity = this.gun.getBulletVelocity(
+    const bulletPosition = this.gun!.getGunPosition(shipLocation, shipRotation);
+    const bulletVelocity = this.gun!.getBulletVelocity(
       shipVelocity,
       shipRotation,
     );
@@ -43,7 +73,11 @@ export default class Ship {
   }
 
   //TODO: ACTIONS should be moved in to update(ACTIONS)
-  updateShipActions(thrust, rotateCounterClockwise, rotateClockwise) {
+  updateShipActions(
+    thrust: boolean,
+    rotateCounterClockwise: boolean,
+    rotateClockwise: boolean,
+  ) {
     this.thrustPower = thrust ? this.thrustMax : 0;
     if (rotateCounterClockwise) {
       this.changeShipRotation(-this.rotationSpeed);
@@ -53,10 +87,10 @@ export default class Ship {
     }
   }
 
-  convertDegreestoRadians(degrees) {
+  convertDegreestoRadians(degrees: number) {
     return 0.0174533 * degrees;
   }
-  convertRadiansToDegrees(radians) {
+  convertRadiansToDegrees(radians: number) {
     return 57.2958 * radians;
   }
   // calculate new speed and direction
@@ -97,7 +131,7 @@ export default class Ship {
   // instead create a function to get and set ship location
   // in index.js get ship location and if needed reset location if off screen
   // this ship shouldn't care about screen dimensions to give it the option of adding a scrolling screen
-  update(SCREEN_WIDTH, SCREEN_HEIGHT) {
+  update(SCREEN_WIDTH: number, SCREEN_HEIGHT: number) {
     if (this.gun !== null) {
       this.gun.update();
     }
@@ -121,7 +155,7 @@ export default class Ship {
     }
   }
 
-  changeShipRotation(dRot) {
+  changeShipRotation(dRot: number) {
     this.rotation.degrees += dRot;
     if (this.rotation.degrees < 0) {
       this.rotation.degrees += FULLDEGREE;
@@ -131,7 +165,7 @@ export default class Ship {
     this.rotation.radians = this.convertDegreestoRadians(this.rotation.degrees);
   }
 
-  render(renderCallback, renderThrustCallback) {
+  render(renderCallback: Function, renderThrustCallback: Function) {
     renderCallback(this.id, this.x, this.y, this.rotation.degrees);
     renderThrustCallback(this.thrustPower);
   }

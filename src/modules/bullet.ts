@@ -16,8 +16,23 @@ import { constrainNumber } from "../helper.js";
 // velocity should be speed and direction from which dx and dy can be calcualted
 export default class Bullet {
   static bulletIDCounter = 0;
+  public id: string;
+  public bulletPower: number;
+  public velocity: { dx: number; dy: number };
+  public position: { x: number; y: number };
+  public endurance: number;
+  public r: number;
 
-  constructor(initialPosition, initialVelocity, bulletSpecs) {
+  constructor(
+    initialPosition: { x: number; y: number },
+    initialVelocity: {
+      dx: number;
+      dy: number;
+      initialSpeed: number;
+      initialDirection: number;
+    },
+    bulletSpecs: { r: number; endurance: number; power: number },
+  ) {
     Bullet.bulletIDCounter++;
     this.id = "bullet" + Bullet.bulletIDCounter;
     this.bulletPower = bulletSpecs.power;
@@ -27,7 +42,7 @@ export default class Bullet {
     this.r = bulletSpecs.r;
   }
 
-  update(SCREEN_WIDTH, SCREEN_HEIGHT) {
+  update(SCREEN_WIDTH: number, SCREEN_HEIGHT: number) {
     this.endurance--;
     if (this.endurance <= 0) {
       this.bulletPower = 0;
@@ -39,7 +54,7 @@ export default class Bullet {
     }
   }
 
-  render(renderCallback) {
+  render(renderCallback: Function) {
     renderCallback(this.id, this.position.x, this.position.y);
   }
 }

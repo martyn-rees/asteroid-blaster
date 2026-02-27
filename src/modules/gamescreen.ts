@@ -1,11 +1,15 @@
 export default class GameScreen {
-  constructor(id, w, h) {
+  public id: string;
+  public width: number;
+  public height: number;
+
+  constructor(id: string, w: number, h: number) {
     this.id = id;
     this.width = w;
     this.height = h;
   }
 
-  setGameScreenDimensions(w, h) {
+  setGameScreenDimensions(w: number, h: number) {
     this.width = w;
     this.height = h;
   }
@@ -14,14 +18,14 @@ export default class GameScreen {
     return { x: this.width / 2, y: this.height / 2 };
   }
 
-  getRandomScreenPosition() {
+  getRandomScreenPosition(): { x: number; y: number } {
     return {
       x: Math.random() * this.width,
       y: Math.random() * this.height,
     };
   }
 
-  getRandomEdgePosition(edge) {
+  getRandomEdgePosition(edge: string): { x: number; y: number } {
     let { x, y } = this.getRandomScreenPosition();
     switch (edge) {
       case "top":
@@ -33,5 +37,6 @@ export default class GameScreen {
       case "left":
         return { x: 0, y: y };
     }
+    return { x, y };
   }
 }

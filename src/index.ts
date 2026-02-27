@@ -12,9 +12,16 @@ import {
 } from "./render.js";
 import { doCirclesCollide } from "./helper.js";
 import { asteroidsSVG, shipSVG } from "./graphics.js";
-import { bulletSpecs, shipSpecs, gunSpec, rockType } from "./gamedata.js";
+import {
+  bulletSpecs,
+  shipSpecs,
+  gunSpec,
+  rockType,
+  RockSpec,
+  RockType,
+} from "./gamedata.js";
 
-var animationId;
+var animationId: number;
 let isGamePlaying = false;
 var ACTIONS = {
   shipThrust: false,
@@ -23,32 +30,44 @@ var ACTIONS = {
   shipRight: false,
 };
 
+interface Rocks {
+  [index: string]: Rock;
+}
+
+interface Bullets {
+  [index: string]: Bullet;
+}
+
 let gameScreen = new GameScreen("gameScreen", 800, 400);
 let score = { bonus: 0, damage: 0 };
-let ship;
-let rockList = [];
-let bulletList = [];
+let ship: Ship;
+let rockList: Rocks = {};
+let bulletList: Bullets = {};
 
 // ----  Rock code ----
-function initRocks(amount) {
+function initRocks(amount: number) {
   for (let i = 0; i < amount; i++) {
     const borders = ["top", "right", "bottom", "left"];
     const edge = borders[Math.floor(Math.random() * 4)];
-    initRock("LARGE", gameScreen.getRandomEdgePosition(edge));
+    const startPosition = gameScreen.getRandomEdgePosition(edge);
+    initRock("LARGE", startPosition);
   }
 }
 
-function getRandomNumber(min, max) {
+function getRandomNumber(min: number, max: number): number {
   return min + Math.random() * (max - min);
 }
 
 const getAsteroidGraphic = () => {
   const n = Math.floor(Math.random() * 3);
-  return asteroidsSVG[n]();
+  return asteroidsSVG[n];
 };
 
-function createNewAsteroid(size, initialPosition) {
-  let rockProps = rockType[size];
+function createNewAsteroid(
+  size: string,
+  initialPosition: { x: number; y: number },
+): Rock {
+  let rockProps: RockSpec = rockType[size];
   let speed = getRandomNumber(rockProps.minSpeed, rockProps.maxSpeed);
   let r = getRandomNumber(rockProps.minRadius, rockProps.maxRadius);
   let direction = getRandomNumber(0, 360);
@@ -67,9 +86,9 @@ function createNewAsteroid(size, initialPosition) {
 }
 
 // this function does several things - creates a rock with random properties, adds it to the rock list, creates a game element for the rock and adds it to the game screen
-function initRock(size, pos) {
+function initRock(size: string, pos: { x: number; y: number }) {
   // create rock with random properties
-  const rock = createNewAsteroid(size, pos);
+  const rock: Rock = createNewAsteroid(size, pos);
 
   // add rock to rocklist
   rockList[rock.id] = rock;
@@ -91,38 +110,39 @@ function initShip() {
 }
 // end of Ship code
 
-function updateScore(value) {
+function updateScore(value: number) {
   score.bonus += value;
-  document.getElementById("gameScore").innerHTML = "SCORE: " + score.bonus;
+  document.getElementById("gameScore")!.innerHTML = "SCORE: " + score.bonus;
 }
 
-function updateDamage(value) {
+function updateDamage(value: number) {
   score.damage += value;
-  document.getElementById("gameScoreDamage").innerHTML =
+  document.getElementById("gameScoreDamage")!.innerHTML =
     "DAMAGE :" + score.damage;
 }
 
 // events code
-function keyEvent(ev, isKeyDown) {
-  var keyCode = ev == null ? window.ev.keyCode : ev.keyCode;
-
-  if (keyCode == 37) {
+function keyEvent(ev: KeyboardEvent, isKeyDown: boolean) {
+  //TODO: keycode is deprecated so replace with newer method
+  //var keyCode = ev == null ? window.ev.keyCode : ev.keyCode;
+  var key = ev.code;
+  if (key == "ArrowLeft") {
     ACTIONS.shipLeft = isKeyDown;
   }
-  if (keyCode == 39) {
+  if (key == "ArrowRight") {
     ACTIONS.shipRight = isKeyDown;
   }
-  if (keyCode == 38) {
+  if (key == "ArrowUp") {
     ACTIONS.shipThrust = isKeyDown;
   }
-  if (keyCode == 83) {
+  if (key == "KeyS") {
     ACTIONS.shoot = isKeyDown;
   }
 }
 
 // TODO: there are now container size options instead of offsetWidth
-export function resizeGameScreenSize(screen) {
-  let screenNode = document.getElementById(screen.id);
+export function resizeGameScreenSize(screen: GameScreen) {
+  let screenNode: HTMLElement = document.getElementById(screen.id)!;
   screen.setGameScreenDimensions(
     screenNode.offsetWidth,
     screenNode.offsetHeight,
@@ -143,13 +163,15 @@ function addEvents() {
   });
 
   // TODO: create a start button component and add this
-  document.getElementById("startButton").addEventListener("click", function () {
-    isGamePlaying = true;
-    startGame();
-  });
+  document
+    .getElementById("startButton")!
+    .addEventListener("click", function () {
+      isGamePlaying = true;
+      startGame();
+    });
 
   // TODO: create a pause button component and add this
-  document.getElementById("pause").addEventListener("click", function () {
+  document.getElementById("pause")!.addEventListener("click", function () {
     isGamePlaying = false;
     cancelAnimationFrame(animationId);
   });
@@ -157,7 +179,7 @@ function addEvents() {
 // end of events code
 
 // GAME loop code
-function step(timestamp) {
+function step(timestamp: number) {
   gameLoop();
 }
 
@@ -177,7 +199,7 @@ function gameLoop() {
 
   // test if bullet fired
   // test if SHOOT KEY is pressed and ship's gun is loaded
-  if (ACTIONS.shoot == true && ship.gun.isGunLoaded()) {
+  if (ACTIONS.shoot == true && ship.gun !== null && ship.gun.isGunLoaded()) {
     const { bulletPosition, bulletVelocity } = ship.gunFired();
     const newBullet = new Bullet(bulletPosition, bulletVelocity, bulletSpecs);
     // add bullet to list of bullets
@@ -195,9 +217,10 @@ function gameLoop() {
 
   // remove dead bullets
   for (var bullet in bulletList) {
-    if (bulletList[bullet].bulletPower == 0) {
+    const thisBullet = bulletList[bullet];
+    if (thisBullet.bulletPower == 0) {
       // remove bullet from gameScreen
-      const nodeId = bulletList[bullet].id;
+      const nodeId = thisBullet.id;
       deleteElement(nodeId);
       // remove bullet from list
       delete bulletList[bullet];
@@ -270,7 +293,12 @@ function gameLoop() {
 // disply game elements, ship, rocks and bullets
 // TODO: pass in gameElelemtns object with single items and arrays which get displayed using generic functions
 // TODO - why does ony bullets use the update function
-export function renderScreen(ship, rockList, bulletList, gameScreen) {
+export function renderScreen(
+  ship: Ship,
+  rockList: Rocks,
+  bulletList: Bullets,
+  gameScreen: GameScreen,
+) {
   ship.render(updateElement, renderThrust); // this calls render method in ship class which calls renderShip above whch calls render
   for (var rock in rockList) {
     rockList[rock].render(updateElement); // this calls render method in rock class which calls render above
@@ -281,7 +309,7 @@ export function renderScreen(ship, rockList, bulletList, gameScreen) {
   }
 }
 
-function playSound(soundDescription) {
+function playSound(soundDescription: string) {
   let soundurl;
   if (soundDescription == "shoot") {
     soundurl = "./sounds/shoot.wav";
@@ -299,7 +327,7 @@ function playSound(soundDescription) {
 
 // TODO: create a start button component and add this
 function hideStartButton() {
-  document.getElementById("startButton").style.display = "none";
+  document.getElementById("startButton")!.style.display = "none";
 }
 
 function startGame() {
@@ -310,7 +338,7 @@ function startGame() {
   animationId = requestAnimationFrame(step);
 }
 
-function startLevel(level) {
+function startLevel(level: number) {
   const shipEl = createElement("ship", "ship", null, shipSVG());
   addElement(shipEl, gameScreen.id);
   setTimeout(() => initRocks(8), 1000);
