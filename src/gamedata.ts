@@ -15,13 +15,14 @@ export const gunSpec = {
   speed: 6,
   reloadTime: 10,
 };
+type Range = { min: number; max: number };
+
 export type RockSpec = {
   description: string;
-  minRadius: number;
-  maxRadius: number;
-  minSpeed: number;
-  maxSpeed: number;
   value: number;
+  radius: Range;
+  speed: Range;
+  rotationRate: Range;
 };
 export type RockType = {
   [key: string]: RockSpec;
@@ -30,32 +31,29 @@ export type RockType = {
 export const rockType: RockType = {
   LARGE: {
     description: "large",
-    minRadius: 60,
-    maxRadius: 80,
-    minSpeed: 1,
-    maxSpeed: 2,
     value: 100,
+    radius: { min: 60, max: 80 },
+    speed: { min: 1, max: 2 },
+    rotationRate: { min: 0.3, max: 0.8 },
   },
   MEDIUM: {
     description: "medium",
-    minRadius: 25,
-    maxRadius: 40,
-    minSpeed: 2.5,
-    maxSpeed: 3,
     value: 200,
+    radius: { min: 25, max: 40 },
+    speed: { min: 2.5, max: 3 },
+    rotationRate: { min: 1.3, max: 2 },
   },
   SMALL: {
     description: "small",
-    minRadius: 10,
-    maxRadius: 15,
-    minSpeed: 4,
-    maxSpeed: 5,
     value: 300,
+    radius: { min: 10, max: 15 },
+    speed: { min: 3, max: 4 },
+    rotationRate: { min: 2, max: 3 },
   },
 };
 export const keyBindings = {
-  rotateLeft: 37,
-  rotateRight: 39,
-  thrust: 38,
-  shoot: 83,
+  rotateLeft: "ArrowLeft",
+  rotateRight: "ArrowRight",
+  thrust: "ArrowUp",
+  shoot: "KeyS",
 };

@@ -18,7 +18,7 @@ import {
   gunSpec,
   rockType,
   RockSpec,
-  RockType,
+  keyBindings,
 } from "./gamedata.js";
 
 var animationId: number;
@@ -58,8 +58,8 @@ function getRandomNumber(min: number, max: number): number {
   return min + Math.random() * (max - min);
 }
 
-const getAsteroidGraphic = () => {
-  const n = Math.floor(Math.random() * 3);
+const getAsteroidGraphic = (): string => {
+  const n = Math.floor(Math.random() * asteroidsSVG.length);
   return asteroidsSVG[n];
 };
 
@@ -68,13 +68,14 @@ function createNewAsteroid(
   initialPosition: { x: number; y: number },
 ): Rock {
   let rockProps: RockSpec = rockType[size];
-  let speed = getRandomNumber(rockProps.minSpeed, rockProps.maxSpeed);
-  let r = getRandomNumber(rockProps.minRadius, rockProps.maxRadius);
+  let speed = getRandomNumber(rockProps.speed.min, rockProps.speed.max);
+  let r = getRandomNumber(rockProps.radius.min, rockProps.radius.max);
   let direction = getRandomNumber(0, 360);
-  // TODO: change min/max to be a positive number and use another function for rotation direction
-  // don't want 0 rotation so use  getRandomNumber(1, 2) with getRotation Direction() {return +1 or -1}
-  // could add this to gameSpec so different size rocks rotate at different speeds. e.g. larger rocks slower rotation
-  let rotationRate = getRandomNumber(-2, 2);
+  let rotationRate = getRandomNumber(
+    rockProps.rotationRate.min,
+    rockProps.rotationRate.max,
+  );
+  rotationRate = Math.random() > 0.5 ? rotationRate : -rotationRate;
   let velocity = { speed, direction };
   const rockSpecs = {
     size,
@@ -95,7 +96,8 @@ function initRock(size: string, pos: { x: number; y: number }) {
 
   // create game element for rock
   let rockStyle = `height:${2 * rock.r}px; width:${2 * rock.r}px; margin-left:-${rock.r}px; margin-top:-${rock.r}px;`;
-  const el = createElement(rock.id, "rock", rockStyle, getAsteroidGraphic());
+  const asteroidSVG = getAsteroidGraphic();
+  const el = createElement(rock.id, "rock", rockStyle, asteroidSVG);
   // add game element to screen
   addElement(el, gameScreen.id);
 }
@@ -123,19 +125,17 @@ function updateDamage(value: number) {
 
 // events code
 function keyEvent(ev: KeyboardEvent, isKeyDown: boolean) {
-  //TODO: keycode is deprecated so replace with newer method
-  //var keyCode = ev == null ? window.ev.keyCode : ev.keyCode;
   var key = ev.code;
-  if (key == "ArrowLeft") {
+  if (key == keyBindings.rotateLeft) {
     ACTIONS.shipLeft = isKeyDown;
   }
-  if (key == "ArrowRight") {
+  if (key == keyBindings.rotateRight) {
     ACTIONS.shipRight = isKeyDown;
   }
-  if (key == "ArrowUp") {
+  if (key == keyBindings.thrust) {
     ACTIONS.shipThrust = isKeyDown;
   }
-  if (key == "KeyS") {
+  if (key == keyBindings.shoot) {
     ACTIONS.shoot = isKeyDown;
   }
 }
@@ -248,15 +248,20 @@ function gameLoop() {
   // test rocks to bullets collision
   for (var rock in rockList) {
     let haveCollision = false;
+    const rockBoundingArea = {
+      x: rockList[rock].x,
+      y: rockList[rock].y,
+      r: rockList[rock].r,
+    };
     for (var bullet in bulletList) {
       if (!haveCollision) {
         const thisBullet = bulletList[bullet];
-        const bulletPosition = {
+        const bulletBoundingArea = {
           x: thisBullet.position.x,
           y: thisBullet.position.y,
           r: thisBullet.r,
         };
-        if (doCirclesCollide(rockList[rock], bulletPosition)) {
+        if (doCirclesCollide(rockBoundingArea, bulletBoundingArea)) {
           const pos = {
             x: rockList[rock].x,
             y: rockList[rock].y,
@@ -271,8 +276,6 @@ function gameLoop() {
             initRock("SMALL", pos);
             initRock("SMALL", pos);
           }
-
-          console.dir(rockList);
           haveCollision = true;
           updateScore(rockType[rockList[rock].size].value);
 
