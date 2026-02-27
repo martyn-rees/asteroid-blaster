@@ -30,11 +30,19 @@ var ACTIONS = {
   shipRight: false,
 };
 
+interface Rocks {
+  [index: string]: Rock;
+}
+
+interface Bullets {
+  [index: string]: Bullet;
+}
+
 let gameScreen = new GameScreen("gameScreen", 800, 400);
 let score = { bonus: 0, damage: 0 };
 let ship: Ship;
-let rockList: Rock[] = [];
-let bulletList: Bullet[] = [];
+let rockList: Rocks = {};
+let bulletList: Bullets = {};
 
 // ----  Rock code ----
 function initRocks(amount: number) {
@@ -191,7 +199,7 @@ function gameLoop() {
 
   // test if bullet fired
   // test if SHOOT KEY is pressed and ship's gun is loaded
-  if (ACTIONS.shoot == true && ship.gun.isGunLoaded()) {
+  if (ACTIONS.shoot == true && ship.gun !== null && ship.gun.isGunLoaded()) {
     const { bulletPosition, bulletVelocity } = ship.gunFired();
     const newBullet = new Bullet(bulletPosition, bulletVelocity, bulletSpecs);
     // add bullet to list of bullets
@@ -209,9 +217,10 @@ function gameLoop() {
 
   // remove dead bullets
   for (var bullet in bulletList) {
-    if (bulletList[bullet].bulletPower == 0) {
+    const thisBullet = bulletList[bullet];
+    if (thisBullet.bulletPower == 0) {
       // remove bullet from gameScreen
-      const nodeId = bulletList[bullet].id;
+      const nodeId = thisBullet.id;
       deleteElement(nodeId);
       // remove bullet from list
       delete bulletList[bullet];
@@ -286,8 +295,8 @@ function gameLoop() {
 // TODO - why does ony bullets use the update function
 export function renderScreen(
   ship: Ship,
-  rockList: Rock[],
-  bulletList: Bullet[],
+  rockList: Rocks,
+  bulletList: Bullets,
   gameScreen: GameScreen,
 ) {
   ship.render(updateElement, renderThrust); // this calls render method in ship class which calls renderShip above whch calls render

@@ -11,6 +11,8 @@ type GunType = {
   getGunPosition: Function;
   getBulletVelocity: Function;
   update: Function;
+  isGunLoaded: Function;
+  reloadGun: Function;
 };
 
 export default class Ship {
