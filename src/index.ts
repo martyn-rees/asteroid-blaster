@@ -39,7 +39,7 @@ interface Bullets {
 }
 
 let gameScreen = new GameScreen("gameScreen", 800, 400);
-let score = { bonus: 0, damage: 0 };
+let score = 0;
 let ship: Ship;
 let rockList: Rocks = {};
 let bulletList: Bullets = {};
@@ -113,14 +113,8 @@ function initShip() {
 // end of Ship code
 
 function updateScore(value: number) {
-  score.bonus += value;
-  document.getElementById("gameScore")!.innerHTML = "SCORE: " + score.bonus;
-}
-
-function updateDamage(value: number) {
-  score.damage += value;
-  document.getElementById("gameScoreDamage")!.innerHTML =
-    "DAMAGE :" + score.damage;
+  score += value;
+  document.getElementById("gameScore")!.innerHTML = "SCORE: " + score;
 }
 
 // events code
@@ -238,7 +232,6 @@ function gameLoop() {
       r: rockList[rock].r,
     };
     if (doCirclesCollide(rockBoundingArea, shipBoundingArea)) {
-      updateDamage(4 * rockType[rockList[rock].size].value);
       const nodeId = rock;
       deleteElement(nodeId);
       delete rockList[rock];
@@ -335,6 +328,7 @@ function hideStartButton() {
 
 function startGame() {
   hideStartButton();
+  updateScore(0);
   initShip();
   startLevel(1);
   cancelAnimationFrame(animationId);
@@ -350,8 +344,6 @@ function startLevel(level: number) {
 function init() {
   addEvents();
   resizeGameScreenSize(gameScreen);
-  updateScore(0);
-  updateDamage(0);
 }
 
 init();
