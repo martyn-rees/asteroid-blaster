@@ -20,6 +20,9 @@ import {
   RockSpec,
   keyBindings,
 } from "./gamedata.js";
+import { createStartButton } from "./ui/startbutton.js";
+import { createPauseButton } from "./ui/pauseButton.js";
+import { createResumeButton } from "./ui/resumeButton.js";
 
 var animationId: number;
 let isGamePlaying = false;
@@ -45,6 +48,7 @@ let rockList: Rocks = {};
 let bulletList: Bullets = {};
 
 // ----  Rock code ----
+// TODO: needs gamescreen to get random edge start position
 function initRocks(amount: number) {
   for (let i = 0; i < amount; i++) {
     const borders = ["top", "right", "bottom", "left"];
@@ -95,6 +99,7 @@ function initRock(size: string, pos: { x: number; y: number }) {
   rockList[rock.id] = rock;
 
   // create game element for rock
+  // TODO: this is DOM related
   let rockStyle = `height:${2 * rock.r}px; width:${2 * rock.r}px; margin-left:-${rock.r}px; margin-top:-${rock.r}px;`;
   const asteroidSVG = getAsteroidGraphic();
   const el = createElement(rock.id, "rock", rockStyle, asteroidSVG);
@@ -144,30 +149,12 @@ export function resizeGameScreenSize(screen: GameScreen) {
 }
 
 function addEvents() {
-  window.addEventListener("resize", function (event) {
-    resizeGameScreenSize(gameScreen);
-  });
-
   window.addEventListener("keydown", function (ev) {
     keyEvent(ev, true);
   });
 
   window.addEventListener("keyup", function (ev) {
     keyEvent(ev, false);
-  });
-
-  // TODO: create a start button component and add this
-  document
-    .getElementById("startButton")!
-    .addEventListener("click", function () {
-      isGamePlaying = true;
-      startGame();
-    });
-
-  // TODO: create a pause button component and add this
-  document.getElementById("pause")!.addEventListener("click", function () {
-    isGamePlaying = false;
-    cancelAnimationFrame(animationId);
   });
 }
 // end of events code
@@ -281,6 +268,7 @@ function gameLoop() {
     }
   }
 
+  //TODO - call render method
   renderScreen(ship, rockList, bulletList, gameScreen);
 
   animationId = window.requestAnimationFrame(step);
@@ -321,13 +309,52 @@ function playSound(soundDescription: string) {
   sound.play();
 }
 
-// TODO: create a start button component and add this
-function hideStartButton() {
-  document.getElementById("startButton")!.style.display = "none";
+/* handlers */
+// TODO: uses render methods
+function startButtonHandler() {
+  isGamePlaying = true;
+  setUpGameScreen();
+  deleteElement("startButton");
 }
 
-function startGame() {
-  hideStartButton();
+function pauseButtonHandler() {
+  isGamePlaying = false;
+  cancelAnimationFrame(animationId);
+  deleteElement("pauseButton");
+  const resumeButton = createResumeButton(resumeButtonHandler);
+  addElement(resumeButton, gameScreen.id);
+}
+
+function resumeButtonHandler() {
+  isGamePlaying = true;
+  cancelAnimationFrame(animationId);
+  animationId = requestAnimationFrame(step);
+  deleteElement("resumeButton");
+  const pauseButton = createPauseButton(pauseButtonHandler);
+  addElement(pauseButton, gameScreen.id);
+}
+/* end of handlers */
+
+/* set up game */
+//TODO - uses render method
+function startLevel(level: number) {
+  const shipEl = createElement("ship", "ship", null, shipSVG());
+  addElement(shipEl, gameScreen.id);
+  setTimeout(() => initRocks(8), 1000);
+}
+
+//TODO: uses render method
+// add start button, instructions, clear up old events and score
+function setUpStartScreen() {
+  const startButton = createStartButton(startButtonHandler);
+  addElement(startButton, gameScreen.id);
+}
+
+// TODO: uses render method
+function setUpGameScreen() {
+  const pauseButton = createPauseButton(pauseButtonHandler);
+  addElement(pauseButton, gameScreen.id);
+  addEvents();
   updateScore(0);
   initShip();
   startLevel(1);
@@ -335,16 +362,17 @@ function startGame() {
   animationId = requestAnimationFrame(step);
 }
 
-function startLevel(level: number) {
-  const shipEl = createElement("ship", "ship", null, shipSVG());
-  addElement(shipEl, gameScreen.id);
-  setTimeout(() => initRocks(8), 1000);
-}
+function setUpEndScreen() {}
 
+// TODO: uses GameScreen instance
 function init() {
-  addEvents();
+  window.addEventListener("resize", function (event) {
+    resizeGameScreenSize(gameScreen);
+  });
   resizeGameScreenSize(gameScreen);
+  setUpStartScreen();
 }
+/* end of set up game */
 
 init();
 // end of GAME loop code
