@@ -16,6 +16,7 @@ test("create new gun", () => {
   expect(gun).toEqual({
     gunSpecs: { barrelLocation: { x: 0, y: 6 }, speed: 6, reloadTime: 10 },
     gunReloadTimer: 0,
+    state: "loaded",
   });
 });
 

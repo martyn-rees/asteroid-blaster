@@ -1,5 +1,5 @@
 import Rock from "./modules/rock.js";
-import Ship from "./modules/ship.js";
+import Ship, { ShipActions } from "./modules/ship.js";
 import Gun from "./modules/gun.js";
 import Bullet from "./modules/bullet.js";
 import GameScreen from "./modules/gamescreen.js";
@@ -26,11 +26,11 @@ import { createResumeButton } from "./ui/resumeButton.js";
 
 var animationId: number;
 let isGamePlaying = false;
-var ACTIONS = {
-  shipThrust: false,
+let ACTIONS: ShipActions = {
+  thrust: false,
   shoot: false,
-  shipLeft: false,
-  shipRight: false,
+  rotateClockwise: false,
+  rotateCounterClockwise: false,
 };
 
 interface Rocks {
@@ -117,6 +117,18 @@ function initShip() {
 }
 // end of Ship code
 
+/* Bullet code */
+function createBullet() {}
+
+function renderNewBullet(id: string) {
+  // create game element for bullet
+  const el = createElement(id, "bullet", null, null);
+  addElement(el, gameScreen.id);
+  // reload ships gun
+  playSound("shoot");
+}
+/* end of bullet code */
+
 function updateScore(value: number) {
   score += value;
   document.getElementById("gameScore")!.innerHTML = "SCORE: " + score;
@@ -126,13 +138,13 @@ function updateScore(value: number) {
 function keyEvent(ev: KeyboardEvent, isKeyDown: boolean) {
   var key = ev.code;
   if (key == keyBindings.rotateLeft) {
-    ACTIONS.shipLeft = isKeyDown;
+    ACTIONS.rotateCounterClockwise = isKeyDown;
   }
   if (key == keyBindings.rotateRight) {
-    ACTIONS.shipRight = isKeyDown;
+    ACTIONS.rotateClockwise = isKeyDown;
   }
   if (key == keyBindings.thrust) {
-    ACTIONS.shipThrust = isKeyDown;
+    ACTIONS.thrust = isKeyDown;
   }
   if (key == keyBindings.shoot) {
     ACTIONS.shoot = isKeyDown;
@@ -171,30 +183,25 @@ function step(timestamp: number) {
 // if ID is in previous list then update element position and rotation
 // if ID is not in current list but is in previous list then remove element
 function gameLoop() {
-  // test controls for ship
-  ship.updateShipActions(
-    ACTIONS.shipThrust,
-    ACTIONS.shipLeft,
-    ACTIONS.shipRight,
-  );
+  const newBullets: Bullet[] = [];
+  // update ship position
+  ship.update(gameScreen.width, gameScreen.height, ACTIONS);
+
+  // update bulllet list
+  // - update positions - position of all bullets in list
+  // - remove dead bullets - if power <= 0
+  // - add new bullets - if ACTION.shoot
 
   // test if bullet fired
   // test if SHOOT KEY is pressed and ship's gun is loaded
-  if (ACTIONS.shoot == true && ship.gun !== null && ship.gun.isGunLoaded()) {
+  if (ship.gun?.state === "firing") {
     const { bulletPosition, bulletVelocity } = ship.gunFired();
     const newBullet = new Bullet(bulletPosition, bulletVelocity, bulletSpecs);
+    ship.gun.reloadGun();
     // add bullet to list of bullets
     bulletList[newBullet.id] = newBullet;
-    // TODO: replace above line with this-->  gameElements.bullets.push(newBullet);
-    // create game element for bullet
-    const el = createElement(newBullet.id, "bullet", null, null);
-    addElement(el, gameScreen.id);
-    // reload ships gun
-    ship.gun.reloadGun();
-    playSound("shoot");
+    renderNewBullet(newBullet.id);
   }
-  // update ship position
-  ship.update(gameScreen.width, gameScreen.height);
 
   // remove dead bullets
   for (var bullet in bulletList) {
@@ -207,6 +214,11 @@ function gameLoop() {
       delete bulletList[bullet];
     }
   }
+
+  // update rock list
+  // - update positions - position of all rocks in list
+  // - remove dead rocks -
+  // - add new rocks
 
   // test rocks to ship collision
   const shipBoundingArea = { x: ship.x, y: ship.y, r: ship.r };

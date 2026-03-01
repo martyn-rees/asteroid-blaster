@@ -1,18 +1,19 @@
+import Gun from "./gun";
+
 const FULLDEGREE = 360;
 type Directions = { degrees: number; radians: number };
+export type ShipActions = {
+  thrust: boolean;
+  rotateCounterClockwise: boolean;
+  rotateClockwise: boolean;
+  shoot: boolean;
+};
 type ShipSpecs = {
   speedMax: number;
   drag: number;
   thrustMax: number;
   radius: number;
   rotationSpeed: number;
-};
-type GunType = {
-  getGunPosition: Function;
-  getBulletVelocity: Function;
-  update: Function;
-  isGunLoaded: Function;
-  reloadGun: Function;
 };
 
 export default class Ship {
@@ -28,7 +29,7 @@ export default class Ship {
   public thrustPower: number;
   public direction: Directions;
   public shipSpeed: number;
-  public gun: GunType | null;
+  public gun: Gun | null;
 
   constructor(pos: { x: number; y: number }, id: string, shipSpecs: ShipSpecs) {
     this.id = id;
@@ -51,7 +52,7 @@ export default class Ship {
     this.gun = null;
   }
 
-  attachGun(gun: GunType) {
+  attachGun(gun: Gun) {
     this.gun = gun;
   }
 
@@ -64,8 +65,8 @@ export default class Ship {
       direction: this.direction.radians,
     };
 
-    const bulletPosition = this.gun!.getGunPosition(shipLocation, shipRotation);
-    const bulletVelocity = this.gun!.getBulletVelocity(
+    const { bulletPosition, bulletVelocity } = this.gun?.getNewBullet(
+      shipLocation,
       shipVelocity,
       shipRotation,
     );
@@ -73,17 +74,22 @@ export default class Ship {
   }
 
   //TODO: ACTIONS should be moved in to update(ACTIONS)
-  updateShipActions(
-    thrust: boolean,
-    rotateCounterClockwise: boolean,
-    rotateClockwise: boolean,
-  ) {
+  updateShipActions({
+    thrust,
+    rotateCounterClockwise,
+    rotateClockwise,
+    shoot,
+  }: ShipActions) {
     this.thrustPower = thrust ? this.thrustMax : 0;
     if (rotateCounterClockwise) {
       this.changeShipRotation(-this.rotationSpeed);
     }
     if (rotateClockwise) {
       this.changeShipRotation(this.rotationSpeed);
+    }
+    // if gun.state == "loaed" then set gun.state =="firing"
+    if (shoot && this.gun?.isGunLoaded()) {
+      this.gun.gunFired();
     }
   }
 
@@ -131,7 +137,9 @@ export default class Ship {
   // instead create a function to get and set ship location
   // in index.js get ship location and if needed reset location if off screen
   // this ship shouldn't care about screen dimensions to give it the option of adding a scrolling screen
-  update(SCREEN_WIDTH: number, SCREEN_HEIGHT: number) {
+  update(SCREEN_WIDTH: number, SCREEN_HEIGHT: number, ACTIONS: ShipActions) {
+    this.updateShipActions(ACTIONS); // if shhot then gun.state = "firing"
+    // this updates gun.reloadTimer
     if (this.gun !== null) {
       this.gun.update();
     }
