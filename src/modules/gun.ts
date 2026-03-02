@@ -43,13 +43,16 @@ export default class Gun {
   }
 
   // TODO: calculate gun position when off the x axis
-  private getGunPosition(
-    shipLocation: Location,
-    shipRotation: number,
-  ): Location {
+  private getGunPosition({
+    location,
+    rotation,
+  }: {
+    location: Location;
+    rotation: number;
+  }): Location {
     const gunlength = this.gunSpecs.barrelLocation.y;
-    const x = shipLocation.x + gunlength * Math.sin(shipRotation);
-    const y = shipLocation.y - gunlength * Math.cos(shipRotation);
+    const x = location.x + gunlength * Math.sin(rotation);
+    const y = location.y - gunlength * Math.cos(rotation);
     return { x, y };
   }
   // gun is attached to ship so its velocity is the same as ship velocity
@@ -65,16 +68,20 @@ export default class Gun {
     };
   }
 
-  public getNewBullet(
-    shipLocation: Location,
-    shipVelocity: Velocity,
-    shipRotation: number,
-  ): { bulletPosition: Location; bulletVelocity: { dx: number; dy: number } } {
-    const bulletPosition: Location = this.getGunPosition(
-      shipLocation,
-      shipRotation,
-    );
-    const bulletVelocity = this.getBulletVelocity(shipVelocity, shipRotation);
+  public getNewBullet({
+    location,
+    velocity,
+    rotation,
+  }: {
+    location: Location;
+    velocity: Velocity;
+    rotation: number;
+  }): { bulletPosition: Location; bulletVelocity: { dx: number; dy: number } } {
+    const bulletPosition: Location = this.getGunPosition({
+      location,
+      rotation,
+    });
+    const bulletVelocity = this.getBulletVelocity(velocity, rotation);
     this.reloadGun();
     return { bulletPosition, bulletVelocity };
   }

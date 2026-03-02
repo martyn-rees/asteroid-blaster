@@ -24,6 +24,16 @@ import { createStartButton } from "./ui/startbutton.js";
 import { createPauseButton } from "./ui/pauseButton.js";
 import { createResumeButton } from "./ui/resumeButton.js";
 
+type Location = {
+  x: number;
+  y: number;
+};
+
+type Velocity = {
+  speed: number;
+  direction: number;
+};
+
 var animationId: number;
 let isGamePlaying = false;
 let ACTIONS: ShipActions = {
@@ -47,31 +57,22 @@ let ship: Ship;
 let rockList: Rocks = {};
 let bulletList: Bullets = {};
 
-// ----  Rock code ----
-// TODO: needs gamescreen to get random edge start position
-function initRocks(amount: number) {
-  for (let i = 0; i < amount; i++) {
-    const borders = ["top", "right", "bottom", "left"];
-    const edge = borders[Math.floor(Math.random() * 4)];
-    const startPosition = gameScreen.getRandomEdgePosition(edge);
-    initRock("LARGE", startPosition);
-  }
+/* get random valus for new asteroids */
+function getStartPosition(screen: GameScreen): { x: number; y: number } {
+  const borders = ["top", "right", "bottom", "left"];
+  const edge = borders[Math.floor(Math.random() * 4)];
+  const startPosition = screen.getRandomEdgePosition(edge);
+  return startPosition;
 }
 
 function getRandomNumber(min: number, max: number): number {
   return min + Math.random() * (max - min);
 }
 
-const getAsteroidGraphic = (): string => {
-  const n = Math.floor(Math.random() * asteroidsSVG.length);
-  return asteroidsSVG[n];
-};
-
-function createNewAsteroid(
-  size: string,
-  initialPosition: { x: number; y: number },
-): Rock {
-  let rockProps: RockSpec = rockType[size];
+function getRandomAsteroidProps(rockProps: RockSpec): {
+  velocity: { speed: number; direction: number };
+  rockSpecs: { size: string; r: number; rotationRate: number };
+} {
   let speed = getRandomNumber(rockProps.speed.min, rockProps.speed.max);
   let r = getRandomNumber(rockProps.radius.min, rockProps.radius.max);
   let direction = getRandomNumber(0, 360);
@@ -82,10 +83,21 @@ function createNewAsteroid(
   rotationRate = Math.random() > 0.5 ? rotationRate : -rotationRate;
   let velocity = { speed, direction };
   const rockSpecs = {
-    size,
+    size: rockProps.description,
     r,
     rotationRate,
   };
+  return { velocity, rockSpecs };
+}
+/* end of random values for new asteroids */
+
+// ----  Rock code ----
+function createNewAsteroid(
+  size: string,
+  initialPosition: { x: number; y: number },
+): Rock {
+  let rockProps: RockSpec = rockType[size];
+  const { velocity, rockSpecs } = getRandomAsteroidProps(rockProps);
   const rock = new Rock(initialPosition, velocity, rockSpecs);
   return rock;
 }
@@ -98,19 +110,22 @@ function initRock(size: string, pos: { x: number; y: number }) {
   // add rock to rocklist
   rockList[rock.id] = rock;
 
-  // create game element for rock
-  // TODO: this is DOM related
-  let rockStyle = `height:${2 * rock.r}px; width:${2 * rock.r}px; margin-left:-${rock.r}px; margin-top:-${rock.r}px;`;
-  const asteroidSVG = getAsteroidGraphic();
-  const el = createElement(rock.id, "rock", rockStyle, asteroidSVG);
-  // add game element to screen
-  addToScreen(el, gameScreen.id);
+  //TODO: move this to render section
+  // look through rockList for new rocks and add to screen
+  addRockToScreen(rock);
+}
+
+// TODO: needs gamescreen to get random edge start position
+function createRocksForNewLevel({ rockAmount }: { rockAmount: number }) {
+  for (let i = 0; i < rockAmount; i++) {
+    const initialPosition = getStartPosition(gameScreen);
+    initRock("large", initialPosition);
+  }
 }
 // end of Rock code
 
 // ---- Ship code ----
-function initShip() {
-  const pos = gameScreen.getScreenCentre();
+function initShip(pos: { x: number; y: number }) {
   ship = new Ship(pos, "ship", shipSpecs);
   const gun = new Gun(gunSpec);
   ship.attachGun(gun);
@@ -118,60 +133,35 @@ function initShip() {
 // end of Ship code
 
 /* Bullet code */
-function addBullet(bullet: Bullet) {
-  bulletList[bullet.id] = bullet;
+type GunProps = {
+  position: Location;
+  velocity: { speed: number; direction: number };
+  rotation: number;
+};
+function createNewBullet(
+  gun: Gun,
+  gunProps: GunProps,
+  bulletSpecs: any,
+): Bullet {
+  const gunPropsWithLocation = {
+    location: gunProps.position,
+    velocity: gunProps.velocity,
+    rotation: gunProps.rotation,
+  };
+  const { bulletPosition, bulletVelocity } =
+    gun.getNewBullet(gunPropsWithLocation);
+  const newBullet = new Bullet(bulletPosition, bulletVelocity, bulletSpecs);
+  return newBullet;
 }
 
-function addNewBulletToScreen(id: string) {
-  // create game element for bullet
-  const el = createElement(id, "bullet", null, null);
-  addToScreen(el, gameScreen.id);
-  // reload ships gun
-  playSound("shoot");
+function addBullet(bullet: Bullet) {
+  bulletList[bullet.id] = bullet;
 }
 /* end of bullet code */
 
 function updateScore(value: number) {
   score += value;
-  document.getElementById("gameScore")!.innerHTML = "SCORE: " + score;
 }
-
-// events code
-function keyEvent(ev: KeyboardEvent, isKeyDown: boolean) {
-  var key = ev.code;
-  if (key == keyBindings.rotateLeft) {
-    ACTIONS.rotateCounterClockwise = isKeyDown;
-  }
-  if (key == keyBindings.rotateRight) {
-    ACTIONS.rotateClockwise = isKeyDown;
-  }
-  if (key == keyBindings.thrust) {
-    ACTIONS.thrust = isKeyDown;
-  }
-  if (key == keyBindings.shoot) {
-    ACTIONS.shoot = isKeyDown;
-  }
-}
-
-// TODO: there are now container size options instead of offsetWidth
-export function resizeGameScreenSize(screen: GameScreen) {
-  let screenNode: HTMLElement = document.getElementById(screen.id)!;
-  screen.setGameScreenDimensions(
-    screenNode.offsetWidth,
-    screenNode.offsetHeight,
-  );
-}
-
-function addEvents() {
-  window.addEventListener("keydown", function (ev) {
-    keyEvent(ev, true);
-  });
-
-  window.addEventListener("keyup", function (ev) {
-    keyEvent(ev, false);
-  });
-}
-// end of events code
 
 // GAME loop code
 function step(timestamp: number) {
@@ -190,6 +180,7 @@ function gameLoop() {
 
   // update ship position
   ship.update(gameScreen.width, gameScreen.height, ACTIONS);
+  const shipBoundingArea = { x: ship.x, y: ship.y, r: ship.r };
 
   // update bulllet list
   // - update positions - position of all bullets in list
@@ -199,19 +190,15 @@ function gameLoop() {
   // test if bullet fired
   // test if SHOOT KEY is pressed and ship's gun is loaded
   if (ship.gun && ship.gun.state === "firing") {
+    // get location of gun attached to ship
     const { shipLocation, shipVelocity, shipRotation } = ship.getShipState();
-    const { bulletPosition, bulletVelocity } = ship.gun!.getNewBullet(
-      shipLocation,
-      shipVelocity,
-      shipRotation,
-    );
-    newBullet = new Bullet(bulletPosition, bulletVelocity, bulletSpecs);
+    const gunProps: GunProps = {
+      position: { x: shipLocation.x, y: shipLocation.y },
+      velocity: shipVelocity,
+      rotation: shipRotation,
+    };
+    newBullet = createNewBullet(ship.gun, gunProps, bulletSpecs);
     addBullet(newBullet);
-  }
-
-  // DOM rendering
-  if (newBullet !== null) {
-    addNewBulletToScreen(newBullet.id);
   }
 
   // remove dead bullets
@@ -233,7 +220,6 @@ function gameLoop() {
   // - add new rocks
 
   // test rocks to ship collision
-  const shipBoundingArea = { x: ship.x, y: ship.y, r: ship.r };
 
   for (var rock in rockList) {
     rockList[rock].update(gameScreen.width, gameScreen.height);
@@ -272,13 +258,13 @@ function gameLoop() {
           };
           // explode rock in to smaller rocks and remove rock and bullet
           playSound("explosion");
-          if (rockList[rock].size == "LARGE") {
-            initRock("MEDIUM", pos);
-            initRock("MEDIUM", pos);
-          } else if (rockList[rock].size == "MEDIUM") {
-            initRock("SMALL", pos);
-            initRock("SMALL", pos);
-            initRock("SMALL", pos);
+          if (rockList[rock].size == "large") {
+            initRock("medium", pos);
+            initRock("medium", pos);
+          } else if (rockList[rock].size == "medium") {
+            initRock("small", pos);
+            initRock("small", pos);
+            initRock("small", pos);
           }
           haveCollision = true;
           updateScore(rockType[rockList[rock].size].value);
@@ -293,7 +279,12 @@ function gameLoop() {
   }
 
   //TODO - call render method
+  // DOM rendering
+  if (newBullet !== null) {
+    addNewBulletToScreen(newBullet.id);
+  }
   renderScreen(ship, rockList, bulletList, gameScreen);
+  displayScore(score);
 
   animationId = window.requestAnimationFrame(step);
 }
@@ -364,7 +355,7 @@ function resumeButtonHandler() {
 function startLevel(level: number) {
   const shipEl = createElement("ship", "ship", null, shipSVG());
   addToScreen(shipEl, gameScreen.id);
-  setTimeout(() => initRocks(8), 1000);
+  setTimeout(() => createRocksForNewLevel({ rockAmount: 8 }), 1000);
 }
 
 //TODO: uses render method
@@ -380,7 +371,8 @@ function setUpGameScreen() {
   addToScreen(pauseButton, gameScreen.id);
   addEvents();
   updateScore(0);
-  initShip();
+  const pos = gameScreen.getScreenCentre();
+  initShip(pos);
   startLevel(1);
   cancelAnimationFrame(animationId);
   animationId = requestAnimationFrame(step);
@@ -400,3 +392,67 @@ function init() {
 
 init();
 // end of GAME loop code
+
+/* RENDER CODEE */
+function addNewBulletToScreen(id: string) {
+  // create game element for bullet
+  const el = createElement(id, "bullet", null, null);
+  addToScreen(el, gameScreen.id);
+  // reload ships gun
+  playSound("shoot");
+}
+
+const getAsteroidGraphic = (): string => {
+  const n = Math.floor(Math.random() * asteroidsSVG.length);
+  return asteroidsSVG[n];
+};
+
+function addRockToScreen(rock: Rock) {
+  let rockStyle = `height:${2 * rock.r}px; width:${2 * rock.r}px; margin-left:-${rock.r}px; margin-top:-${rock.r}px;`;
+  const asteroidSVG = getAsteroidGraphic();
+  const el = createElement(rock.id, "rock", rockStyle, asteroidSVG);
+  // add game element to screen
+  addToScreen(el, gameScreen.id);
+}
+
+function displayScore(score: number) {
+  document.getElementById("gameScore")!.innerHTML = "SCORE: " + score;
+}
+/* end of RENDER DOCE */
+
+// events code
+function keyEvent(ev: KeyboardEvent, isKeyDown: boolean) {
+  var key = ev.code;
+  if (key == keyBindings.rotateLeft) {
+    ACTIONS.rotateCounterClockwise = isKeyDown;
+  }
+  if (key == keyBindings.rotateRight) {
+    ACTIONS.rotateClockwise = isKeyDown;
+  }
+  if (key == keyBindings.thrust) {
+    ACTIONS.thrust = isKeyDown;
+  }
+  if (key == keyBindings.shoot) {
+    ACTIONS.shoot = isKeyDown;
+  }
+}
+
+// TODO: there are now container size options instead of offsetWidth
+export function resizeGameScreenSize(screen: GameScreen) {
+  let screenNode: HTMLElement = document.getElementById(screen.id)!;
+  screen.setGameScreenDimensions(
+    screenNode.offsetWidth,
+    screenNode.offsetHeight,
+  );
+}
+
+function addEvents() {
+  window.addEventListener("keydown", function (ev) {
+    keyEvent(ev, true);
+  });
+
+  window.addEventListener("keyup", function (ev) {
+    keyEvent(ev, false);
+  });
+}
+// end of events code

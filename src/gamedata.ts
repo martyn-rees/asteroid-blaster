@@ -29,21 +29,21 @@ export type RockType = {
 };
 
 export const rockType: RockType = {
-  LARGE: {
+  large: {
     description: "large",
     value: 100,
     radius: { min: 60, max: 80 },
     speed: { min: 1, max: 2 },
     rotationRate: { min: 0.3, max: 0.8 },
   },
-  MEDIUM: {
+  medium: {
     description: "medium",
     value: 200,
     radius: { min: 25, max: 40 },
     speed: { min: 2.5, max: 3 },
     rotationRate: { min: 1.3, max: 2 },
   },
-  SMALL: {
+  small: {
     description: "small",
     value: 300,
     radius: { min: 10, max: 15 },

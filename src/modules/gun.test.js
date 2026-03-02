@@ -23,17 +23,20 @@ test("create new gun", () => {
 test("gun position on a ship (when pointing North then East)", () => {
   const gunSpec = setUp();
   const gun = new Gun(gunSpec);
-  const shipLocation = { x: 100, y: 100 };
+  const location = { x: 100, y: 100 };
   const shipRotationNorth = 0;
-  const location = gun.getGunPosition(shipLocation, shipRotationNorth);
+  const gunLocation = gun.getGunPosition({
+    location,
+    rotation: shipRotationNorth,
+  });
   // TODO: reversed y axis.
-  expect(location).toStrictEqual({ x: 100, y: 94 });
+  expect(gunLocation).toStrictEqual({ x: 100, y: 94 });
 
   const shipRotationEast = Math.PI / 2;
-  const locationAfterRotation = gun.getGunPosition(
-    shipLocation,
-    shipRotationEast,
-  );
+  const locationAfterRotation = gun.getGunPosition({
+    location,
+    rotation: shipRotationEast,
+  });
   // TODO: reversed y axis.
   expect(locationAfterRotation).toStrictEqual({ x: 106, y: 100 });
 });
