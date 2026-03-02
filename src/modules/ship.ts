@@ -56,25 +56,21 @@ export default class Ship {
     this.gun = gun;
   }
 
-  // calculate iniital position and velocity of bullet when ship's gun is fired
-  gunFired() {
+  getShipState() {
     const shipLocation = { x: this.x, y: this.y };
     const shipRotation = this.rotation.radians;
     const shipVelocity = {
       speed: this.shipSpeed,
       direction: this.direction.radians,
     };
-
-    const { bulletPosition, bulletVelocity } = this.gun?.getNewBullet(
+    return {
       shipLocation,
       shipVelocity,
       shipRotation,
-    );
-    return { bulletPosition, bulletVelocity };
+    };
   }
 
-  //TODO: ACTIONS should be moved in to update(ACTIONS)
-  updateShipActions({
+  private updateShipActions({
     thrust,
     rotateCounterClockwise,
     rotateClockwise,
@@ -88,8 +84,8 @@ export default class Ship {
       this.changeShipRotation(this.rotationSpeed);
     }
     // if gun.state == "loaed" then set gun.state =="firing"
-    if (shoot && this.gun?.isGunLoaded()) {
-      this.gun.gunFired();
+    if (shoot && this.gun!.isGunLoaded()) {
+      this.gun!.gunFired();
     }
   }
 

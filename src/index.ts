@@ -4,8 +4,8 @@ import Gun from "./modules/gun.js";
 import Bullet from "./modules/bullet.js";
 import GameScreen from "./modules/gamescreen.js";
 import {
-  addElement,
-  deleteElement,
+  addToScreen,
+  removeFromScreen,
   createElement,
   updateElement,
   renderThrust,
@@ -104,7 +104,7 @@ function initRock(size: string, pos: { x: number; y: number }) {
   const asteroidSVG = getAsteroidGraphic();
   const el = createElement(rock.id, "rock", rockStyle, asteroidSVG);
   // add game element to screen
-  addElement(el, gameScreen.id);
+  addToScreen(el, gameScreen.id);
 }
 // end of Rock code
 
@@ -118,12 +118,14 @@ function initShip() {
 // end of Ship code
 
 /* Bullet code */
-function createBullet() {}
+function addBullet(bullet: Bullet) {
+  bulletList[bullet.id] = bullet;
+}
 
-function renderNewBullet(id: string) {
+function addNewBulletToScreen(id: string) {
   // create game element for bullet
   const el = createElement(id, "bullet", null, null);
-  addElement(el, gameScreen.id);
+  addToScreen(el, gameScreen.id);
   // reload ships gun
   playSound("shoot");
 }
@@ -183,7 +185,9 @@ function step(timestamp: number) {
 // if ID is in previous list then update element position and rotation
 // if ID is not in current list but is in previous list then remove element
 function gameLoop() {
-  const newBullets: Bullet[] = [];
+  let newBullet: Bullet | null = null;
+  let oldBullets: string[] = [];
+
   // update ship position
   ship.update(gameScreen.width, gameScreen.height, ACTIONS);
 
@@ -194,22 +198,30 @@ function gameLoop() {
 
   // test if bullet fired
   // test if SHOOT KEY is pressed and ship's gun is loaded
-  if (ship.gun?.state === "firing") {
-    const { bulletPosition, bulletVelocity } = ship.gunFired();
-    const newBullet = new Bullet(bulletPosition, bulletVelocity, bulletSpecs);
-    ship.gun.reloadGun();
-    // add bullet to list of bullets
-    bulletList[newBullet.id] = newBullet;
-    renderNewBullet(newBullet.id);
+  if (ship.gun && ship.gun.state === "firing") {
+    const { shipLocation, shipVelocity, shipRotation } = ship.getShipState();
+    const { bulletPosition, bulletVelocity } = ship.gun!.getNewBullet(
+      shipLocation,
+      shipVelocity,
+      shipRotation,
+    );
+    newBullet = new Bullet(bulletPosition, bulletVelocity, bulletSpecs);
+    addBullet(newBullet);
+  }
+
+  // DOM rendering
+  if (newBullet !== null) {
+    addNewBulletToScreen(newBullet.id);
   }
 
   // remove dead bullets
   for (var bullet in bulletList) {
     const thisBullet = bulletList[bullet];
     if (thisBullet.bulletPower == 0) {
+      oldBullets.push(thisBullet.id);
       // remove bullet from gameScreen
       const nodeId = thisBullet.id;
-      deleteElement(nodeId);
+      removeFromScreen(nodeId);
       // remove bullet from list
       delete bulletList[bullet];
     }
@@ -232,7 +244,7 @@ function gameLoop() {
     };
     if (doCirclesCollide(rockBoundingArea, shipBoundingArea)) {
       const nodeId = rock;
-      deleteElement(nodeId);
+      removeFromScreen(nodeId);
       delete rockList[rock];
     }
   }
@@ -271,9 +283,9 @@ function gameLoop() {
           haveCollision = true;
           updateScore(rockType[rockList[rock].size].value);
 
-          deleteElement(rockList[rock].id);
+          removeFromScreen(rockList[rock].id);
           delete rockList[rock];
-          deleteElement(bulletList[bullet].id);
+          removeFromScreen(bulletList[bullet].id);
           delete bulletList[bullet];
         }
       }
@@ -326,24 +338,24 @@ function playSound(soundDescription: string) {
 function startButtonHandler() {
   isGamePlaying = true;
   setUpGameScreen();
-  deleteElement("startButton");
+  removeFromScreen("startButton");
 }
 
 function pauseButtonHandler() {
   isGamePlaying = false;
   cancelAnimationFrame(animationId);
-  deleteElement("pauseButton");
+  removeFromScreen("pauseButton");
   const resumeButton = createResumeButton(resumeButtonHandler);
-  addElement(resumeButton, gameScreen.id);
+  addToScreen(resumeButton, gameScreen.id);
 }
 
 function resumeButtonHandler() {
   isGamePlaying = true;
   cancelAnimationFrame(animationId);
   animationId = requestAnimationFrame(step);
-  deleteElement("resumeButton");
+  removeFromScreen("resumeButton");
   const pauseButton = createPauseButton(pauseButtonHandler);
-  addElement(pauseButton, gameScreen.id);
+  addToScreen(pauseButton, gameScreen.id);
 }
 /* end of handlers */
 
@@ -351,7 +363,7 @@ function resumeButtonHandler() {
 //TODO - uses render method
 function startLevel(level: number) {
   const shipEl = createElement("ship", "ship", null, shipSVG());
-  addElement(shipEl, gameScreen.id);
+  addToScreen(shipEl, gameScreen.id);
   setTimeout(() => initRocks(8), 1000);
 }
 
@@ -359,13 +371,13 @@ function startLevel(level: number) {
 // add start button, instructions, clear up old events and score
 function setUpStartScreen() {
   const startButton = createStartButton(startButtonHandler);
-  addElement(startButton, gameScreen.id);
+  addToScreen(startButton, gameScreen.id);
 }
 
 // TODO: uses render method
 function setUpGameScreen() {
   const pauseButton = createPauseButton(pauseButtonHandler);
-  addElement(pauseButton, gameScreen.id);
+  addToScreen(pauseButton, gameScreen.id);
   addEvents();
   updateScore(0);
   initShip();

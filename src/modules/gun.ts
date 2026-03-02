@@ -21,6 +21,7 @@ export type GunState =
   | "firing"
   | "reloading"
   | "malfunction";
+
 export default class Gun {
   private gunSpecs: GunSpec;
   private gunReloadTimer: number;
@@ -74,6 +75,7 @@ export default class Gun {
       shipRotation,
     );
     const bulletVelocity = this.getBulletVelocity(shipVelocity, shipRotation);
+    this.reloadGun();
     return { bulletPosition, bulletVelocity };
   }
 

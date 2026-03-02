@@ -23,7 +23,7 @@ export const renderThrust = (thrustPower: number) => {
 };
 
 // DOM functions
-export function addElement(newEl: HTMLElement, screenId: string) {
+export function addToScreen(newEl: HTMLElement, screenId: string) {
   let screenNode = document.getElementById(screenId);
   screenNode!.appendChild(newEl);
 }
@@ -50,7 +50,7 @@ export function createElement(
 
 // remove DOM element with matching ID
 // could be Display.remove
-export function deleteElement(elId: string) {
+export function removeFromScreen(elId: string) {
   let elNode: HTMLElement = document.getElementById(elId)!;
   elNode.parentNode!.removeChild(elNode);
 }
