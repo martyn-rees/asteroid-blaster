@@ -28,8 +28,8 @@ export default class Bullet {
     initialVelocity: {
       dx: number;
       dy: number;
-      initialSpeed: number;
-      initialDirection: number;
+      initialSpeed?: number;
+      initialDirection?: number;
     },
     bulletSpecs: { r: number; endurance: number; power: number },
   ) {
