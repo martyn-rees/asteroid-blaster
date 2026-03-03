@@ -107,10 +107,7 @@ function createNewAsteroid(
 function initRock(size: string, pos: { x: number; y: number }) {
   // create rock with random properties
   const rock: Rock = createNewAsteroid(size, pos);
-
-  // add rock to rocklist
-  rockList[rock.id] = rock;
-
+  addRock(rock);
   //TODO: move this to render section
   // look through rockList for new rocks and add to screen
   addRockToScreen(rock);
@@ -163,6 +160,28 @@ function deleteBullet(bullet: string) {
 }
 /* end of bullet code */
 
+function addRock(rock: Rock) {
+  rockList[rock.id] = rock;
+}
+
+function explodeRock(rock: string) {
+  const pos = {
+    x: rockList[rock].x,
+    y: rockList[rock].y,
+  };
+  // explode rock in to smaller rocks and remove rock and bullet
+  if (rockList[rock].size == "large") {
+    initRock("medium", pos);
+    initRock("medium", pos);
+  } else if (rockList[rock].size == "medium") {
+    initRock("small", pos);
+    initRock("small", pos);
+    initRock("small", pos);
+  }
+
+  delete rockList[rock];
+}
+
 function updateScore(value: number) {
   score += value;
 }
@@ -172,15 +191,10 @@ function step(timestamp: number) {
   gameLoop();
 }
 
-// rendering
-// add gamelements (id, pos, rotation) to rendering list
-// map through rendering list. Add ID to previous list
-// if ID is not in previous list then create element
-// if ID is in previous list then update element position and rotation
-// if ID is not in current list but is in previous list then remove element
-function gameLoop() {
+function gameLoopUpdate() {
   let newBullet: Bullet | null = null;
   let oldBullets: string[] = [];
+  let oldRocks: string[] = [];
 
   // update ship position
   ship.update(gameScreen.width, gameScreen.height, ACTIONS);
@@ -217,26 +231,15 @@ function gameLoop() {
 
   // update rock list
   // - update positions - position of all rocks in list
+  for (var rock in rockList) {
+    rockList[rock].update(gameScreen.width, gameScreen.height);
+  }
   // - remove dead rocks -
   // - add new rocks
 
-  // test rocks to ship collision
-
-  for (var rock in rockList) {
-    rockList[rock].update(gameScreen.width, gameScreen.height);
-    const rockBoundingArea = {
-      x: rockList[rock].x,
-      y: rockList[rock].y,
-      r: rockList[rock].r,
-    };
-    if (doCirclesCollide(rockBoundingArea, shipBoundingArea)) {
-      const nodeId = rock;
-      removeFromScreen(nodeId);
-      delete rockList[rock];
-    }
-  }
-
-  // test rocks to bullets collision
+  // test each rock for collision
+  // first test each rock against each bullet - if collision then remove bullet and rock, add score and add smaller rocks if needed
+  // if no bullet collision then test rock against ship - if collision then remove rock and ship
   for (var rock in rockList) {
     let haveCollision = false;
     const rockBoundingArea = {
@@ -244,6 +247,7 @@ function gameLoop() {
       y: rockList[rock].y,
       r: rockList[rock].r,
     };
+    // test rock against each bullet until collision is found - if collision then remove bullet and rock, add score and add smaller rocks if needed
     for (var bullet in bulletList) {
       if (!haveCollision) {
         const thisBullet = bulletList[bullet];
@@ -252,40 +256,46 @@ function gameLoop() {
           y: thisBullet.position.y,
           r: thisBullet.r,
         };
+        // TODO - can i pass in rock and bullet objects instead of creating bounding areas here
+        // rename doCirclesCollide to haveCollision and move to helper file
         if (doCirclesCollide(rockBoundingArea, bulletBoundingArea)) {
-          const pos = {
-            x: rockList[rock].x,
-            y: rockList[rock].y,
-          };
-          // explode rock in to smaller rocks and remove rock and bullet
-          // TODO: playSound should be in rendering section
-          playSound("explosion");
-          if (rockList[rock].size == "large") {
-            initRock("medium", pos);
-            initRock("medium", pos);
-          } else if (rockList[rock].size == "medium") {
-            initRock("small", pos);
-            initRock("small", pos);
-            initRock("small", pos);
-          }
           haveCollision = true;
           updateScore(rockType[rockList[rock].size].value);
-          // TODO: this is rendering method code - need to move to render section
-          removeFromScreen(rockList[rock].id);
-          delete rockList[rock];
+          const explodedRockId = rockList[rock].id;
+          explodeRock(explodedRockId);
+          oldRocks.push(explodedRockId);
           deleteBullet(bulletList[bullet].id);
           oldBullets.push(thisBullet.id);
         }
       }
     }
+    // if the rock has not collided with a bullet then check if it has collided with the ship
+    if (!haveCollision) {
+      if (doCirclesCollide(rockBoundingArea, shipBoundingArea)) {
+        const explodedRockId = rockList[rock].id;
+        explodeRock(explodedRockId);
+        oldRocks.push(explodedRockId);
+      }
+    }
   }
+  return { newBullet, oldBullets, oldRocks };
+}
 
+// rendering
+// add gamelements (id, pos, rotation) to rendering list
+// map through rendering list. Add ID to previous list
+// if ID is not in previous list then create element
+// if ID is in previous list then update element position and rotation
+// if ID is not in current list but is in previous list then remove element
+function gameLoop() {
+  const { newBullet, oldBullets, oldRocks } = gameLoopUpdate();
   // DOM rendering
-  renderScreen(
+  gameLoopRender(
     ship,
     rockList,
     bulletList,
     oldBullets,
+    oldRocks,
     score,
     newBullet,
     gameScreen,
@@ -367,11 +377,12 @@ init();
 // disply game elements, ship, rocks and bullets
 // TODO: pass in gameElelemtns object with single items and arrays which get displayed using generic functions
 // TODO - why does ony bullets use the update function
-export function renderScreen(
+export function gameLoopRender(
   ship: Ship,
   rockList: Rocks,
   bulletList: Bullets,
   oldBullets: string[],
+  oldRocks: string[],
   score: number,
   newBullet: Bullet | null,
   gameScreen: GameScreen,
@@ -391,6 +402,11 @@ export function renderScreen(
   // remove dead bullets
   oldBullets.forEach((bulletId) => {
     removeFromScreen(bulletId);
+  });
+  // remove dead rocks
+  oldRocks.forEach((rockId) => {
+    removeFromScreen(rockId);
+    playSound("explosion");
   });
   displayScore(score);
 }
