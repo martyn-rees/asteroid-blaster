@@ -24,6 +24,7 @@ import { createStartButton } from "./ui/startbutton.js";
 import { createPauseButton } from "./ui/pauseButton.js";
 import { createResumeButton } from "./ui/resumeButton.js";
 
+// TODO: Location and Velocity types should be shared across modules
 type Location = {
   x: number;
   y: number;
@@ -57,7 +58,6 @@ let ship: Ship;
 let rockList: Rocks = {};
 let bulletList: Bullets = {};
 
-/* get random valus for new asteroids */
 function getStartPosition(screen: GameScreen): { x: number; y: number } {
   const borders = ["top", "right", "bottom", "left"];
   const edge = borders[Math.floor(Math.random() * 4)];
@@ -65,6 +65,7 @@ function getStartPosition(screen: GameScreen): { x: number; y: number } {
   return startPosition;
 }
 
+/* get random valus for new asteroids */
 function getRandomNumber(min: number, max: number): number {
   return min + Math.random() * (max - min);
 }
@@ -157,6 +158,9 @@ function createNewBullet(
 function addBullet(bullet: Bullet) {
   bulletList[bullet.id] = bullet;
 }
+function deleteBullet(bullet: string) {
+  delete bulletList[bullet];
+}
 /* end of bullet code */
 
 function updateScore(value: number) {
@@ -184,10 +188,20 @@ function gameLoop() {
 
   // update bulllet list
   // - update positions - position of all bullets in list
+  for (var bullet in bulletList) {
+    bulletList[bullet].update(gameScreen.width, gameScreen.height);
+  }
   // - remove dead bullets - if power <= 0
-  // - add new bullets - if ACTION.shoot
+  for (var bulletId in bulletList) {
+    const thisBullet = bulletList[bulletId];
+    if (thisBullet.bulletPower == 0) {
+      oldBullets.push(thisBullet.id);
+      // remove bullet from list
+      deleteBullet(bulletId);
+    }
+  }
 
-  // test if bullet fired
+  // - add new bullets - if ACTION.shoot
   // test if SHOOT KEY is pressed and ship's gun is loaded
   if (ship.gun && ship.gun.state === "firing") {
     // get location of gun attached to ship
@@ -199,19 +213,6 @@ function gameLoop() {
     };
     newBullet = createNewBullet(ship.gun, gunProps, bulletSpecs);
     addBullet(newBullet);
-  }
-
-  // remove dead bullets
-  for (var bullet in bulletList) {
-    const thisBullet = bulletList[bullet];
-    if (thisBullet.bulletPower == 0) {
-      oldBullets.push(thisBullet.id);
-      // remove bullet from gameScreen
-      const nodeId = thisBullet.id;
-      removeFromScreen(nodeId);
-      // remove bullet from list
-      delete bulletList[bullet];
-    }
   }
 
   // update rock list
@@ -257,6 +258,7 @@ function gameLoop() {
             y: rockList[rock].y,
           };
           // explode rock in to smaller rocks and remove rock and bullet
+          // TODO: playSound should be in rendering section
           playSound("explosion");
           if (rockList[rock].size == "large") {
             initRock("medium", pos);
@@ -268,60 +270,28 @@ function gameLoop() {
           }
           haveCollision = true;
           updateScore(rockType[rockList[rock].size].value);
-
+          // TODO: this is rendering method code - need to move to render section
           removeFromScreen(rockList[rock].id);
           delete rockList[rock];
-          removeFromScreen(bulletList[bullet].id);
-          delete bulletList[bullet];
+          deleteBullet(bulletList[bullet].id);
+          oldBullets.push(thisBullet.id);
         }
       }
     }
   }
 
-  //TODO - call render method
   // DOM rendering
-  if (newBullet !== null) {
-    addNewBulletToScreen(newBullet.id);
-  }
-  renderScreen(ship, rockList, bulletList, gameScreen);
-  displayScore(score);
+  renderScreen(
+    ship,
+    rockList,
+    bulletList,
+    oldBullets,
+    score,
+    newBullet,
+    gameScreen,
+  );
 
   animationId = window.requestAnimationFrame(step);
-}
-
-// disply game elements, ship, rocks and bullets
-// TODO: pass in gameElelemtns object with single items and arrays which get displayed using generic functions
-// TODO - why does ony bullets use the update function
-export function renderScreen(
-  ship: Ship,
-  rockList: Rocks,
-  bulletList: Bullets,
-  gameScreen: GameScreen,
-) {
-  ship.render(updateElement, renderThrust); // this calls render method in ship class which calls renderShip above whch calls render
-  for (var rock in rockList) {
-    rockList[rock].render(updateElement); // this calls render method in rock class which calls render above
-  }
-  for (var bullet in bulletList) {
-    bulletList[bullet].update(gameScreen.width, gameScreen.height);
-    bulletList[bullet].render(updateElement);
-  }
-}
-
-function playSound(soundDescription: string) {
-  let soundurl;
-  if (soundDescription == "shoot") {
-    soundurl = "./sounds/shoot.wav";
-  } else if (soundDescription == "explosion") {
-    soundurl = "./sounds/explosion.wav";
-  } else {
-    console.error(`sound description ${soundDescription} not recognised`);
-    return;
-  }
-  const sound = new Audio(soundurl);
-  sound.volume = 0.1;
-  sound.load();
-  sound.play();
 }
 
 /* handlers */
@@ -394,12 +364,57 @@ init();
 // end of GAME loop code
 
 /* RENDER CODEE */
+// disply game elements, ship, rocks and bullets
+// TODO: pass in gameElelemtns object with single items and arrays which get displayed using generic functions
+// TODO - why does ony bullets use the update function
+export function renderScreen(
+  ship: Ship,
+  rockList: Rocks,
+  bulletList: Bullets,
+  oldBullets: string[],
+  score: number,
+  newBullet: Bullet | null,
+  gameScreen: GameScreen,
+) {
+  //TODO: if addNewBullet is moved to end of this function then get an error that new bullet is not rendered on first frame. Why?
+  if (newBullet !== null) {
+    addNewBulletToScreen(newBullet.id);
+    playSound("shoot");
+  }
+  ship.render(updateElement, renderThrust); // this calls render method in ship class which calls renderShip above whch calls render
+  for (var rock in rockList) {
+    rockList[rock].render(updateElement); // this calls render method in rock class which calls render above
+  }
+  for (var bullet in bulletList) {
+    bulletList[bullet].render(updateElement);
+  }
+  // remove dead bullets
+  oldBullets.forEach((bulletId) => {
+    removeFromScreen(bulletId);
+  });
+  displayScore(score);
+}
+
+function playSound(soundDescription: string) {
+  let soundurl;
+  if (soundDescription == "shoot") {
+    soundurl = "./sounds/shoot.wav";
+  } else if (soundDescription == "explosion") {
+    soundurl = "./sounds/explosion.wav";
+  } else {
+    console.error(`sound description ${soundDescription} not recognised`);
+    return;
+  }
+  const sound = new Audio(soundurl);
+  sound.volume = 0.1;
+  sound.load();
+  sound.play();
+}
+
 function addNewBulletToScreen(id: string) {
   // create game element for bullet
   const el = createElement(id, "bullet", null, null);
   addToScreen(el, gameScreen.id);
-  // reload ships gun
-  playSound("shoot");
 }
 
 const getAsteroidGraphic = (): string => {

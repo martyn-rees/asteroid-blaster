@@ -1,4 +1,5 @@
 // gun specs of gun that can be attached to ship
+// TODO: Location and Velocity types should be shared across modules
 type Location = {
   x: number;
   y: number;

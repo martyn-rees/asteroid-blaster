@@ -57,16 +57,13 @@ export default class Ship {
   }
 
   getShipState() {
-    const shipLocation = { x: this.x, y: this.y };
-    const shipRotation = this.rotation.radians;
-    const shipVelocity = {
-      speed: this.shipSpeed,
-      direction: this.direction.radians,
-    };
     return {
-      shipLocation,
-      shipVelocity,
-      shipRotation,
+      shipLocation: { x: this.x, y: this.y },
+      shipVelocity: {
+        speed: this.shipSpeed,
+        direction: this.direction.radians,
+      },
+      shipRotation: this.rotation.radians,
     };
   }
 
@@ -83,7 +80,6 @@ export default class Ship {
     if (rotateClockwise) {
       this.changeShipRotation(this.rotationSpeed);
     }
-    // if gun.state == "loaed" then set gun.state =="firing"
     if (shoot && this.gun!.isGunLoaded()) {
       this.gun!.gunFired();
     }
