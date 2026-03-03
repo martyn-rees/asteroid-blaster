@@ -1,4 +1,5 @@
-// TODO: rewrite so this accepts location and screen coords and returns new location if off edge of screen
+// TODO: these functions should be passed in as a callback to the ship, rock and bullet classes so that they can be used in the update and render methods of those classes
+
 export const constrainNumber = (
   n: number,
   min: number,
@@ -34,7 +35,7 @@ export const constrainNumber = (
 const distanceBetweenPoints = (
   p1: { x: number; y: number },
   p2: { x: number; y: number },
-) => {
+): number => {
   let dx = p1.x - p2.x;
   let dy = p1.y - p2.y;
   return Math.sqrt(dx * dx + dy * dy);
@@ -44,7 +45,7 @@ const distanceBetweenPoints = (
 export const testCollision = (
   c1: { x: number; y: number; r: number },
   c2: { x: number; y: number; r: number },
-) => {
+): boolean => {
   let minDistance = c1.r + c2.r;
   return distanceBetweenPoints(c1, c2) < minDistance ? true : false;
 };

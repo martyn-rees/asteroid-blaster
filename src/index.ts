@@ -239,35 +239,35 @@ function gameLoopUpdate() {
   // test each rock for collision
   // first test each rock against each bullet - if collision then remove bullet and rock, add score and add smaller rocks if needed
   // if no bullet collision then test rock against ship - if collision then remove rock and ship
-  for (var rock in rockList) {
-    let haveCollision = false;
-    const thisRock = rockList[rock];
+  for (var rockId in rockList) {
+    let hasRockCollided: boolean = false;
+    const thisRock = rockList[rockId];
     // test rock against each bullet until collision is found - if collision then remove bullet and rock, add score and add smaller rocks if needed
     for (var bulletId in bulletList) {
       const thisBullet = bulletList[bulletId];
-      let haveCollision2 = testCollision(
+      hasRockCollided = testCollision(
         thisRock.boundary(),
         thisBullet.boundary(),
       );
-      if (!haveCollision) {
-        if (testCollision(thisRock.boundary(), thisBullet.boundary())) {
-          haveCollision = true;
-          updateScore(rockType[rockList[rock].size].value);
-          const explodedRockId = rockList[rock].id;
-          explodeRock(explodedRockId);
-          oldRocks.push(explodedRockId);
-          deleteBullet(bulletId);
-          oldBullets.push(bulletId);
-        }
+      if (hasRockCollided) {
+        deleteBullet(bulletId);
+        oldBullets.push(bulletId);
+        break;
       }
     }
     // if the rock has not collided with a bullet then check if it has collided with the ship
-    if (!haveCollision) {
-      if (testCollision(thisRock.boundary(), ship.boundary())) {
-        const explodedRockId = rockList[rock].id;
-        explodeRock(explodedRockId);
-        oldRocks.push(explodedRockId);
+    if (!hasRockCollided) {
+      hasRockCollided = testCollision(thisRock.boundary(), ship.boundary());
+      if (hasRockCollided) {
+        // explodeShip(); or reduceShields() - or use one of the automaticshields that gives invincibility for a few seconds
       }
+    }
+    // if collision with bullet or ship then remove rock, add score and add smaller rocks if needed
+    if (hasRockCollided) {
+      const valueOfRock = rockType[rockList[rockId].size].value;
+      updateScore(valueOfRock);
+      explodeRock(rockId);
+      oldRocks.push(rockId);
     }
   }
   return { newBullet, oldBullets, oldRocks };
@@ -368,7 +368,8 @@ init();
 /* RENDER CODEE */
 // disply game elements, ship, rocks and bullets
 // TODO: pass in gameElelemtns object with single items and arrays which get displayed using generic functions
-// TODO - why does ony bullets use the update function
+// TODO - keep a copy of rockList and bullewtList from previous frame and compare to current list to decide which elements to add, update and remove
+// can then remove oldBullets, oldRocks and newBullet
 export function gameLoopRender(
   ship: Ship,
   rockList: Rocks,
@@ -385,11 +386,11 @@ export function gameLoopRender(
     playSound("shoot");
   }
   ship.render(updateElement, renderThrust); // this calls render method in ship class which calls renderShip above whch calls render
-  for (var rock in rockList) {
-    rockList[rock].render(updateElement); // this calls render method in rock class which calls render above
+  for (var rockId in rockList) {
+    rockList[rockId].render(updateElement); // this calls render method in rock class which calls render above
   }
-  for (var bullet in bulletList) {
-    bulletList[bullet].render(updateElement);
+  for (var bulletId in bulletList) {
+    bulletList[bulletId].render(updateElement);
   }
   // remove dead bullets
   oldBullets.forEach((bulletId) => {
