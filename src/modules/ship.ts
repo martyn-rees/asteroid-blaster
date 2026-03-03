@@ -137,7 +137,11 @@ export default class Ship {
   // instead create a function to get and set ship location
   // in index.js get ship location and if needed reset location if off screen
   // this ship shouldn't care about screen dimensions to give it the option of adding a scrolling screen
-  update(SCREEN_WIDTH: number, SCREEN_HEIGHT: number, ACTIONS: ShipActions) {
+  update(
+    ACTIONS: ShipActions,
+    transformXCallback?: Function,
+    transformYCallback?: Function,
+  ) {
     this.updateShipActions(ACTIONS); // if shhot then gun.state = "firing"
     // this updates gun.reloadTimer
     if (this.gun !== null) {
@@ -145,22 +149,11 @@ export default class Ship {
     }
 
     this.calculateNewVelocity();
-    this.x += this.shipSpeed * Math.sin(this.direction.radians);
-    this.y -= this.shipSpeed * Math.cos(this.direction.radians);
-
-    //amend x,y values to keep ship on screen
-    // this moves to screen edge but should move the amount it's past the screen boundary e.g. this.x -= SCREEN_WIDTH
-    if (this.x < 0) {
-      this.x += SCREEN_WIDTH;
-    } else if (this.x > SCREEN_WIDTH) {
-      this.x -= SCREEN_WIDTH;
-    }
-
-    if (this.y < 0) {
-      this.y += SCREEN_HEIGHT;
-    } else if (this.y > SCREEN_HEIGHT) {
-      this.y -= SCREEN_HEIGHT;
-    }
+    const newX = this.x + this.shipSpeed * Math.sin(this.direction.radians);
+    const newY = this.y - this.shipSpeed * Math.cos(this.direction.radians);
+    // use transforms to update position of rock on game screen
+    this.x = transformXCallback ? transformXCallback(newX) : newX;
+    this.y = transformYCallback ? transformYCallback(newY) : newY;
   }
 
   changeShipRotation(dRot: number) {

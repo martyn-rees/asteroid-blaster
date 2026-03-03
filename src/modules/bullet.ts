@@ -1,5 +1,3 @@
-import { constrainNumber } from "../helper.js";
-
 // bullet specifications
 // endurance - a bullet only lasts for a short time after being fired. Count this down every frame (or time if using time based animation)
 // when this time is up the bulletPower becomes 0 signifying that the bullet can be removed
@@ -50,15 +48,16 @@ export default class Bullet {
     };
   }
 
-  update(SCREEN_WIDTH: number, SCREEN_HEIGHT: number) {
+  update(transformXCallback?: Function, transformYCallback?: Function) {
     this.endurance--;
     if (this.endurance <= 0) {
       this.bulletPower = 0;
     } else {
       let newX = this.position.x + this.velocity.dx;
       let newY = this.position.y - this.velocity.dy;
-      this.position.x = constrainNumber(newX, 0, SCREEN_WIDTH);
-      this.position.y = constrainNumber(newY, 0, SCREEN_HEIGHT);
+      // use transforms to update position of bullet on game screen
+      this.position.x = transformXCallback ? transformXCallback(newX) : newX;
+      this.position.y = transformYCallback ? transformYCallback(newY) : newY;
     }
   }
 

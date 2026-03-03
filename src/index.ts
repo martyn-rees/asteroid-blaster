@@ -10,7 +10,7 @@ import {
   updateElement,
   renderThrust,
 } from "./render.js";
-import { testCollision } from "./helper.js";
+import { constrainNumber, testCollision } from "./helper.js";
 import { asteroidsSVG, shipSVG } from "./graphics.js";
 import {
   bulletSpecs,
@@ -195,25 +195,25 @@ function gameLoopUpdate() {
   let newBullet: Bullet | null = null;
   let oldBullets: string[] = [];
   let oldRocks: string[] = [];
+  // use constrainNumber as a callback in update method of ship, rock and bullet classes instead of passing in gameScreen dimensions
+  const warpX = (x: number) => constrainNumber(x, 0, gameScreen.width);
+  const warpY = (y: number) => constrainNumber(y, 0, gameScreen.height);
 
-  // update ship position
-  ship.update(gameScreen.width, gameScreen.height, ACTIONS);
+  // update ship position and state based on ACTIONS
+  ship.update(ACTIONS, warpX, warpY);
 
-  // update bulllet list
-  // - update positions - position of all bullets in list
-  for (var bullet in bulletList) {
-    bulletList[bullet].update(gameScreen.width, gameScreen.height);
+  // update position of all bullets
+  for (var bulletId in bulletList) {
+    bulletList[bulletId].update(warpX, warpY);
   }
-  // update rock list
-  // - update positions - position of all rocks in list
+  // update position of all rocks
   for (var rock in rockList) {
-    rockList[rock].update(gameScreen.width, gameScreen.height);
+    rockList[rock].update(warpX, warpY);
   }
 
   // - add new bullets - if ACTION.shoot
-  // test if SHOOT KEY is pressed and ship's gun is loaded
   if (ship.gun && ship.gun.state === "firing") {
-    // get location of gun attached to ship
+    // get location of gun attached to ship as the starting position of new bullet
     const { shipLocation, shipVelocity, shipRotation } = ship.getShipState();
     const gunProps: GunProps = {
       position: { x: shipLocation.x, y: shipLocation.y },
@@ -224,10 +224,8 @@ function gameLoopUpdate() {
     addBullet(newBullet);
   }
 
-  // - remove dead rocks -
-  // - add new rocks
-
   // - remove dead bullets - if power <= 0
+  // this could be moved to collision function where it loops over bullets to save looping over bullets twice but for now its kept separate for clarity
   for (var bulletId in bulletList) {
     const thisBullet = bulletList[bulletId];
     if (thisBullet.bulletPower == 0) {
@@ -236,13 +234,11 @@ function gameLoopUpdate() {
     }
   }
 
-  // test each rock for collision
-  // first test each rock against each bullet - if collision then remove bullet and rock, add score and add smaller rocks if needed
-  // if no bullet collision then test rock against ship - if collision then remove rock and ship
+  // test each rock for collision with bullets and ship
   for (var rockId in rockList) {
     let hasRockCollided: boolean = false;
     const thisRock = rockList[rockId];
-    // test rock against each bullet until collision is found - if collision then remove bullet and rock, add score and add smaller rocks if needed
+    // test rock against each bullet until collision is found - if collision then remove bullet and record a collision has happened and break out of bullet loop
     for (var bulletId in bulletList) {
       const thisBullet = bulletList[bulletId];
       hasRockCollided = testCollision(
@@ -259,6 +255,7 @@ function gameLoopUpdate() {
     if (!hasRockCollided) {
       hasRockCollided = testCollision(thisRock.boundary(), ship.boundary());
       if (hasRockCollided) {
+        // add ship collision code
         // explodeShip(); or reduceShields() - or use one of the automaticshields that gives invincibility for a few seconds
       }
     }

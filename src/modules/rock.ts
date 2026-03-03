@@ -1,5 +1,3 @@
-import { constrainNumber } from "../helper.js";
-
 type RockSpec = {
   size: string;
   r: number;
@@ -35,20 +33,6 @@ export default class Rock {
     this.rotation = 0;
   }
 
-  // alternatrive to warping to other side of screen
-  /*bounceOffWalls(screenWidth, screenHeight) {
-    if (this.x - this.r < 0) {
-      this.velocity.dx = Math.abs(this.velocity.dx);
-    } else if (this.x + this.r > screenWidth) {
-      this.velocity.dx = -Math.abs(this.velocity.dx);
-    }
-    if (this.y - this.r < 0) {
-      this.velocity.dy = Math.abs(this.velocity.dy);
-    } else if (this.y + this.r > screenHeight) {
-      this.velocity.dy = -Math.abs(this.velocity.dy);
-    }
-  }*/
-
   convertDegreestoRadians(degrees: number) {
     return 0.0174533 * degrees;
   }
@@ -61,17 +45,17 @@ export default class Rock {
     };
   }
 
-  update(screenWidth: number, screenHeight: number) {
+  update(transformXCallback?: Function, transformYCallback?: Function) {
     // update new location of rock based on velocity
     const radians = this.convertDegreestoRadians(this.velocity.direction);
     const dx = this.velocity.speed * Math.sin(radians);
     const dy = this.velocity.speed * Math.cos(radians);
     let newX = this.x + dx;
     let newY = this.y + dy;
-
     this.rotation += this.rotationRate;
-    this.x = constrainNumber(newX, 0, screenWidth);
-    this.y = constrainNumber(newY, 0, screenHeight);
+    // use transforms to update position of rock on game screen
+    this.x = transformXCallback ? transformXCallback(newX) : newX;
+    this.y = transformYCallback ? transformYCallback(newY) : newY;
   }
 
   render(renderCallback: Function) {

@@ -14,6 +14,20 @@ export const constrainNumber = (
   return constrainedNumber;
 };
 
+// alternatrive to warping to other side of screen
+/*bounceOffWalls(screenWidth, screenHeight) {
+    if (this.x - this.r < 0) {
+      this.velocity.dx = Math.abs(this.velocity.dx);
+    } else if (this.x + this.r > screenWidth) {
+      this.velocity.dx = -Math.abs(this.velocity.dx);
+    }
+    if (this.y - this.r < 0) {
+      this.velocity.dy = Math.abs(this.velocity.dy);
+    } else if (this.y + this.r > screenHeight) {
+      this.velocity.dy = -Math.abs(this.velocity.dy);
+    }
+  }*/
+
 // position: {x,y} - the position of the object that has gone off the screen
 // boundingBox: {w,h} - the width and height of the game screen
 /*export const translateToOppositeSideIfOutside = (position, boundingBox) => {
