@@ -41,7 +41,7 @@ const distanceBetweenPoints = (
 };
 
 // c1 and c2 are objects with x, y and r properties
-export const doCirclesCollide = (
+export const testCollision = (
   c1: { x: number; y: number; r: number },
   c2: { x: number; y: number; r: number },
 ) => {

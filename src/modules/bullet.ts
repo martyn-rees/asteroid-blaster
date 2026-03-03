@@ -42,6 +42,14 @@ export default class Bullet {
     this.r = bulletSpecs.r;
   }
 
+  boundary(): { x: number; y: number; r: number } {
+    return {
+      x: this.position.x,
+      y: this.position.y,
+      r: this.r,
+    };
+  }
+
   update(SCREEN_WIDTH: number, SCREEN_HEIGHT: number) {
     this.endurance--;
     if (this.endurance <= 0) {

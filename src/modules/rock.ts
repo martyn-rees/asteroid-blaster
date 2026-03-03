@@ -53,6 +53,14 @@ export default class Rock {
     return 0.0174533 * degrees;
   }
 
+  boundary(): { x: number; y: number; r: number } {
+    return {
+      x: this.x,
+      y: this.y,
+      r: this.r,
+    };
+  }
+
   update(screenWidth: number, screenHeight: number) {
     // update new location of rock based on velocity
     const radians = this.convertDegreestoRadians(this.velocity.direction);

@@ -67,6 +67,14 @@ export default class Ship {
     };
   }
 
+  boundary(): { x: number; y: number; r: number } {
+    return {
+      x: this.x,
+      y: this.y,
+      r: this.r,
+    };
+  }
+
   private updateShipActions({
     thrust,
     rotateCounterClockwise,

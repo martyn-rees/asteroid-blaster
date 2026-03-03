@@ -10,7 +10,7 @@ import {
   updateElement,
   renderThrust,
 } from "./render.js";
-import { doCirclesCollide } from "./helper.js";
+import { testCollision } from "./helper.js";
 import { asteroidsSVG, shipSVG } from "./graphics.js";
 import {
   bulletSpecs,
@@ -198,21 +198,16 @@ function gameLoopUpdate() {
 
   // update ship position
   ship.update(gameScreen.width, gameScreen.height, ACTIONS);
-  const shipBoundingArea = { x: ship.x, y: ship.y, r: ship.r };
 
   // update bulllet list
   // - update positions - position of all bullets in list
   for (var bullet in bulletList) {
     bulletList[bullet].update(gameScreen.width, gameScreen.height);
   }
-  // - remove dead bullets - if power <= 0
-  for (var bulletId in bulletList) {
-    const thisBullet = bulletList[bulletId];
-    if (thisBullet.bulletPower == 0) {
-      oldBullets.push(thisBullet.id);
-      // remove bullet from list
-      deleteBullet(bulletId);
-    }
+  // update rock list
+  // - update positions - position of all rocks in list
+  for (var rock in rockList) {
+    rockList[rock].update(gameScreen.width, gameScreen.height);
   }
 
   // - add new bullets - if ACTION.shoot
@@ -229,49 +224,46 @@ function gameLoopUpdate() {
     addBullet(newBullet);
   }
 
-  // update rock list
-  // - update positions - position of all rocks in list
-  for (var rock in rockList) {
-    rockList[rock].update(gameScreen.width, gameScreen.height);
-  }
   // - remove dead rocks -
   // - add new rocks
+
+  // - remove dead bullets - if power <= 0
+  for (var bulletId in bulletList) {
+    const thisBullet = bulletList[bulletId];
+    if (thisBullet.bulletPower == 0) {
+      deleteBullet(bulletId);
+      oldBullets.push(bulletId);
+    }
+  }
 
   // test each rock for collision
   // first test each rock against each bullet - if collision then remove bullet and rock, add score and add smaller rocks if needed
   // if no bullet collision then test rock against ship - if collision then remove rock and ship
   for (var rock in rockList) {
     let haveCollision = false;
-    const rockBoundingArea = {
-      x: rockList[rock].x,
-      y: rockList[rock].y,
-      r: rockList[rock].r,
-    };
+    const thisRock = rockList[rock];
     // test rock against each bullet until collision is found - if collision then remove bullet and rock, add score and add smaller rocks if needed
-    for (var bullet in bulletList) {
+    for (var bulletId in bulletList) {
+      const thisBullet = bulletList[bulletId];
+      let haveCollision2 = testCollision(
+        thisRock.boundary(),
+        thisBullet.boundary(),
+      );
       if (!haveCollision) {
-        const thisBullet = bulletList[bullet];
-        const bulletBoundingArea = {
-          x: thisBullet.position.x,
-          y: thisBullet.position.y,
-          r: thisBullet.r,
-        };
-        // TODO - can i pass in rock and bullet objects instead of creating bounding areas here
-        // rename doCirclesCollide to haveCollision and move to helper file
-        if (doCirclesCollide(rockBoundingArea, bulletBoundingArea)) {
+        if (testCollision(thisRock.boundary(), thisBullet.boundary())) {
           haveCollision = true;
           updateScore(rockType[rockList[rock].size].value);
           const explodedRockId = rockList[rock].id;
           explodeRock(explodedRockId);
           oldRocks.push(explodedRockId);
-          deleteBullet(bulletList[bullet].id);
-          oldBullets.push(thisBullet.id);
+          deleteBullet(bulletId);
+          oldBullets.push(bulletId);
         }
       }
     }
     // if the rock has not collided with a bullet then check if it has collided with the ship
     if (!haveCollision) {
-      if (doCirclesCollide(rockBoundingArea, shipBoundingArea)) {
+      if (testCollision(thisRock.boundary(), ship.boundary())) {
         const explodedRockId = rockList[rock].id;
         explodeRock(explodedRockId);
         oldRocks.push(explodedRockId);
