@@ -110,7 +110,7 @@ function initRock(size: string, pos: { x: number; y: number }) {
   addRock(rock);
   //TODO: move this to render section
   // look through rockList for new rocks and add to screen
-  addRockToScreen(rock);
+  addNewRockToScreen(rock, gameScreen);
 }
 
 // TODO: needs gamescreen to get random edge start position
@@ -164,22 +164,22 @@ function addRock(rock: Rock) {
   rockList[rock.id] = rock;
 }
 
-function explodeRock(rock: string) {
+function explodeRock(rockId: string) {
   const pos = {
-    x: rockList[rock].x,
-    y: rockList[rock].y,
+    x: rockList[rockId].x,
+    y: rockList[rockId].y,
   };
   // explode rock in to smaller rocks and remove rock and bullet
-  if (rockList[rock].size == "large") {
+  if (rockList[rockId].size == "large") {
     initRock("medium", pos);
     initRock("medium", pos);
-  } else if (rockList[rock].size == "medium") {
+  } else if (rockList[rockId].size == "medium") {
     initRock("small", pos);
     initRock("small", pos);
     initRock("small", pos);
   }
 
-  delete rockList[rock];
+  delete rockList[rockId];
 }
 
 function updateScore(value: number) {
@@ -379,7 +379,7 @@ export function gameLoopRender(
 ) {
   //TODO: if addNewBullet is moved to end of this function then get an error that new bullet is not rendered on first frame. Why?
   if (newBullet !== null) {
-    addNewBulletToScreen(newBullet.id);
+    addNewBulletToScreen(newBullet.id, gameScreen);
     playSound("shoot");
   }
   ship.render(updateElement, renderThrust); // this calls render method in ship class which calls renderShip above whch calls render
@@ -417,7 +417,7 @@ function playSound(soundDescription: string) {
   sound.play();
 }
 
-function addNewBulletToScreen(id: string) {
+function addNewBulletToScreen(id: string, gameScreen: GameScreen) {
   // create game element for bullet
   const el = createElement(id, "bullet", null, null);
   addToScreen(el, gameScreen.id);
@@ -428,7 +428,7 @@ const getAsteroidGraphic = (): string => {
   return asteroidsSVG[n];
 };
 
-function addRockToScreen(rock: Rock) {
+function addNewRockToScreen(rock: Rock, gameScreen: GameScreen) {
   let rockStyle = `height:${2 * rock.r}px; width:${2 * rock.r}px; margin-left:-${rock.r}px; margin-top:-${rock.r}px;`;
   const asteroidSVG = getAsteroidGraphic();
   const el = createElement(rock.id, "rock", rockStyle, asteroidSVG);
