@@ -6,15 +6,17 @@ function setUp() {
   Rock.rockIDCounter = 0;
   const initialPosition = { x: 100, y: 100 };
   let velocity = { speed: 1, direction: 45 };
-  const rockSpecs = { size: "large", r: 70, rotationRate: 1.5 };
-  return { initialPosition, velocity, rockSpecs };
+  const size = "large";
+  const r = 70;
+  const rotationRate = 1.5;
+  return { initialPosition, velocity, size, r, rotationRate };
 }
 
 test("create new rocks", () => {
-  const { initialPosition, velocity, rockSpecs } = setUp();
-  const rock1 = new Rock(initialPosition, velocity, rockSpecs);
+  const { initialPosition, velocity, size, r, rotationRate } = setUp();
+  const rock1 = new Rock(initialPosition, velocity, size, r, rotationRate);
   const secondRockPosition = { x: 110, y: 100 };
-  const rock2 = new Rock(secondRockPosition, velocity, rockSpecs);
+  const rock2 = new Rock(secondRockPosition, velocity, size, r, rotationRate);
   expect(rock1).toEqual({
     id: "rock0",
     size: "large",
@@ -39,8 +41,8 @@ test("create new rocks", () => {
 
 test("render calls callback function with id, position and rotation", () => {
   const mockRenderCallback = vi.fn();
-  const { initialPosition, velocity, rockSpecs } = setUp();
-  const rock = new Rock(initialPosition, velocity, rockSpecs);
+  const { initialPosition, velocity, size, r, rotationRate } = setUp();
+  const rock = new Rock(initialPosition, velocity, size, r, rotationRate);
 
   //expect renderCallback to be called with id,x,y parameters
   rock.render(mockRenderCallback);

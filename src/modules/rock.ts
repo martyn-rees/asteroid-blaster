@@ -1,9 +1,3 @@
-type RockSpec = {
-  size: string;
-  r: number;
-  rotationRate: number;
-};
-
 export default class Rock {
   static rockIDCounter = 0;
   public id: string;
@@ -18,13 +12,15 @@ export default class Rock {
   constructor(
     initialPosition: { x: number; y: number },
     velocity: { speed: number; direction: number },
-    rockSpecs: RockSpec,
+    size: string,
+    r: number,
+    rotationRate: number,
   ) {
     // constant values for life of this rock
     this.id = "rock" + Rock.rockIDCounter++;
-    this.size = rockSpecs.size;
-    this.r = rockSpecs.r;
-    this.rotationRate = rockSpecs.rotationRate;
+    this.size = size;
+    this.r = r;
+    this.rotationRate = rotationRate;
 
     // these values change per frame
     this.velocity = velocity;

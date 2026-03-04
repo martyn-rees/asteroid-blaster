@@ -16,9 +16,9 @@ import {
   bulletSpecs,
   shipSpecs,
   gunSpec,
-  rockType,
-  RockSpec,
   keyBindings,
+  getRockData,
+  getRockValue,
 } from "./gamedata.js";
 import { createStartButton } from "./ui/startbutton.js";
 import { createPauseButton } from "./ui/pauseButton.js";
@@ -65,48 +65,12 @@ function getStartPosition(screen: GameScreen): { x: number; y: number } {
   return startPosition;
 }
 
-/* get random valus for new asteroids */
-function getRandomNumber(min: number, max: number): number {
-  return min + Math.random() * (max - min);
-}
-
-function getRandomAsteroidProps(rockProps: RockSpec): {
-  velocity: { speed: number; direction: number };
-  rockSpecs: { size: string; r: number; rotationRate: number };
-} {
-  let speed = getRandomNumber(rockProps.speed.min, rockProps.speed.max);
-  let r = getRandomNumber(rockProps.radius.min, rockProps.radius.max);
-  let direction = getRandomNumber(0, 360);
-  let rotationRate = getRandomNumber(
-    rockProps.rotationRate.min,
-    rockProps.rotationRate.max,
-  );
-  rotationRate = Math.random() > 0.5 ? rotationRate : -rotationRate;
-  let velocity = { speed, direction };
-  const rockSpecs = {
-    size: rockProps.description,
-    r,
-    rotationRate,
-  };
-  return { velocity, rockSpecs };
-}
-/* end of random values for new asteroids */
-
 // ----  Rock code ----
-function createNewAsteroid(
-  size: string,
-  initialPosition: { x: number; y: number },
-): Rock {
-  let rockProps: RockSpec = rockType[size];
-  const { velocity, rockSpecs } = getRandomAsteroidProps(rockProps);
-  const rock = new Rock(initialPosition, velocity, rockSpecs);
-  return rock;
-}
 
 // this function does several things - creates a rock with random properties, adds it to the rock list, creates a game element for the rock and adds it to the game screen
 function initRock(size: string, pos: { x: number; y: number }) {
-  // create rock with random properties
-  const rock: Rock = createNewAsteroid(size, pos);
+  const { velocity, r, rotationRate } = getRockData(size);
+  const rock = new Rock(pos, velocity, size, r, rotationRate);
   addRock(rock);
   //TODO: move this to render section
   // look through rockList for new rocks and add to screen
@@ -261,7 +225,7 @@ function gameLoopUpdate() {
     }
     // if collision with bullet or ship then remove rock, add score and add smaller rocks if needed
     if (hasRockCollided) {
-      const valueOfRock = rockType[rockList[rockId].size].value;
+      const valueOfRock = getRockValue(rockList[rockId].size);
       updateScore(valueOfRock);
       explodeRock(rockId);
       oldRocks.push(rockId);
@@ -352,9 +316,9 @@ function setUpEndScreen() {}
 // TODO: uses GameScreen instance
 function init() {
   window.addEventListener("resize", function (event) {
-    resizeGameScreenSize(gameScreen);
+    setGameScreenSize(gameScreen);
   });
-  resizeGameScreenSize(gameScreen);
+  setGameScreenSize(gameScreen);
   setUpStartScreen();
 }
 /* end of set up game */
@@ -459,7 +423,7 @@ function keyEvent(ev: KeyboardEvent, isKeyDown: boolean) {
 }
 
 // TODO: there are now container size options instead of offsetWidth
-export function resizeGameScreenSize(screen: GameScreen) {
+export function setGameScreenSize(screen: GameScreen) {
   let screenNode: HTMLElement = document.getElementById(screen.id)!;
   screen.setGameScreenDimensions(
     screenNode.offsetWidth,
