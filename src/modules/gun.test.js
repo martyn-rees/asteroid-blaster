@@ -3,8 +3,8 @@ import Gun from "./gun";
 
 function setUp() {
   const gunSpec = {
-    barrelLocation: { x: 0, y: 6 },
-    speed: 6,
+    barrelOffset: { x: 0, y: 6 },
+    power: 6,
     reloadTime: 10,
   };
   return gunSpec;
@@ -14,9 +14,23 @@ test("create new gun", () => {
   const gunSpec = setUp();
   const gun = new Gun(gunSpec);
   expect(gun).toEqual({
-    gunSpecs: { barrelLocation: { x: 0, y: 6 }, speed: 6, reloadTime: 10 },
+    barrelOffset: {
+      x: 0,
+      y: 6,
+    },
     gunReloadTimer: 0,
+    location: {
+      x: 0,
+      y: 0,
+    },
+    power: 6,
+    reloadTime: 10,
+    rotation: 0,
     state: "loaded",
+    velocity: {
+      direction: 0,
+      speed: 0,
+    },
   });
 });
 

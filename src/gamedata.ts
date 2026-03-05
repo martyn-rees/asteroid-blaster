@@ -11,8 +11,8 @@ export const shipSpecs = {
   rotationSpeed: 2,
 };
 export const gunSpec = {
-  barrelLocation: { x: 0, y: 6 },
-  speed: 6,
+  barrelOffset: { x: 0, y: 6 },
+  power: 6,
   reloadTime: 12,
 };
 type Range = { min: number; max: number };

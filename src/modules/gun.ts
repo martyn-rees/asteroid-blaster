@@ -1,4 +1,6 @@
 // gun specs of gun that can be attached to ship
+// TODO: set location, velocity and rotation of gun nozzzle
+
 // TODO: Location and Velocity types should be shared across modules
 type Location = {
   x: number;
@@ -10,12 +12,6 @@ type Velocity = {
   direction: number;
 };
 
-type GunSpec = {
-  barrelLocation: Location;
-  speed: number;
-  reloadTime: number;
-};
-
 export type GunState =
   | "nogun"
   | "loaded"
@@ -24,14 +20,32 @@ export type GunState =
   | "malfunction";
 
 export default class Gun {
-  private gunSpecs: GunSpec;
   private gunReloadTimer: number;
   public state: GunState;
+  private barrelOffset: Location;
+  private power: number;
+  private reloadTime: number;
+  private location: Location;
+  private velocity: Velocity;
+  private rotation: number;
 
-  constructor(gunSpecs: GunSpec) {
-    this.gunSpecs = gunSpecs;
+  constructor({
+    barrelOffset,
+    power,
+    reloadTime,
+  }: {
+    barrelOffset: Location;
+    power: number;
+    reloadTime: number;
+  }) {
+    this.barrelOffset = barrelOffset;
+    this.power = power;
+    this.reloadTime = reloadTime;
     this.gunReloadTimer = 0;
     this.state = "loaded";
+    this.location = { x: 0, y: 0 };
+    this.velocity = { speed: 0, direction: 0 };
+    this.rotation = 0;
   }
 
   update() {
@@ -51,7 +65,7 @@ export default class Gun {
     location: Location;
     rotation: number;
   }): Location {
-    const gunlength = this.gunSpecs.barrelLocation.y;
+    const gunlength = this.barrelOffset.y;
     const x = location.x + gunlength * Math.sin(rotation);
     const y = location.y - gunlength * Math.cos(rotation);
     return { x, y };
@@ -61,8 +75,8 @@ export default class Gun {
   private getBulletVelocity(shipVelocity: Velocity, shipRotation: number) {
     const shipVelocityX = shipVelocity.speed * Math.sin(shipVelocity.direction);
     const shipVelocityY = shipVelocity.speed * Math.cos(shipVelocity.direction);
-    const dx = shipVelocityX + this.gunSpecs.speed * Math.sin(shipRotation);
-    const dy = shipVelocityY + this.gunSpecs.speed * Math.cos(shipRotation);
+    const dx = shipVelocityX + this.power * Math.sin(shipRotation);
+    const dy = shipVelocityY + this.power * Math.cos(shipRotation);
     return {
       dx,
       dy,
@@ -92,7 +106,7 @@ export default class Gun {
   }
 
   reloadGun() {
-    this.gunReloadTimer = this.gunSpecs.reloadTime;
+    this.gunReloadTimer = this.reloadTime;
     this.state = "reloading";
   }
 

@@ -24,7 +24,7 @@ function setUp() {
 
   // TODO: this isn't good that I need to recreate methods in gun class
   const gun = {
-    gunSpecs: { barrelLocation: { x: 0, y: 6 }, speed: 6, reloadTime: 10 },
+    gunSpecs: { barrelOffset: { x: 0, y: 6 }, speed: 6, reloadTime: 10 },
     gunReloadTimer: 0,
     getNewBullet: vi.fn(),
     update: vi.fn(),

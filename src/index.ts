@@ -84,6 +84,29 @@ function createRocksForNewLevel({ rockAmount }: { rockAmount: number }) {
     initRock("large", initialPosition);
   }
 }
+
+function addRock(rock: Rock) {
+  rockList[rock.id] = rock;
+}
+
+function explodeRock(rockId: string) {
+  const explodedRockLocation = {
+    x: rockList[rockId].x,
+    y: rockList[rockId].y,
+  };
+  const rockSize = rockList[rockId].size;
+  // explode rock in to smaller rocks
+  if (rockSize == "large") {
+    initRock("medium", explodedRockLocation);
+    initRock("medium", explodedRockLocation);
+  } else if (rockSize == "medium") {
+    initRock("small", explodedRockLocation);
+    initRock("small", explodedRockLocation);
+    initRock("small", explodedRockLocation);
+  }
+
+  delete rockList[rockId];
+}
 // end of Rock code
 
 // ---- Ship code ----
@@ -123,28 +146,6 @@ function deleteBullet(bullet: string) {
   delete bulletList[bullet];
 }
 /* end of bullet code */
-
-function addRock(rock: Rock) {
-  rockList[rock.id] = rock;
-}
-
-function explodeRock(rockId: string) {
-  const pos = {
-    x: rockList[rockId].x,
-    y: rockList[rockId].y,
-  };
-  // explode rock in to smaller rocks and remove rock and bullet
-  if (rockList[rockId].size == "large") {
-    initRock("medium", pos);
-    initRock("medium", pos);
-  } else if (rockList[rockId].size == "medium") {
-    initRock("small", pos);
-    initRock("small", pos);
-    initRock("small", pos);
-  }
-
-  delete rockList[rockId];
-}
 
 function updateScore(value: number) {
   score += value;
