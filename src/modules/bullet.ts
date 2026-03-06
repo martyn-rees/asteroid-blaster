@@ -9,8 +9,8 @@
     power: number = 1,
 */
 
-// position is the x,y location on the game screen
-// velocity is the dx,dy change in position every frame. This is calculated when the bullet is created based on the ship's position, rotation and speed and the bullet's speed.
+// position is the x,y position on the game screen
+// velocity is the dx,dy change in position every frame.
 // velocity should be speed and direction from which dx and dy can be calcualted
 export default class Bullet {
   static bulletIDCounter = 0;

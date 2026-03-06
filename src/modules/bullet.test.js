@@ -37,6 +37,12 @@ test("create new Bullets", () => {
   });
 });
 
+test("boundary of bullet", () => {
+  const { bulletPosition, bulletVelocity, bulletSpecs } = setUp();
+  const bullet = new Bullet(bulletPosition, bulletVelocity, bulletSpecs);
+  expect(bullet.boundary()).toStrictEqual({ x: 100, y: 100, r: 2 });
+});
+
 // NB: that y axis is reversed for computer screens with 0,0 being top left instead of bottom left
 // maybe I should change calculations so that -dy moves up and +dy moves down
 test("bullet movement after 2 frames", () => {
@@ -47,6 +53,19 @@ test("bullet movement after 2 frames", () => {
   bullet.update();
   expect(bullet.position.x).toBe(108);
   expect(bullet.position.y).toBe(98);
+});
+
+test("bullet movement after 2 frames with transform", () => {
+  const transformCallback = (x) => {
+    return 10;
+  };
+  const { bulletPosition, bulletVelocity, bulletSpecs } = setUp();
+  const bullet = new Bullet(bulletPosition, bulletVelocity, bulletSpecs);
+  // bullet moves dx=4 every frame so should move 8 pixels after 2 frames
+  bullet.update();
+  bullet.update(transformCallback, transformCallback);
+  expect(bullet.position.x).toBe(10);
+  expect(bullet.position.y).toBe(10);
 });
 
 test("life expectancy of bullet", () => {
