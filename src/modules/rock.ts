@@ -5,8 +5,7 @@ export default class Rock {
   public r: number;
   public rotationRate: number;
   public velocity: { speed: number; direction: number };
-  public x: number;
-  public y: number;
+  public position;
   public rotation: number;
 
   constructor(
@@ -24,8 +23,7 @@ export default class Rock {
 
     // these values change per frame
     this.velocity = velocity;
-    this.x = initialPosition.x;
-    this.y = initialPosition.y;
+    this.position = { x: initialPosition.x, y: initialPosition.y };
     this.rotation = 0;
   }
 
@@ -35,26 +33,26 @@ export default class Rock {
 
   boundary(): { x: number; y: number; r: number } {
     return {
-      x: this.x,
-      y: this.y,
+      x: this.position.x,
+      y: this.position.y,
       r: this.r,
     };
   }
 
   update(transformXCallback?: Function, transformYCallback?: Function) {
-    // update new location of rock based on velocity
+    // update new position of rock based on velocity
     const radians = this.convertDegreestoRadians(this.velocity.direction);
     const dx = this.velocity.speed * Math.sin(radians);
     const dy = this.velocity.speed * Math.cos(radians);
-    let newX = this.x + dx;
-    let newY = this.y + dy;
+    let newX = this.position.x + dx;
+    let newY = this.position.y + dy;
     this.rotation += this.rotationRate;
     // use transforms to update position of rock on game screen
-    this.x = transformXCallback ? transformXCallback(newX) : newX;
-    this.y = transformYCallback ? transformYCallback(newY) : newY;
+    this.position.x = transformXCallback ? transformXCallback(newX) : newX;
+    this.position.y = transformYCallback ? transformYCallback(newY) : newY;
   }
 
   render(renderCallback: Function) {
-    renderCallback(this.id, this.x, this.y, this.rotation);
+    renderCallback(this.id, this.position.x, this.position.y, this.rotation);
   }
 }

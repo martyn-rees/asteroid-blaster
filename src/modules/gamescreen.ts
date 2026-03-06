@@ -1,3 +1,4 @@
+type EDGE = "top" | "right" | "bottom" | "left";
 export default class GameScreen {
   public id: string;
   public width: number;
@@ -18,15 +19,22 @@ export default class GameScreen {
     return { x: this.width / 2, y: this.height / 2 };
   }
 
-  getRandomScreenPosition(): { x: number; y: number } {
+  private getRandomScreenPosition(): { x: number; y: number } {
     return {
-      x: Math.random() * this.width,
-      y: Math.random() * this.height,
+      x: Math.floor(Math.random() * (this.width + 1)),
+      y: Math.floor(Math.random() * (this.height + 1)),
     };
   }
 
-  getRandomEdgePosition(edge: string): { x: number; y: number } {
+  private getRandomEdge(): EDGE {
+    const borders: EDGE[] = ["top", "right", "bottom", "left"];
+    const edge: EDGE = borders[Math.floor(Math.random() * 4)];
+    return edge;
+  }
+
+  getRandomEdgePosition(): { x: number; y: number } {
     let { x, y } = this.getRandomScreenPosition();
+    let edge = this.getRandomEdge();
     switch (edge) {
       case "top":
         return { x: x, y: 0 };
@@ -37,6 +45,5 @@ export default class GameScreen {
       case "left":
         return { x: 0, y: y };
     }
-    return { x, y };
   }
 }

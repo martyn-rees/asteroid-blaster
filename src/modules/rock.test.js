@@ -23,8 +23,7 @@ test("create new rocks", () => {
     r: 70,
     rotationRate: 1.5,
     velocity: { speed: 1, direction: 45 },
-    x: 100,
-    y: 100,
+    position: { x: 100, y: 100 },
     rotation: 0,
   });
   expect(rock2).toEqual({
@@ -33,10 +32,27 @@ test("create new rocks", () => {
     r: 70,
     rotationRate: 1.5,
     velocity: { speed: 1, direction: 45 },
-    x: 110,
-    y: 100,
+    position: { x: 110, y: 100 },
     rotation: 0,
   });
+});
+
+test("boundary of rock", () => {
+  const { initialPosition, velocity, size, r, rotationRate } = setUp();
+  const rock1 = new Rock(initialPosition, velocity, size, r, rotationRate);
+  expect(rock1.boundary()).toStrictEqual({ x: 100, y: 100, r: 70 });
+});
+
+test("rock movement after 2 frames with transform", () => {
+  const transformCallback = (x) => {
+    return 10;
+  };
+  const { initialPosition, velocity, size, r, rotationRate } = setUp();
+  const rock = new Rock(initialPosition, velocity, size, r, rotationRate);
+  rock.update();
+  rock.update(transformCallback, transformCallback);
+  expect(rock.position.x).toBe(10);
+  expect(rock.position.y).toBe(10);
 });
 
 test("render calls callback function with id, position and rotation", () => {

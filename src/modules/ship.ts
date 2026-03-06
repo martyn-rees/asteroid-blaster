@@ -1,4 +1,4 @@
-import Gun from "./gun";
+import Gun, { MotionState } from "./gun";
 
 const FULLDEGREE = 360;
 type Directions = { degrees: number; radians: number };
@@ -18,8 +18,7 @@ type ShipSpecs = {
 
 export default class Ship {
   public id: string;
-  public x: number;
-  public y: number;
+  public position: { x: number; y: number };
   private speedMax: number;
   private drag: number;
   private thrustMax: number;
@@ -34,8 +33,7 @@ export default class Ship {
   constructor(pos: { x: number; y: number }, id: string, shipSpecs: ShipSpecs) {
     this.id = id;
     // position
-    this.x = pos.x;
-    this.y = pos.y;
+    this.position = pos;
     // ship specifications - this can be passed in for different ships
     this.speedMax = shipSpecs.speedMax;
     this.drag = shipSpecs.drag;
@@ -56,41 +54,23 @@ export default class Ship {
     this.gun = gun;
   }
 
-  getShipState() {
+  getShipMotionState(): MotionState {
     return {
-      shipLocation: { x: this.x, y: this.y },
-      shipVelocity: {
+      position: this.position,
+      velocity: {
         speed: this.shipSpeed,
         direction: this.direction.radians,
       },
-      shipRotation: this.rotation.radians,
+      rotation: this.rotation.radians,
     };
   }
 
   boundary(): { x: number; y: number; r: number } {
     return {
-      x: this.x,
-      y: this.y,
+      x: this.position.x,
+      y: this.position.y,
       r: this.r,
     };
-  }
-
-  private updateShipActions({
-    thrust,
-    rotateCounterClockwise,
-    rotateClockwise,
-    shoot,
-  }: ShipActions) {
-    this.thrustPower = thrust ? this.thrustMax : 0;
-    if (rotateCounterClockwise) {
-      this.changeShipRotation(-this.rotationSpeed);
-    }
-    if (rotateClockwise) {
-      this.changeShipRotation(this.rotationSpeed);
-    }
-    if (shoot && this.gun!.isGunLoaded()) {
-      this.gun!.gunFired();
-    }
   }
 
   convertDegreestoRadians(degrees: number) {
@@ -133,27 +113,38 @@ export default class Ship {
     }
   }
 
-  // TODO: consider moving screen dimensions out of here
-  // instead create a function to get and set ship location
-  // in index.js get ship location and if needed reset location if off screen
-  // this ship shouldn't care about screen dimensions to give it the option of adding a scrolling screen
   update(
     ACTIONS: ShipActions,
     transformXCallback?: Function,
     transformYCallback?: Function,
   ) {
-    this.updateShipActions(ACTIONS); // if shhot then gun.state = "firing"
-    // this updates gun.reloadTimer
-    if (this.gun !== null) {
-      this.gun.update();
+    const { thrust, rotateCounterClockwise, rotateClockwise, shoot } = ACTIONS;
+    // update Motion State
+    this.thrustPower = thrust ? this.thrustMax : 0;
+    if (rotateCounterClockwise) {
+      this.changeShipRotation(-this.rotationSpeed);
     }
-
+    if (rotateClockwise) {
+      this.changeShipRotation(this.rotationSpeed);
+    }
     this.calculateNewVelocity();
-    const newX = this.x + this.shipSpeed * Math.sin(this.direction.radians);
-    const newY = this.y - this.shipSpeed * Math.cos(this.direction.radians);
+    const newX =
+      this.position.x + this.shipSpeed * Math.sin(this.direction.radians);
+    const newY =
+      this.position.y - this.shipSpeed * Math.cos(this.direction.radians);
     // use transforms to update position of rock on game screen
-    this.x = transformXCallback ? transformXCallback(newX) : newX;
-    this.y = transformYCallback ? transformYCallback(newY) : newY;
+    this.position.x = transformXCallback ? transformXCallback(newX) : newX;
+    this.position.y = transformYCallback ? transformYCallback(newY) : newY;
+
+    // update gun state
+    if (this.gun !== null) {
+      this.gun.updateMotionState({
+        position: this.position,
+        velocity: { speed: this.shipSpeed, direction: this.direction.radians },
+        rotation: this.rotation.radians,
+      });
+      this.gun.update(shoot);
+    }
   }
 
   changeShipRotation(dRot: number) {
@@ -167,7 +158,12 @@ export default class Ship {
   }
 
   render(renderCallback: Function, renderThrustCallback: Function) {
-    renderCallback(this.id, this.x, this.y, this.rotation.degrees);
+    renderCallback(
+      this.id,
+      this.position.x,
+      this.position.y,
+      this.rotation.degrees,
+    );
     renderThrustCallback(this.thrustPower);
   }
 }

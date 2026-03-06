@@ -19,7 +19,7 @@ test("create new gun", () => {
       y: 6,
     },
     gunReloadTimer: 0,
-    location: {
+    position: {
       x: 0,
       y: 0,
     },
@@ -34,13 +34,33 @@ test("create new gun", () => {
   });
 });
 
+test("get motion state", () => {
+  const gunSpec = setUp();
+  const gun = new Gun(gunSpec);
+
+  const motionstate = gun.updateMotionState({
+    position: { x: 100, y: 100 },
+    velocity: {
+      speed: 0,
+      direction: 0,
+    },
+    rotation: 10,
+  });
+  expect(gun.position).toStrictEqual({ x: 100, y: 100 });
+  expect(gun.velocity).toStrictEqual({
+    speed: 0,
+    direction: 0,
+  });
+  expect(gun.rotation).toBe(10);
+});
+
 test("gun position on a ship (when pointing North then East)", () => {
   const gunSpec = setUp();
   const gun = new Gun(gunSpec);
-  const location = { x: 100, y: 100 };
+  const position = { x: 100, y: 100 };
   const shipRotationNorth = 0;
   const gunLocation = gun.getGunPosition({
-    location,
+    position,
     rotation: shipRotationNorth,
   });
   // TODO: reversed y axis.
@@ -48,7 +68,7 @@ test("gun position on a ship (when pointing North then East)", () => {
 
   const shipRotationEast = Math.PI / 2;
   const locationAfterRotation = gun.getGunPosition({
-    location,
+    position,
     rotation: shipRotationEast,
   });
   // TODO: reversed y axis.
@@ -77,15 +97,15 @@ test("when gun is fired it is not reloaded until reload time has passed", () => 
   gunSpec.reloadTime = 3;
   const gun = new Gun(gunSpec);
   // gun is loaded at start
-  expect(gun.isGunLoaded()).toBe(true);
+  expect(gun.state).toBe("loaded");
+  gun.update(true);
+  expect(gun.state).toBe("firing");
   // reload gun after being fired
   gun.reloadGun();
-  expect(gun.isGunLoaded()).toBe(false);
-  // update reload gun timer
   gun.update();
   gun.update();
-  expect(gun.isGunLoaded()).toBe(false);
+  expect(gun.state).toBe("reloading");
   // when updates = reload time then gun is loaded again
   gun.update();
-  expect(gun.isGunLoaded()).toBe(true);
+  expect(gun.state).toBe("loaded");
 });

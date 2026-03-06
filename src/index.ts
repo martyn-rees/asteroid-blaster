@@ -1,6 +1,6 @@
 import Rock from "./modules/rock.js";
 import Ship, { ShipActions } from "./modules/ship.js";
-import Gun from "./modules/gun.js";
+import Gun, { MotionState } from "./modules/gun.js";
 import Bullet from "./modules/bullet.js";
 import GameScreen from "./modules/gamescreen.js";
 import {
@@ -24,8 +24,8 @@ import { createStartButton } from "./ui/startbutton.js";
 import { createPauseButton } from "./ui/pauseButton.js";
 import { createResumeButton } from "./ui/resumeButton.js";
 
-// TODO: Location and Velocity types should be shared across modules
-type Location = {
+// TODO: Position and Velocity types should be shared across modules
+type Position = {
   x: number;
   y: number;
 };
@@ -58,13 +58,6 @@ let ship: Ship;
 let rockList: Rocks = {};
 let bulletList: Bullets = {};
 
-function getStartPosition(screen: GameScreen): { x: number; y: number } {
-  const borders = ["top", "right", "bottom", "left"];
-  const edge = borders[Math.floor(Math.random() * 4)];
-  const startPosition = screen.getRandomEdgePosition(edge);
-  return startPosition;
-}
-
 // ----  Rock code ----
 
 // this function does several things - creates a rock with random properties, adds it to the rock list, creates a game element for the rock and adds it to the game screen
@@ -80,7 +73,7 @@ function initRock(size: string, pos: { x: number; y: number }) {
 // TODO: needs gamescreen to get random edge start position
 function createRocksForNewLevel({ rockAmount }: { rockAmount: number }) {
   for (let i = 0; i < rockAmount; i++) {
-    const initialPosition = getStartPosition(gameScreen);
+    const initialPosition = gameScreen.getRandomEdgePosition();
     initRock("large", initialPosition);
   }
 }
@@ -91,8 +84,8 @@ function addRock(rock: Rock) {
 
 function explodeRock(rockId: string) {
   const explodedRockLocation = {
-    x: rockList[rockId].x,
-    y: rockList[rockId].y,
+    x: rockList[rockId].position.x,
+    y: rockList[rockId].position.y,
   };
   const rockSize = rockList[rockId].size;
   // explode rock in to smaller rocks
@@ -118,23 +111,13 @@ function initShip(pos: { x: number; y: number }) {
 // end of Ship code
 
 /* Bullet code */
-type GunProps = {
-  position: Location;
-  velocity: { speed: number; direction: number };
-  rotation: number;
-};
+
 function createNewBullet(
   gun: Gun,
-  gunProps: GunProps,
+  gunMotionState: MotionState,
   bulletSpecs: any,
 ): Bullet {
-  const gunPropsWithLocation = {
-    location: gunProps.position,
-    velocity: gunProps.velocity,
-    rotation: gunProps.rotation,
-  };
-  const { bulletPosition, bulletVelocity } =
-    gun.getNewBullet(gunPropsWithLocation);
+  const { bulletPosition, bulletVelocity } = gun.getNewBullet(gunMotionState);
   const newBullet = new Bullet(bulletPosition, bulletVelocity, bulletSpecs);
   return newBullet;
 }
@@ -178,14 +161,9 @@ function gameLoopUpdate() {
 
   // - add new bullets - if ACTION.shoot
   if (ship.gun && ship.gun.state === "firing") {
-    // get location of gun attached to ship as the starting position of new bullet
-    const { shipLocation, shipVelocity, shipRotation } = ship.getShipState();
-    const gunProps: GunProps = {
-      position: { x: shipLocation.x, y: shipLocation.y },
-      velocity: shipVelocity,
-      rotation: shipRotation,
-    };
-    newBullet = createNewBullet(ship.gun, gunProps, bulletSpecs);
+    // get position of gun attached to ship as the starting position of new bullet
+    const gunMotionState: MotionState = ship.getShipMotionState();
+    newBullet = createNewBullet(ship.gun, gunMotionState, bulletSpecs);
     addBullet(newBullet);
   }
 

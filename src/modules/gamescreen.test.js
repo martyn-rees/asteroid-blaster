@@ -20,16 +20,3 @@ test("random screen position should be inside screen dimesnions", () => {
     expect(y).toBeLessThanOrEqual(5);
   }
 });
-
-test("random edge position should be on boundary", () => {
-  const screen1 = new GameScreen("gameScreen1", 10, 5);
-  const topEdge = screen1.getRandomEdgePosition("top");
-  const rightEdge = screen1.getRandomEdgePosition("right");
-  const bottomEdge = screen1.getRandomEdgePosition("bottom");
-  const leftEdge = screen1.getRandomEdgePosition("left");
-
-  expect(topEdge.y).toBe(0);
-  expect(bottomEdge.y).toBe(5);
-  expect(rightEdge.x).toBe(10);
-  expect(leftEdge.x).toBe(0);
-});

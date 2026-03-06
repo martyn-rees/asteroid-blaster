@@ -1,8 +1,8 @@
 // gun specs of gun that can be attached to ship
-// TODO: set location, velocity and rotation of gun nozzzle
+// TODO: set position, velocity and rotation of gun nozzzle
 
-// TODO: Location and Velocity types should be shared across modules
-type Location = {
+// TODO: Position and Velocity types should be shared across modules
+type Position = {
   x: number;
   y: number;
 };
@@ -10,6 +10,12 @@ type Location = {
 type Velocity = {
   speed: number;
   direction: number;
+};
+
+export type MotionState = {
+  position: Position;
+  velocity: Velocity;
+  rotation: number;
 };
 
 export type GunState =
@@ -22,10 +28,10 @@ export type GunState =
 export default class Gun {
   private gunReloadTimer: number;
   public state: GunState;
-  private barrelOffset: Location;
+  private barrelOffset: Position;
   private power: number;
   private reloadTime: number;
-  private location: Location;
+  private position: Position;
   private velocity: Velocity;
   private rotation: number;
 
@@ -34,7 +40,7 @@ export default class Gun {
     power,
     reloadTime,
   }: {
-    barrelOffset: Location;
+    barrelOffset: Position;
     power: number;
     reloadTime: number;
   }) {
@@ -43,12 +49,42 @@ export default class Gun {
     this.reloadTime = reloadTime;
     this.gunReloadTimer = 0;
     this.state = "loaded";
-    this.location = { x: 0, y: 0 };
+    this.position = { x: 0, y: 0 };
     this.velocity = { speed: 0, direction: 0 };
     this.rotation = 0;
   }
 
-  update() {
+  private updateGunLocation(position: Position) {
+    this.position = position;
+  }
+
+  private updateGunVelocity(velocity: Velocity) {
+    this.velocity = velocity;
+  }
+
+  private updateGunRotation(rotation: number) {
+    this.rotation = rotation;
+  }
+
+  updateMotionState({
+    position,
+    velocity,
+    rotation,
+  }: {
+    position?: Position;
+    velocity?: Velocity;
+    rotation?: number;
+  }) {
+    position && this.updateGunLocation(position);
+    velocity && this.updateGunVelocity(velocity);
+    rotation && this.updateGunRotation(rotation);
+  }
+
+  update(shoot: boolean) {
+    if (shoot && this.state === "loaded") {
+      this.state = "firing";
+    }
+
     if (this.state == "reloading") {
       this.gunReloadTimer--;
       if (this.gunReloadTimer <= 0) {
@@ -59,15 +95,15 @@ export default class Gun {
 
   // TODO: calculate gun position when off the x axis
   private getGunPosition({
-    location,
+    position,
     rotation,
   }: {
-    location: Location;
+    position: Position;
     rotation: number;
-  }): Location {
+  }): Position {
     const gunlength = this.barrelOffset.y;
-    const x = location.x + gunlength * Math.sin(rotation);
-    const y = location.y - gunlength * Math.cos(rotation);
+    const x = position.x + gunlength * Math.sin(rotation);
+    const y = position.y - gunlength * Math.cos(rotation);
     return { x, y };
   }
   // gun is attached to ship so its velocity is the same as ship velocity
@@ -83,17 +119,12 @@ export default class Gun {
     };
   }
 
-  public getNewBullet({
-    location,
-    velocity,
-    rotation,
-  }: {
-    location: Location;
-    velocity: Velocity;
-    rotation: number;
-  }): { bulletPosition: Location; bulletVelocity: { dx: number; dy: number } } {
-    const bulletPosition: Location = this.getGunPosition({
-      location,
+  public getNewBullet({ position, velocity, rotation }: MotionState): {
+    bulletPosition: Position;
+    bulletVelocity: { dx: number; dy: number };
+  } {
+    const bulletPosition: Position = this.getGunPosition({
+      position,
       rotation,
     });
     const bulletVelocity = this.getBulletVelocity(velocity, rotation);
@@ -101,16 +132,8 @@ export default class Gun {
     return { bulletPosition, bulletVelocity };
   }
 
-  gunFired() {
-    this.state = "firing";
-  }
-
   reloadGun() {
     this.gunReloadTimer = this.reloadTime;
     this.state = "reloading";
-  }
-
-  isGunLoaded(): Boolean {
-    return this.state === "loaded";
   }
 }

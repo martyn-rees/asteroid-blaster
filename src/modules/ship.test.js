@@ -26,8 +26,8 @@ function setUp() {
   const gun = {
     gunSpecs: { barrelOffset: { x: 0, y: 6 }, speed: 6, reloadTime: 10 },
     gunReloadTimer: 0,
-    getNewBullet: vi.fn(),
     update: vi.fn(),
+    updateMotionState: vi.fn(),
   };
   return { shipSpecs, gun };
 }
@@ -37,8 +37,7 @@ test("create a new ship", () => {
   const ship = new Ship({ x: 100, y: 100 }, "ship", shipSpecs);
   expect(ship).toEqual({
     id: "ship",
-    x: 100,
-    y: 100,
+    position: { x: 100, y: 100 },
     speedMax: 4,
     drag: 0.1,
     thrustMax: 1,
@@ -57,15 +56,33 @@ test("create a new ship", () => {
   expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(0);
 });
 
+test("boundary of ship", () => {
+  const { shipSpecs } = setUp();
+  const ship = new Ship({ x: 100, y: 100 }, "ship", shipSpecs);
+  expect(ship.boundary()).toStrictEqual({ x: 100, y: 100, r: 6 });
+});
+
+test("get motion state", () => {
+  const { shipSpecs } = setUp();
+  const ship = new Ship({ x: 100, y: 100 }, "ship", shipSpecs);
+  const motionstate = ship.getShipMotionState();
+  expect(motionstate).toStrictEqual({
+    position: { x: 100, y: 100 },
+    velocity: {
+      speed: 0,
+      direction: 0,
+    },
+    rotation: 0,
+  });
+});
+
 test("attach a gun to ship and fire it", () => {
   const { shipSpecs, gun } = setUp();
   const ship = new Ship({ x: 100, y: 100 }, "ship", shipSpecs);
   ship.attachGun(gun);
   expect(ship.gun).not.toBe(null);
-  // const { bulletPosition, bulletVelocity } = ship.gunFired();
-  //expect(bulletPosition).toEqual({ x: 100, y: 94 });
-  // expect(bulletVelocity).toEqual({ dx: 0, dy: 6 });
-  const ACTIONS = newActions();
+  const ACTIONS = newActions({ shoot: true });
+  console.log(ACTIONS);
   ship.update(ACTIONS);
   expect(ship.gun.update).toBeCalled();
 });
@@ -148,42 +165,20 @@ test("ships rotation resets after 360 degrees", () => {
   expect(ship.rotation.degrees).toBe(0);
 });
 
-/*test("move ship to left side of screen if moves beyond right screen boundaries", () => {
+test("ship movement after 2 frames with transform", () => {
+  const transformCallback = (x) => {
+    return 10;
+  };
   const { shipSpecs } = setUp();
-  const ship = new Ship({ x: 402, y: 100 }, "ship", shipSpecs);
-  ship.update(400, 300, newActions());
-  const mockRenderCallback = vi.fn();
-  const mockRenderThrustCallback = vi.fn();
-  ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 2, 100, 0);
-});
+  const ship = new Ship({ x: 100, y: 100 }, "ship", shipSpecs);
 
-test("move ship to right side of screen if moves beyond left screen boundaries", () => {
-  const { shipSpecs } = setUp();
-  const ship = new Ship({ x: -2, y: 100 }, "ship", shipSpecs);
-  ship.update(400, 300, newActions());
-  const mockRenderCallback = vi.fn();
-  const mockRenderThrustCallback = vi.fn();
-  ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 398, 100, 0);
+  ship.update(
+    newActions({
+      thrust: true,
+    }),
+    transformCallback,
+    transformCallback,
+  );
+  expect(ship.position.x).toBe(10);
+  expect(ship.position.y).toBe(10);
 });
-
-test("move ship to top side of screen if moves beyond bottom screen boundaries", () => {
-  const { shipSpecs } = setUp();
-  const ship = new Ship({ x: 100, y: 304 }, "ship", shipSpecs);
-  ship.update(400, 300, newActions());
-  const mockRenderCallback = vi.fn();
-  const mockRenderThrustCallback = vi.fn();
-  ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 4, 0);
-});
-
-test("move ship to bottom side of screen if moves beyond top screen boundaries", () => {
-  const { shipSpecs } = setUp();
-  const ship = new Ship({ x: 402, y: -4 }, "ship", shipSpecs);
-  ship.update(400, 300, newActions());
-  const mockRenderCallback = vi.fn();
-  const mockRenderThrustCallback = vi.fn();
-  ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 2, 296, 0);
-});*/
