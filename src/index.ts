@@ -112,12 +112,8 @@ function initShip(pos: { x: number; y: number }) {
 
 /* Bullet code */
 
-function createNewBullet(
-  gun: Gun,
-  gunMotionState: MotionState,
-  bulletSpecs: any,
-): Bullet {
-  const { bulletPosition, bulletVelocity } = gun.getNewBullet(gunMotionState);
+function createNewBullet(gun: Gun, bulletSpecs: any): Bullet {
+  const { bulletPosition, bulletVelocity } = gun.getNewBullet();
   const newBullet = new Bullet(bulletPosition, bulletVelocity, bulletSpecs);
   return newBullet;
 }
@@ -162,8 +158,7 @@ function gameLoopUpdate() {
   // - add new bullets - if ACTION.shoot
   if (ship.gun && ship.gun.state === "firing") {
     // get position of gun attached to ship as the starting position of new bullet
-    const gunMotionState: MotionState = ship.getShipMotionState();
-    newBullet = createNewBullet(ship.gun, gunMotionState, bulletSpecs);
+    newBullet = createNewBullet(ship.gun, bulletSpecs);
     addBullet(newBullet);
   }
 

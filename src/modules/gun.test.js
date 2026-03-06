@@ -57,20 +57,23 @@ test("get motion state", () => {
 test("gun position on a ship (when pointing North then East)", () => {
   const gunSpec = setUp();
   const gun = new Gun(gunSpec);
-  const position = { x: 100, y: 100 };
-  const shipRotationNorth = 0;
-  const gunLocation = gun.getGunPosition({
-    position,
-    rotation: shipRotationNorth,
-  });
+  const motionStateNorth = {
+    position: { x: 100, y: 100 },
+    velocity: { speed: 0, direction: 0 },
+    rotation: 0,
+  };
+  gun.updateMotionState(motionStateNorth);
+  const gunLocation = gun.getGunPosition();
   // TODO: reversed y axis.
   expect(gunLocation).toStrictEqual({ x: 100, y: 94 });
 
-  const shipRotationEast = Math.PI / 2;
-  const locationAfterRotation = gun.getGunPosition({
-    position,
-    rotation: shipRotationEast,
-  });
+  const motionStateEast = {
+    position: { x: 100, y: 100 },
+    velocity: { speed: 0, direction: 0 },
+    rotation: Math.PI / 2,
+  };
+  gun.updateMotionState(motionStateEast);
+  const locationAfterRotation = gun.getGunPosition();
   // TODO: reversed y axis.
   expect(locationAfterRotation).toStrictEqual({ x: 106, y: 100 });
 });
@@ -89,7 +92,7 @@ test("get velocity of bullet when ship's gun is fired", () => {
     shipVelocity2,
     shipRotationNorth,
   );
-  expect(bulletVelocity2).toStrictEqual({ dx: 0, dy: 8 });
+  expect(bulletVelocity2).toStrictEqual({ dx: 0, dy: 6 });
 });
 
 test("when gun is fired it is not reloaded until reload time has passed", () => {

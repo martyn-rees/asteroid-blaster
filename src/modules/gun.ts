@@ -94,40 +94,31 @@ export default class Gun {
   }
 
   // TODO: calculate gun position when off the x axis
-  private getGunPosition({
-    position,
-    rotation,
-  }: {
-    position: Position;
-    rotation: number;
-  }): Position {
+  private getGunPosition(): Position {
     const gunlength = this.barrelOffset.y;
-    const x = position.x + gunlength * Math.sin(rotation);
-    const y = position.y - gunlength * Math.cos(rotation);
+    const x = this.position.x + gunlength * Math.sin(this.rotation);
+    const y = this.position.y - gunlength * Math.cos(this.rotation);
     return { x, y };
   }
-  // gun is attached to ship so its velocity is the same as ship velocity
-  // bullet velocity is related to gun speed (power) and direction that gun is pointing and relative to ships velocity
-  private getBulletVelocity(shipVelocity: Velocity, shipRotation: number) {
-    const shipVelocityX = shipVelocity.speed * Math.sin(shipVelocity.direction);
-    const shipVelocityY = shipVelocity.speed * Math.cos(shipVelocity.direction);
-    const dx = shipVelocityX + this.power * Math.sin(shipRotation);
-    const dy = shipVelocityY + this.power * Math.cos(shipRotation);
+
+  // bullet velocity is related to gun's motion state plus rotarion and power of gun
+  private getBulletVelocity() {
+    const velocityX = this.velocity.speed * Math.sin(this.velocity.direction);
+    const velocityY = this.velocity.speed * Math.cos(this.velocity.direction);
+    const dx = velocityX + this.power * Math.sin(this.rotation);
+    const dy = velocityY + this.power * Math.cos(this.rotation);
     return {
       dx,
       dy,
     };
   }
 
-  public getNewBullet({ position, velocity, rotation }: MotionState): {
+  public getNewBullet(): {
     bulletPosition: Position;
     bulletVelocity: { dx: number; dy: number };
   } {
-    const bulletPosition: Position = this.getGunPosition({
-      position,
-      rotation,
-    });
-    const bulletVelocity = this.getBulletVelocity(velocity, rotation);
+    const bulletPosition: Position = this.getGunPosition();
+    const bulletVelocity = this.getBulletVelocity();
     this.reloadGun();
     return { bulletPosition, bulletVelocity };
   }
