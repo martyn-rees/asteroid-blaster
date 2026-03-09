@@ -82,7 +82,6 @@ test("attach a gun to ship and fire it", () => {
   ship.attachGun(gun);
   expect(ship.gun).not.toBe(null);
   const ACTIONS = newActions({ shoot: true });
-  console.log(ACTIONS);
   ship.update(ACTIONS);
   expect(ship.gun.update).toBeCalled();
 });
