@@ -1,7 +1,7 @@
 import { expect, test, vi } from "vitest";
 import Rock from "./rock";
 
-function setUp(x = 100, y = 100) {
+function setUp({ x, y } = { x: 100, y: 100 }) {
   // reset the static variable that creates a unique ID
   Rock.rockIDCounter = 0;
   const position = { x, y };
@@ -21,7 +21,8 @@ function setUp(x = 100, y = 100) {
 
 test("create new rocks", () => {
   const rock1 = setUp();
-  const rock2 = setUp(110, 100);
+  const newPosition = { x: 110, y: 100 };
+  const rock2 = setUp(newPosition);
   expect(rock1).toEqual({
     id: "rock0",
     size: "large",
