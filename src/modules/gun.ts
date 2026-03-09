@@ -2,12 +2,13 @@
 // TODO: set position, velocity and rotation of gun nozzzle
 
 // TODO: Position and Velocity types should be shared across modules
-type Position = {
+
+export type Position = {
   x: number;
   y: number;
 };
 
-type Velocity = {
+export type Velocity = {
   speed: number;
   direction: number;
 };
@@ -29,7 +30,7 @@ export default class Gun {
   private gunReloadTimer: number;
   public state: GunState;
   private barrelOffset: Position;
-  private power: number;
+  private muzzleSpeed: number;
   private reloadTime: number;
   private position: Position;
   private velocity: Velocity;
@@ -37,15 +38,15 @@ export default class Gun {
 
   constructor({
     barrelOffset,
-    power,
+    muzzleSpeed,
     reloadTime,
   }: {
     barrelOffset: Position;
-    power: number;
+    muzzleSpeed: number;
     reloadTime: number;
   }) {
     this.barrelOffset = barrelOffset;
-    this.power = power;
+    this.muzzleSpeed = muzzleSpeed;
     this.reloadTime = reloadTime;
     this.gunReloadTimer = 0;
     this.state = "loaded";
@@ -102,11 +103,11 @@ export default class Gun {
   }
 
   // bullet velocity is related to gun's motion state plus rotarion and power of gun
-  private getBulletVelocity() {
+  private getBulletDxDy() {
     const velocityX = this.velocity.speed * Math.sin(this.velocity.direction);
     const velocityY = this.velocity.speed * Math.cos(this.velocity.direction);
-    const dx = velocityX + this.power * Math.sin(this.rotation);
-    const dy = velocityY + this.power * Math.cos(this.rotation);
+    const dx = velocityX + this.muzzleSpeed * Math.sin(this.rotation);
+    const dy = velocityY + this.muzzleSpeed * Math.cos(this.rotation);
     return {
       dx,
       dy,
@@ -115,12 +116,12 @@ export default class Gun {
 
   public getNewBullet(): {
     bulletPosition: Position;
-    bulletVelocity: { dx: number; dy: number };
+    bulletDxDy: { dx: number; dy: number };
   } {
     const bulletPosition: Position = this.getGunPosition();
-    const bulletVelocity = this.getBulletVelocity();
+    const bulletDxDy = this.getBulletDxDy();
     this.reloadGun();
-    return { bulletPosition, bulletVelocity };
+    return { bulletPosition, bulletDxDy };
   }
 
   reloadGun() {

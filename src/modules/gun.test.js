@@ -4,7 +4,7 @@ import Gun from "./gun";
 function setUp() {
   const gunSpec = {
     barrelOffset: { x: 0, y: 6 },
-    power: 6,
+    muzzleSpeed: 6,
     reloadTime: 10,
   };
   return gunSpec;
@@ -23,7 +23,7 @@ test("create new gun", () => {
       x: 0,
       y: 0,
     },
-    power: 6,
+    muzzleSpeed: 6,
     reloadTime: 10,
     rotation: 0,
     state: "loaded",
@@ -84,14 +84,11 @@ test("get velocity of bullet when ship's gun is fired", () => {
   // when ship is stationary and pointing North
   const shipVelocity = { speed: 0, direction: 0 };
   const shipRotationNorth = 0;
-  const bulletVelocity = gun.getBulletVelocity(shipVelocity, shipRotationNorth);
-  expect(bulletVelocity).toStrictEqual({ dx: 0, dy: 6 });
+  const bulletDxDy = gun.getBulletDxDy(shipVelocity, shipRotationNorth);
+  expect(bulletDxDy).toStrictEqual({ dx: 0, dy: 6 });
   // when ship is moving North at 2 pixels per frame
   const shipVelocity2 = { speed: 2, direction: 0 };
-  const bulletVelocity2 = gun.getBulletVelocity(
-    shipVelocity2,
-    shipRotationNorth,
-  );
+  const bulletVelocity2 = gun.getBulletDxDy(shipVelocity2, shipRotationNorth);
   expect(bulletVelocity2).toStrictEqual({ dx: 0, dy: 6 });
 });
 

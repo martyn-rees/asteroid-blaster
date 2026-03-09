@@ -12,7 +12,7 @@ export const shipSpecs = {
 };
 export const gunSpec = {
   barrelOffset: { x: 0, y: 6 },
-  power: 6,
+  muzzleSpeed: 6,
   reloadTime: 12,
 };
 type Range = { min: number; max: number };
@@ -71,7 +71,10 @@ export function getRockData(size: string): {
   let rockProps: RockSpec = rockType[size];
   let speed = getRandomNumber(rockProps.speed.min, rockProps.speed.max);
   let r = getRandomNumber(rockProps.radius.min, rockProps.radius.max);
-  let direction = getRandomNumber(0, 360);
+  // choose a random direction but avoid angles within 15 degrees to vertical or horizontal
+  let direction = getRandomNumber(15, 75);
+  let quadrant = 1 + Math.floor(Math.random() * 4);
+  direction = direction * quadrant;
   let rotationRate = getRandomNumber(
     rockProps.rotationRate.min,
     rockProps.rotationRate.max,
