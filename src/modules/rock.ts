@@ -4,17 +4,23 @@ export default class Rock {
   public size: string;
   public r: number;
   public rotationRate: number;
-  public velocity: { speed: number; direction: number };
-  public position;
+  private velocity: { speed: number; direction: number };
+  private position: { x: number; y: number };
   public rotation: number;
 
-  constructor(
-    initialPosition: { x: number; y: number },
-    velocity: { speed: number; direction: number },
-    size: string,
-    r: number,
-    rotationRate: number,
-  ) {
+  constructor({
+    initialPosition,
+    initialVelocity,
+    size,
+    r,
+    rotationRate,
+  }: {
+    initialPosition: { x: number; y: number };
+    initialVelocity: { speed: number; direction: number };
+    size: string;
+    r: number;
+    rotationRate: number;
+  }) {
     // constant values for life of this rock
     this.id = "rock" + Rock.rockIDCounter++;
     this.size = size;
@@ -22,9 +28,16 @@ export default class Rock {
     this.rotationRate = rotationRate;
 
     // these values change per frame
-    this.velocity = velocity;
+    this.velocity = {
+      speed: initialVelocity.speed,
+      direction: initialVelocity.direction,
+    };
     this.position = { x: initialPosition.x, y: initialPosition.y };
     this.rotation = 0;
+  }
+
+  public getPosition(): { x: number; y: number } {
+    return this.position;
   }
 
   convertDegreestoRadians(degrees: number) {

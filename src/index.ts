@@ -1,6 +1,6 @@
 import Rock from "./modules/rock.js";
 import Ship, { ShipActions } from "./modules/ship.js";
-import Gun, { MotionState } from "./modules/gun.js";
+import Gun, { MotionState, Position, Velocity } from "./modules/gun.js";
 import Bullet from "./modules/bullet.js";
 import GameScreen from "./modules/gamescreen.js";
 import {
@@ -25,16 +25,6 @@ import { createPauseButton } from "./ui/pauseButton.js";
 import { createResumeButton } from "./ui/resumeButton.js";
 
 // TODO: Position and Velocity types should be shared across modules
-type Position = {
-  x: number;
-  y: number;
-};
-
-type Velocity = {
-  speed: number;
-  direction: number;
-};
-
 var animationId: number;
 let isGamePlaying = false;
 let ACTIONS: ShipActions = {
@@ -63,7 +53,13 @@ let bulletList: Bullets = {};
 // this function does several things - creates a rock with random properties, adds it to the rock list, creates a game element for the rock and adds it to the game screen
 function initRock(size: string, pos: { x: number; y: number }) {
   const { velocity, r, rotationRate } = getRockData(size);
-  const rock = new Rock(pos, velocity, size, r, rotationRate);
+  const rock = new Rock({
+    initialPosition: pos,
+    initialVelocity: velocity,
+    size,
+    r,
+    rotationRate,
+  });
   addRock(rock);
   //TODO: move this to render section
   // look through rockList for new rocks and add to screen
@@ -73,8 +69,8 @@ function initRock(size: string, pos: { x: number; y: number }) {
 // TODO: needs gamescreen to get random edge start position
 function createRocksForNewLevel({ rockAmount }: { rockAmount: number }) {
   for (let i = 0; i < rockAmount; i++) {
-    const initialPosition = gameScreen.getRandomEdgePosition();
-    initRock("large", initialPosition);
+    const posXY = gameScreen.getRandomEdgePosition();
+    initRock("large", posXY);
   }
 }
 
@@ -83,10 +79,7 @@ function addRock(rock: Rock) {
 }
 
 function explodeRock(rockId: string) {
-  const explodedRockLocation = {
-    x: rockList[rockId].position.x,
-    y: rockList[rockId].position.y,
-  };
+  const explodedRockLocation = rockList[rockId].getPosition();
   const rockSize = rockList[rockId].size;
   // explode rock in to smaller rocks
   if (rockSize == "large") {
@@ -111,7 +104,6 @@ function initShip(pos: { x: number; y: number }) {
 // end of Ship code
 
 /* Bullet code */
-
 function createNewBullet(gun: Gun, bulletSpecs: any): Bullet {
   const { bulletPosition, bulletVelocity } = gun.getNewBullet();
   const newBullet = new Bullet(bulletPosition, bulletVelocity, bulletSpecs);
@@ -152,7 +144,8 @@ function gameLoopUpdate() {
   }
   // update position of all rocks
   for (var rock in rockList) {
-    rockList[rock].update(warpX, warpY);
+    const thisRock = rockList[rock];
+    thisRock.update(warpX, warpY);
   }
 
   // - add new bullets - if ACTION.shoot

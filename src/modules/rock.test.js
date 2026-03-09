@@ -1,22 +1,27 @@
 import { expect, test, vi } from "vitest";
 import Rock from "./rock";
 
-function setUp() {
+function setUp(x = 100, y = 100) {
   // reset the static variable that creates a unique ID
   Rock.rockIDCounter = 0;
-  const initialPosition = { x: 100, y: 100 };
+  const position = { x, y };
   let velocity = { speed: 1, direction: 45 };
   const size = "large";
   const r = 70;
   const rotationRate = 1.5;
-  return { initialPosition, velocity, size, r, rotationRate };
+  const rock = new Rock({
+    initialPosition: position,
+    initialVelocity: velocity,
+    size,
+    r,
+    rotationRate,
+  });
+  return rock;
 }
 
 test("create new rocks", () => {
-  const { initialPosition, velocity, size, r, rotationRate } = setUp();
-  const rock1 = new Rock(initialPosition, velocity, size, r, rotationRate);
-  const secondRockPosition = { x: 110, y: 100 };
-  const rock2 = new Rock(secondRockPosition, velocity, size, r, rotationRate);
+  const rock1 = setUp();
+  const rock2 = setUp(110, 100);
   expect(rock1).toEqual({
     id: "rock0",
     size: "large",
@@ -27,7 +32,7 @@ test("create new rocks", () => {
     rotation: 0,
   });
   expect(rock2).toEqual({
-    id: "rock1",
+    id: "rock0",
     size: "large",
     r: 70,
     rotationRate: 1.5,
@@ -38,17 +43,15 @@ test("create new rocks", () => {
 });
 
 test("boundary of rock", () => {
-  const { initialPosition, velocity, size, r, rotationRate } = setUp();
-  const rock1 = new Rock(initialPosition, velocity, size, r, rotationRate);
-  expect(rock1.boundary()).toStrictEqual({ x: 100, y: 100, r: 70 });
+  const rock = setUp();
+  expect(rock.boundary()).toStrictEqual({ x: 100, y: 100, r: 70 });
 });
 
 test("rock movement after 2 frames with transform", () => {
   const transformCallback = (x) => {
     return 10;
   };
-  const { initialPosition, velocity, size, r, rotationRate } = setUp();
-  const rock = new Rock(initialPosition, velocity, size, r, rotationRate);
+  const rock = setUp();
   rock.update();
   rock.update(transformCallback, transformCallback);
   expect(rock.position.x).toBe(10);
@@ -57,8 +60,7 @@ test("rock movement after 2 frames with transform", () => {
 
 test("render calls callback function with id, position and rotation", () => {
   const mockRenderCallback = vi.fn();
-  const { initialPosition, velocity, size, r, rotationRate } = setUp();
-  const rock = new Rock(initialPosition, velocity, size, r, rotationRate);
+  const rock = setUp();
 
   //expect renderCallback to be called with id,x,y parameters
   rock.render(mockRenderCallback);
