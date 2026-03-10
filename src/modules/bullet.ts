@@ -10,32 +10,51 @@
 */
 
 // position is the x,y position on the game screen
-// velocity is the dx,dy change in position every frame.
+// dxdy is the dx,dy change in position every frame.
 // velocity should be speed and direction from which dx and dy can be calcualted
 export default class Bullet {
   static bulletIDCounter = 0;
   public id: string;
   public bulletPower: number;
-  public velocity: { dx: number; dy: number };
+  // TODO: remove dxdy when velocity calcualtions work
+  public dxdy: { dx: number; dy: number };
+  // TODO: calculations that create testdxdy should result in the same value as dxdy
+  public testdxdy: { dx: number; dy: number };
+  public velocity: { speed: number; direction: number };
   public position: { x: number; y: number };
   public endurance: number;
   public r: number;
 
   constructor(
-    initialPosition: { x: number; y: number },
-    initialVelocity: {
-      dx: number;
-      dy: number;
-      initialSpeed?: number;
-      initialDirection?: number;
+    // TODO: remove dxdy and testdxdywhen velocity calculations work
+    {
+      initialPosition,
+      dxdy,
+      velocity,
+      bulletSpecs,
+    }: {
+      initialPosition: { x: number; y: number };
+      dxdy: {
+        dx: number;
+        dy: number;
+      };
+      velocity: {
+        speed: number;
+        direction: number;
+      };
+      bulletSpecs: { r: number; endurance: number; power: number };
     },
-    bulletSpecs: { r: number; endurance: number; power: number },
   ) {
     Bullet.bulletIDCounter++;
     this.id = "bullet" + Bullet.bulletIDCounter;
     this.bulletPower = bulletSpecs.power;
-    this.velocity = { dx: initialVelocity.dx, dy: initialVelocity.dy };
-    this.position = { x: initialPosition.x, y: initialPosition.y };
+    // TODO: remove dxdy when velocity calcualtions work
+    this.dxdy = { dx: dxdy.dx, dy: dxdy.dy };
+    const newdx = velocity.speed * Math.sin(velocity.direction);
+    const newdy = velocity.speed * Math.cos(velocity.direction);
+    this.testdxdy = { dx: newdx, dy: newdy };
+    this.velocity = velocity;
+    this.position = initialPosition;
     this.endurance = bulletSpecs.endurance;
     this.r = bulletSpecs.r;
   }
@@ -53,11 +72,20 @@ export default class Bullet {
     if (this.endurance <= 0) {
       this.bulletPower = 0;
     } else {
-      let newX = this.position.x + this.velocity.dx;
-      let newY = this.position.y - this.velocity.dy;
+      // OLD CALULCATIONS
+      let newX = this.position.x + this.dxdy.dx;
+      let newY = this.position.y - this.dxdy.dy;
       // use transforms to update position of bullet on game screen
       this.position.x = transformXCallback ? transformXCallback(newX) : newX;
       this.position.y = transformYCallback ? transformYCallback(newY) : newY;
+      // NEW CALCULATIONS CAUSE ERROR
+      const testDx = this.velocity.speed * Math.sin(this.velocity.direction);
+      const testDy = this.velocity.speed * Math.cos(this.velocity.direction);
+      this.testdxdy = { dx: testDx, dy: testDy };
+      //let testNewX = this.position.x + testDx;
+      //let testNewY = this.position.y - testDy;
+      //this.position.x = transformXCallback ? transformXCallback(testNewX) : testNewX;
+      //this.position.y = transformYCallback ? transformYCallback(testNewY) : testNewY;
     }
   }
 

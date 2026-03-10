@@ -105,8 +105,15 @@ function initShip(pos: { x: number; y: number }) {
 
 /* Bullet code */
 function createNewBullet(gun: Gun, bulletSpecs: any): Bullet {
-  const { bulletPosition, bulletVelocity } = gun.getNewBullet();
-  const newBullet = new Bullet(bulletPosition, bulletVelocity, bulletSpecs);
+  // TODO: remove bulletPosition, bulletDxDy, bulletVelocity and replace with bulletMotionState
+  // e.g. const newBullet = new Bullet({bulletMotionState,bulletSpecs});
+  const { bulletPosition, bulletDxDy, bulletVelocity } = gun.getNewBullet();
+  const newBullet = new Bullet({
+    initialPosition: bulletPosition,
+    dxdy: bulletDxDy,
+    velocity: bulletVelocity,
+    bulletSpecs,
+  });
   return newBullet;
 }
 

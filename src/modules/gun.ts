@@ -102,12 +102,19 @@ export default class Gun {
     return { x, y };
   }
 
-  // bullet velocity is related to gun's motion state plus rotarion and power of gun
-  private getBulletDxDy() {
-    const velocityX = this.velocity.speed * Math.sin(this.velocity.direction);
-    const velocityY = this.velocity.speed * Math.cos(this.velocity.direction);
-    const dx = velocityX + this.muzzleSpeed * Math.sin(this.rotation);
-    const dy = velocityY + this.muzzleSpeed * Math.cos(this.rotation);
+  // --- methods related to bullet motionstate when gun is fired
+  // TODO: this should be replaced with returning real speed and velocity
+  // bullet velocity is related to gun's motion state plus rotation and power of gun
+  private getBulletDxDy(): { dx: number; dy: number } {
+    // Convert speed and direction to velocity components (vx, vy)
+    const gunVx = this.velocity.speed * Math.sin(this.velocity.direction);
+    const gunVy = this.velocity.speed * Math.cos(this.velocity.direction);
+    const bulletVx = this.muzzleSpeed * Math.sin(this.rotation);
+    const bulletVy = this.muzzleSpeed * Math.cos(this.rotation);
+    // Create component velocity of bullet
+    const dx = gunVx + bulletVx;
+    const dy = gunVy + bulletVy;
+
     return {
       dx,
       dy,
@@ -117,11 +124,19 @@ export default class Gun {
   public getNewBullet(): {
     bulletPosition: Position;
     bulletDxDy: { dx: number; dy: number };
+    bulletVelocity: { speed: number; direction: number };
   } {
     const bulletPosition: Position = this.getGunPosition();
     const bulletDxDy = this.getBulletDxDy();
+    // create velocity of bullet fired from moving gun
+    const newSpeed = Math.sqrt(bulletDxDy.dx ** 2 + bulletDxDy.dy ** 2);
+    // TODO: write test to check if this is correct
+    const newDirection = Math.atan2(bulletDxDy.dy, bulletDxDy.dx);
+    const bulletVelocity = { speed: newSpeed, direction: newDirection };
+
     this.reloadGun();
-    return { bulletPosition, bulletDxDy };
+    // TODO: could remove dxdy if motionState works
+    return { bulletPosition, bulletDxDy, bulletVelocity };
   }
 
   reloadGun() {
