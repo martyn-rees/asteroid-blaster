@@ -36,7 +36,7 @@ export default class Rock {
     this.rotation = 0;
   }
 
-  public getPosition(): { x: number; y: number } {
+  public get rockPosition(): { x: number; y: number } {
     return this.position;
   }
 

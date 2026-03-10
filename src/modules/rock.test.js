@@ -1,10 +1,9 @@
 import { expect, test, vi } from "vitest";
 import Rock from "./rock";
 
-function setUp({ x, y } = { x: 100, y: 100 }) {
+function setUp(position = { x: 100, y: 100 }) {
   // reset the static variable that creates a unique ID
   Rock.rockIDCounter = 0;
-  const position = { x, y };
   let velocity = { speed: 1, direction: 45 };
   const size = "large";
   const r = 70;
@@ -46,6 +45,11 @@ test("create new rocks", () => {
 test("boundary of rock", () => {
   const rock = setUp();
   expect(rock.boundary()).toStrictEqual({ x: 100, y: 100, r: 70 });
+});
+
+test("get position", () => {
+  const rock = setUp();
+  expect(rock.rockPosition).toStrictEqual({ x: 100, y: 100 });
 });
 
 test("rock movement after 2 frames with transform", () => {

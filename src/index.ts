@@ -46,6 +46,7 @@ let gameScreen = new GameScreen("gameScreen", 800, 400);
 let score = 0;
 let ship: Ship;
 let rockList: Rocks = {};
+let newRocks: string[] = [];
 let bulletList: Bullets = {};
 
 // ----  Rock code ----
@@ -61,9 +62,7 @@ function initRock(size: string, pos: { x: number; y: number }) {
     rotationRate,
   });
   addRock(rock);
-  //TODO: move this to render section
-  // look through rockList for new rocks and add to screen
-  addNewRockToScreen(rock, gameScreen);
+  newRocks.push(rock.id);
 }
 
 // TODO: needs gamescreen to get random edge start position
@@ -79,7 +78,7 @@ function addRock(rock: Rock) {
 }
 
 function explodeRock(rockId: string) {
-  const explodedRockLocation = rockList[rockId].getPosition();
+  const explodedRockLocation = rockList[rockId].rockPosition;
   const rockSize = rockList[rockId].size;
   // explode rock in to smaller rocks
   if (rockSize == "large") {
@@ -205,6 +204,7 @@ function gameLoopUpdate() {
       oldRocks.push(rockId);
     }
   }
+
   return { newBullet, oldBullets, oldRocks };
 }
 
@@ -321,6 +321,12 @@ export function gameLoopRender(
     playSound("shoot");
   }
   ship.render(updateElement, renderThrust); // this calls render method in ship class which calls renderShip above whch calls render
+  // add new rocks to screen and then reset newRocks list to []
+  newRocks.forEach((rockId) => {
+    addNewRockToScreen(rockList[rockId], gameScreen);
+  });
+  newRocks = [];
+
   for (var rockId in rockList) {
     rockList[rockId].render(updateElement); // this calls render method in rock class which calls render above
   }
