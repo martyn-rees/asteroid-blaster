@@ -18,6 +18,7 @@ import { createStartButton } from "./ui/startbutton.js";
 import { createPauseButton } from "./ui/pauseButton.js";
 import { createResumeButton } from "./ui/resumeButton.js";
 import { gameLoopRender } from "./gamelooprender.js";
+import { gameState, changeGameState } from "./gameState.js";
 
 // TODO: Position and Velocity types should be shared across modules
 var animationId: number;
@@ -29,40 +30,8 @@ let ACTIONS: ShipActions = {
   rotateCounterClockwise: false,
 };
 
-interface Rocks {
-  [index: string]: Rock;
-}
-
-interface Bullets {
-  [index: string]: Bullet;
-}
-
-export type GameState = {
-  state: string;
-  gameScreen: GameScreen;
-  score: number;
-  ship: Ship | undefined;
-  rockList: Rocks;
-  oldRocks: string[];
-  newRocks: string[];
-  bulletList: Bullets;
-  newBullets: string[];
-  oldBullets: string[];
-};
-
 let gameScreen = new GameScreen("gameScreen", 800, 400);
-let gameState: GameState = {
-  state: "start",
-  gameScreen: gameScreen,
-  score: 0,
-  ship: undefined,
-  rockList: {},
-  oldRocks: [],
-  newRocks: [],
-  bulletList: {},
-  newBullets: [],
-  oldBullets: [],
-};
+
 // ----  Rock code ----
 
 // this function does several things - creates a rock with random properties, adds it to the rock list, creates a game element for the rock and adds it to the game screen
@@ -75,7 +44,7 @@ function initRock(size: string, pos: { x: number; y: number }) {
     r,
     rotationRate,
   });
-  addRock(rock);
+  changeGameState({ action: "add rock", gameElement: rock });
 }
 
 // TODO: needs gamescreen to get random edge start position
@@ -86,12 +55,7 @@ function createRocksForNewLevel({ rockAmount }: { rockAmount: number }) {
   }
 }
 
-function addRock(rock: Rock) {
-  gameState.rockList[rock.id] = rock;
-  gameState.newRocks.push(rock.id);
-}
-
-function explodeRock(rockId: string, rock: Rock) {
+function explodeRock(rock: Rock) {
   const explodedRockLocation = rock.rockPosition;
   const rockSize = rock.size;
   // explode rock in to smaller rocks
@@ -103,8 +67,7 @@ function explodeRock(rockId: string, rock: Rock) {
     initRock("small", explodedRockLocation);
     initRock("small", explodedRockLocation);
   }
-
-  delete gameState.rockList[rockId];
+  changeGameState({ action: "delete rock", gameElement: rock });
 }
 // end of Rock code
 
@@ -116,20 +79,6 @@ function initShip(pos: { x: number; y: number }): Ship {
   return ship;
 }
 // end of Ship code
-
-function addBullet(bullet: Bullet) {
-  gameState.bulletList[bullet.id] = bullet;
-  gameState.newBullets.push(bullet.id);
-}
-function deleteBullet(bulletId: string) {
-  delete gameState.bulletList[bulletId];
-  gameState.oldBullets.push(bulletId);
-}
-/* end of bullet code */
-
-function updateScore(value: number) {
-  gameState.score += value;
-}
 
 // GAME loop code
 function step(timestamp: number) {
@@ -166,7 +115,7 @@ function gameLoopUpdate() {
       velocity: bulletVelocity,
       bulletSpecs,
     });
-    addBullet(bullet);
+    changeGameState({ action: "add bullet", gameElement: bullet });
   }
 
   // - remove dead bullets - if power <= 0
@@ -174,7 +123,7 @@ function gameLoopUpdate() {
   for (var bulletId in gameState.bulletList) {
     const thisBullet = gameState.bulletList[bulletId];
     if (thisBullet.bulletPower == 0) {
-      deleteBullet(bulletId);
+      changeGameState({ action: "delete bullet", gameElement: thisBullet });
     }
   }
 
@@ -190,8 +139,7 @@ function gameLoopUpdate() {
         thisBullet.boundary(),
       );
       if (hasRockCollided) {
-        deleteBullet(bulletId);
-
+        changeGameState({ action: "delete bullet", gameElement: thisBullet });
         break;
       }
     }
@@ -209,8 +157,8 @@ function gameLoopUpdate() {
     // if collision with bullet or ship then remove rock, add score and add smaller rocks if needed
     if (hasRockCollided) {
       const valueOfRock = getRockValue(gameState.rockList[rockId].size);
-      updateScore(valueOfRock);
-      explodeRock(rockId, gameState.rockList[rockId]);
+      changeGameState({ action: "score", gameElement: valueOfRock });
+      explodeRock(gameState.rockList[rockId]);
       gameState.oldRocks.push(rockId);
     }
   }
@@ -228,10 +176,7 @@ function gameLoop() {
   const { gameState } = gameLoopUpdate();
   // DOM rendering
   gameLoopRender(gameState, gameScreen);
-  gameState.newRocks = [];
-  gameState.newBullets = [];
-  gameState.oldBullets = [];
-  gameState.oldRocks = [];
+  changeGameState({ action: "reset lists", gameElement: "" });
   animationId = window.requestAnimationFrame(step);
 }
 
@@ -281,7 +226,7 @@ function setUpGameScreen() {
   const pauseButton = createPauseButton(pauseButtonHandler);
   addToScreen(pauseButton, gameScreen.id);
   addEvents();
-  updateScore(0);
+  changeGameState({ action: "score", gameElement: 0 });
   const pos = gameScreen.getScreenCentre();
   gameState.ship = initShip(pos);
   startLevel(1);
