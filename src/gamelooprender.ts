@@ -9,7 +9,7 @@ import {
 import { asteroidsSVG } from "./graphics.js";
 import Rock from "./modules/rock.js";
 import GameScreen from "./modules/gamescreen.js";
-import { GameState } from "./index.js";
+import { GameState } from "./gameState.js";
 
 /* RENDER CODEE */
 // disply game elements, ship, rocks and bullets
