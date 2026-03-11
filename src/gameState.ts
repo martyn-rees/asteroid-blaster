@@ -45,6 +45,10 @@ type gameStateChanger = {
 
 export function changeGameState({ action, gameElement }: gameStateChanger) {
   switch (action) {
+    case "add ship":
+      const ship = gameElement as Ship;
+      gameState.ship = ship;
+      break;
     case "add rock":
       const rock = gameElement as Rock;
       gameState.rockList[rock.id] = rock;

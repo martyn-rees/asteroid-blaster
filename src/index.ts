@@ -104,11 +104,11 @@ function gameLoopUpdate() {
   }
 
   // - add new bullets - if ACTION.shoot
-  if (gameState.ship!.gun && gameState.ship!.gun.state === "firing") {
+  const shipGun: Gun | null = gameState.ship!.gun;
+  if (shipGun && shipGun.state === "firing") {
     // get position of gun attached to ship as the starting position of new bullet
     const { bulletPosition, bulletDxDy, bulletVelocity } =
-      gameState.ship!.gun.getNewBullet();
-
+      shipGun.getNewBullet();
     const bullet = new Bullet({
       initialPosition: bulletPosition,
       dxdy: bulletDxDy,
@@ -207,13 +207,6 @@ function resumeButtonHandler() {
 /* end of handlers */
 
 /* set up game */
-//TODO - uses render method
-function startLevel(level: number) {
-  const shipEl = createElement("ship", "ship", null, shipSVG());
-  addToScreen(shipEl, gameScreen.id);
-  setTimeout(() => createRocksForNewLevel({ rockAmount: 8 }), 1000);
-}
-
 //TODO: uses render method
 // add start button, instructions, clear up old events and score
 function setUpStartScreen() {
@@ -228,8 +221,13 @@ function setUpGameScreen() {
   addEvents();
   changeGameState({ action: "score", gameElement: 0 });
   const pos = gameScreen.getScreenCentre();
-  gameState.ship = initShip(pos);
-  startLevel(1);
+  // create ship
+  const ship: Ship = initShip(pos);
+  changeGameState({ action: "add ship", gameElement: ship });
+  // add new ship to screen
+  const shipEl = createElement("ship", "ship", null, shipSVG());
+  addToScreen(shipEl, gameScreen.id);
+  setTimeout(() => createRocksForNewLevel({ rockAmount: 8 }), 1000);
   cancelAnimationFrame(animationId);
   animationId = requestAnimationFrame(step);
 }
