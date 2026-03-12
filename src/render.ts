@@ -1,5 +1,3 @@
-const renderType = "css";
-
 // change position and rotation to element already on screen
 // TODO maybe provide additonalCLass property which could be used for examples such as ships thrust
 // could be Display.update
@@ -16,6 +14,10 @@ export const updateElement = (
     el.style.transform = `rotate(${rotation}deg)`;
   }
 };
+
+export function displayScore(score: number) {
+  document.getElementById("gameScore")!.innerHTML = "SCORE: " + score;
+}
 
 export const renderThrust = (thrustPower: number) => {
   const thrustStyle = thrustPower > 0 ? "block" : "none";
@@ -35,7 +37,7 @@ export function createElement(
   className: string,
   style: string | null,
   graphicSVG: string | null,
-) {
+): HTMLElement {
   let elContainer = document.createElement("div");
   elContainer.setAttribute("id", id);
   elContainer.setAttribute("class", className);
@@ -48,10 +50,43 @@ export function createElement(
   return elContainer;
 }
 
-// remove DOM element with matching ID
-// could be Display.remove
+const getAsteroidGraphic = (SVGList: string[]): string => {
+  const n = Math.floor(Math.random() * SVGList.length);
+  return SVGList[n];
+};
+
+export function createRockElement({
+  id,
+  r,
+  SVGList,
+}: {
+  id: string;
+  r: number;
+  SVGList: string[];
+}): HTMLElement {
+  let rockStyle = `height:${2 * r}px; width:${2 * r}px; margin-left:-${r}px; margin-top:-${r}px;`;
+  const asteroidSVG = getAsteroidGraphic(SVGList);
+  const el = createElement(id, "rock", rockStyle, asteroidSVG);
+  return el;
+}
+
 export function removeFromScreen(elId: string) {
   let elNode: HTMLElement = document.getElementById(elId)!;
   elNode.parentNode!.removeChild(elNode);
 }
-// end of DOM functions
+
+export function playSound(soundDescription: string) {
+  let soundurl;
+  if (soundDescription == "shoot") {
+    soundurl = "./sounds/shoot.wav";
+  } else if (soundDescription == "explosion") {
+    soundurl = "./sounds/explosion.wav";
+  } else {
+    console.error(`sound description ${soundDescription} not recognised`);
+    return;
+  }
+  const sound = new Audio(soundurl);
+  sound.volume = 0.1;
+  sound.load();
+  sound.play();
+}

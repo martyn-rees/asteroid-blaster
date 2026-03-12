@@ -15,10 +15,10 @@ export type GameState = {
   gameScreen: GameScreen;
   score: number;
   ship: Ship | undefined;
-  rockList: Rocks;
+  rocks: Rocks;
   oldRocks: string[];
   newRocks: string[];
-  bulletList: Bullets;
+  bullets: Bullets;
   newBullets: string[];
   oldBullets: string[];
 };
@@ -30,10 +30,10 @@ export let gameState: GameState = {
   gameScreen: gameScreen,
   score: 0,
   ship: undefined,
-  rockList: {},
+  rocks: {},
   oldRocks: [],
   newRocks: [],
-  bulletList: {},
+  bullets: {},
   newBullets: [],
   oldBullets: [],
 };
@@ -51,21 +51,21 @@ export function changeGameState({ action, gameElement }: gameStateChanger) {
       break;
     case "add rock":
       const rock = gameElement as Rock;
-      gameState.rockList[rock.id] = rock;
+      gameState.rocks[rock.id] = rock;
       gameState.newRocks.push(rock.id);
       break;
     case "delete rock":
       const oldRock = gameElement as Rock;
-      delete gameState.rockList[oldRock.id];
+      delete gameState.rocks[oldRock.id];
       break;
     case "add bullet":
       const newBullet = gameElement as Bullet;
-      gameState.bulletList[newBullet.id] = newBullet;
+      gameState.bullets[newBullet.id] = newBullet;
       gameState.newBullets.push(newBullet.id);
       break;
     case "delete bullet":
       const oldBullet = gameElement as Bullet;
-      delete gameState.bulletList[oldBullet.id];
+      delete gameState.bullets[oldBullet.id];
       gameState.oldBullets.push(oldBullet.id);
       break;
     case "score":

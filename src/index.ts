@@ -94,12 +94,12 @@ function gameLoopUpdate() {
   gameState.ship!.update(ACTIONS, warpX, warpY);
 
   // update position of all bullets
-  for (var bulletId in gameState.bulletList) {
-    gameState.bulletList[bulletId].update(warpX, warpY);
+  for (var bulletId in gameState.bullets) {
+    gameState.bullets[bulletId].update(warpX, warpY);
   }
   // update position of all rocks
-  for (var rock in gameState.rockList) {
-    const thisRock = gameState.rockList[rock];
+  for (var rock in gameState.rocks) {
+    const thisRock = gameState.rocks[rock];
     thisRock.update(warpX, warpY);
   }
 
@@ -120,20 +120,20 @@ function gameLoopUpdate() {
 
   // - remove dead bullets - if power <= 0
   // this could be moved to collision function where it loops over bullets to save looping over bullets twice but for now its kept separate for clarity
-  for (var bulletId in gameState.bulletList) {
-    const thisBullet = gameState.bulletList[bulletId];
+  for (var bulletId in gameState.bullets) {
+    const thisBullet = gameState.bullets[bulletId];
     if (thisBullet.bulletPower == 0) {
       changeGameState({ action: "delete bullet", gameElement: thisBullet });
     }
   }
 
   // test each rock for collision with bullets and ship
-  for (var rockId in gameState.rockList) {
+  for (var rockId in gameState.rocks) {
     let hasRockCollided: boolean = false;
-    const thisRock = gameState.rockList[rockId];
+    const thisRock = gameState.rocks[rockId];
     // test rock against each bullet until collision is found - if collision then remove bullet and record a collision has happened and break out of bullet loop
-    for (var bulletId in gameState.bulletList) {
-      const thisBullet = gameState.bulletList[bulletId];
+    for (var bulletId in gameState.bullets) {
+      const thisBullet = gameState.bullets[bulletId];
       hasRockCollided = testCollision(
         thisRock.boundary(),
         thisBullet.boundary(),
@@ -156,9 +156,9 @@ function gameLoopUpdate() {
     }
     // if collision with bullet or ship then remove rock, add score and add smaller rocks if needed
     if (hasRockCollided) {
-      const valueOfRock = getRockValue(gameState.rockList[rockId].size);
+      const valueOfRock = getRockValue(gameState.rocks[rockId].size);
       changeGameState({ action: "score", gameElement: valueOfRock });
-      explodeRock(gameState.rockList[rockId]);
+      explodeRock(gameState.rocks[rockId]);
       gameState.oldRocks.push(rockId);
     }
   }
@@ -175,7 +175,7 @@ function gameLoopUpdate() {
 function gameLoop() {
   const { gameState } = gameLoopUpdate();
   // DOM rendering
-  gameLoopRender(gameState, gameScreen);
+  gameLoopRender(gameState, gameScreen.id);
   changeGameState({ action: "reset lists", gameElement: "" });
   animationId = window.requestAnimationFrame(step);
 }
