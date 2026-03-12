@@ -16,12 +16,12 @@ import {
 } from "./gamedata.js";
 import { createButton } from "./ui/button.ts";
 import { gameLoopRender } from "./gamelooprender.ts";
-import { gameState, changeGameState } from "./gameState.ts";
+import { GameState, gameState, changeGameState } from "./gameState.ts";
 
 // TODO: Position and Velocity types should be shared across modules
 var animationId: number;
 let isGamePlaying = false;
-let ACTIONS: ShipActions = {
+let shipActions: ShipActions = {
   thrust: false,
   shoot: false,
   rotateClockwise: false,
@@ -83,24 +83,30 @@ function step(timestamp: number) {
   gameLoop();
 }
 
-function gameLoopUpdate() {
+function updateMotionStates(gameState: GameState) {
+  const { ship, bullets, rocks } = gameState;
   // use constrainNumber as a callback in update method of ship, rock and bullet classes instead of passing in gameScreen dimensions
   const warpX = (x: number) => constrainNumber(x, 0, gameScreen.width);
   const warpY = (y: number) => constrainNumber(y, 0, gameScreen.height);
 
-  // update ship position and state based on ACTIONS
-  gameState.ship!.update(ACTIONS, warpX, warpY);
+  // update ship position based on motion state
+  ship!.update(warpX, warpY);
 
-  // update position of all bullets
+  // update position of bullet based on motion state
   for (var bulletId in gameState.bullets) {
-    gameState.bullets[bulletId].update(warpX, warpY);
+    bullets[bulletId].update(warpX, warpY);
   }
-  // update position of all rocks
-  for (var rock in gameState.rocks) {
-    const thisRock = gameState.rocks[rock];
+
+  // update position of rock based on motion state
+  for (var rock in rocks) {
+    const thisRock = rocks[rock];
     thisRock.update(warpX, warpY);
   }
+}
 
+function gameLoopUpdate() {
+  gameState.ship!.updateActions(shipActions);
+  updateMotionStates(gameState);
   // - add new bullets - if ACTION.shoot
   const shipGun: Gun | null = gameState.ship!.gun;
   if (shipGun && shipGun.state === "firing") {
@@ -269,16 +275,16 @@ init();
 function keyEvent(ev: KeyboardEvent, isKeyDown: boolean) {
   var key = ev.code;
   if (key == keyBindings.rotateLeft) {
-    ACTIONS.rotateCounterClockwise = isKeyDown;
+    shipActions.rotateCounterClockwise = isKeyDown;
   }
   if (key == keyBindings.rotateRight) {
-    ACTIONS.rotateClockwise = isKeyDown;
+    shipActions.rotateClockwise = isKeyDown;
   }
   if (key == keyBindings.thrust) {
-    ACTIONS.thrust = isKeyDown;
+    shipActions.thrust = isKeyDown;
   }
   if (key == keyBindings.shoot) {
-    ACTIONS.shoot = isKeyDown;
+    shipActions.shoot = isKeyDown;
   }
 }
 

@@ -29,6 +29,7 @@ export default class Ship {
   public direction: Directions;
   public shipSpeed: number;
   public gun: Gun | null;
+  public isTriggerPressed: boolean;
 
   constructor(pos: { x: number; y: number }, id: string, shipSpecs: ShipSpecs) {
     this.id = id;
@@ -48,6 +49,7 @@ export default class Ship {
     this.shipSpeed = 0;
     // gun specifications - this can be passed in for different gunpower and position. Need to use array if more than one gun
     this.gun = null;
+    this.isTriggerPressed = false;
   }
 
   attachGun(gun: Gun) {
@@ -113,13 +115,8 @@ export default class Ship {
     }
   }
 
-  update(
-    ACTIONS: ShipActions,
-    transformXCallback?: Function,
-    transformYCallback?: Function,
-  ) {
+  updateActions(ACTIONS: ShipActions) {
     const { thrust, rotateCounterClockwise, rotateClockwise, shoot } = ACTIONS;
-    // update Motion State
     this.thrustPower = thrust ? this.thrustMax : 0;
     if (rotateCounterClockwise) {
       this.changeShipRotation(-this.rotationSpeed);
@@ -127,6 +124,11 @@ export default class Ship {
     if (rotateClockwise) {
       this.changeShipRotation(this.rotationSpeed);
     }
+    this.isTriggerPressed = shoot;
+  }
+
+  update(transformXCallback?: Function, transformYCallback?: Function) {
+    // update Motion State
     this.calculateNewVelocity();
     const newX =
       this.position.x + this.shipSpeed * Math.sin(this.direction.radians);
@@ -143,7 +145,7 @@ export default class Ship {
         velocity: { speed: this.shipSpeed, direction: this.direction.radians },
         rotation: this.rotation.radians,
       });
-      this.gun.update(shoot);
+      this.gun.update(this.isTriggerPressed);
     }
   }
 
