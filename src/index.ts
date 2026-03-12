@@ -1,11 +1,11 @@
-import Rock from "./modules/rock.js";
-import Ship, { ShipActions } from "./modules/ship.js";
-import Gun from "./modules/gun.js";
-import Bullet from "./modules/bullet.js";
-import GameScreen from "./modules/gamescreen.js";
-import { addToScreen, removeFromScreen, createElement } from "./render.js";
-import { constrainNumber, testCollision } from "./helper.js";
-import { shipSVG } from "./graphics.js";
+import Rock from "./modules/rock.ts";
+import Ship, { ShipActions } from "./modules/ship.ts";
+import Gun from "./modules/gun.ts";
+import Bullet from "./modules/bullet.ts";
+import GameScreen from "./modules/gamescreen.ts";
+import { addToScreen, removeFromScreen, createElement } from "./render.ts";
+import { constrainNumber, testCollision } from "./helper.ts";
+import { shipSVG } from "./graphics.ts";
 import {
   bulletSpecs,
   shipSpecs,
@@ -14,11 +14,9 @@ import {
   getRockData,
   getRockValue,
 } from "./gamedata.js";
-import { createStartButton } from "./ui/startbutton.js";
-import { createPauseButton } from "./ui/pauseButton.js";
-import { createResumeButton } from "./ui/resumeButton.js";
-import { gameLoopRender } from "./gamelooprender.js";
-import { gameState, changeGameState } from "./gameState.js";
+import { createButton } from "./ui/button.ts";
+import { gameLoopRender } from "./gamelooprender.ts";
+import { gameState, changeGameState } from "./gameState.ts";
 
 // TODO: Position and Velocity types should be shared across modules
 var animationId: number;
@@ -192,7 +190,12 @@ function pauseButtonHandler() {
   isGamePlaying = false;
   cancelAnimationFrame(animationId);
   removeFromScreen("pauseButton");
-  const resumeButton = createResumeButton(resumeButtonHandler);
+  const resumeButton = createButton({
+    label: "resume",
+    id: "resumeButton",
+    className: "pause-button",
+    buttonCallback: resumeButtonHandler,
+  });
   addToScreen(resumeButton, gameScreen.id);
 }
 
@@ -201,7 +204,12 @@ function resumeButtonHandler() {
   cancelAnimationFrame(animationId);
   animationId = requestAnimationFrame(step);
   removeFromScreen("resumeButton");
-  const pauseButton = createPauseButton(pauseButtonHandler);
+  const pauseButton = createButton({
+    label: "pause",
+    id: "pauseButton",
+    className: "pause-button",
+    buttonCallback: pauseButtonHandler,
+  });
   addToScreen(pauseButton, gameScreen.id);
 }
 /* end of handlers */
@@ -210,13 +218,23 @@ function resumeButtonHandler() {
 //TODO: uses render method
 // add start button, instructions, clear up old events and score
 function setUpStartScreen() {
-  const startButton = createStartButton(startButtonHandler);
+  const startButton = createButton({
+    label: "start",
+    id: "startButton",
+    className: "start-button",
+    buttonCallback: startButtonHandler,
+  });
   addToScreen(startButton, gameScreen.id);
 }
 
 // TODO: uses render method
 function setUpGameScreen() {
-  const pauseButton = createPauseButton(pauseButtonHandler);
+  const pauseButton = createButton({
+    label: "pause",
+    id: "pauseButton",
+    className: "pause-button",
+    buttonCallback: pauseButtonHandler,
+  });
   addToScreen(pauseButton, gameScreen.id);
   addEvents();
   changeGameState({ action: "score", gameElement: 0 });
