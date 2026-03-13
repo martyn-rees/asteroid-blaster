@@ -1,8 +1,6 @@
 // gun specs of gun that can be attached to ship
-// TODO: set position, velocity and rotation of gun nozzzle
 
 // TODO: Position and Velocity types should be shared across modules
-
 export type Position = {
   x: number;
   y: number;

@@ -46,10 +46,8 @@ function addNewItems(
 
 /* RENDER CODEE */
 // disply game elements, ship, rocks and bullets
-// TODO: pass in gameElelemtns object with single items and arrays which get displayed using generic functions
 // TODO - keep a copy of rocks and bullets from previous frame and compare to current list to decide which elements to add, update and remove
 // can then remove oldBullets, oldRocks and newBullets
-//
 export function gameLoopRender(gameState: GameState, screenId: string) {
   const {
     bullets,

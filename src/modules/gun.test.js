@@ -64,7 +64,7 @@ test("gun position on a ship (when pointing North then East)", () => {
   };
   gun.updateMotionState(motionStateNorth);
   const gunLocation = gun.getGunPosition();
-  // TODO: reversed y axis.
+  // reversed y axis (screen coords) so going up decreses in value
   expect(gunLocation).toStrictEqual({ x: 100, y: 94 });
 
   const motionStateEast = {
@@ -74,7 +74,7 @@ test("gun position on a ship (when pointing North then East)", () => {
   };
   gun.updateMotionState(motionStateEast);
   const locationAfterRotation = gun.getGunPosition();
-  // TODO: reversed y axis.
+  // reversed y axis (screen coords) so going down increases in value
   expect(locationAfterRotation).toStrictEqual({ x: 106, y: 100 });
 });
 

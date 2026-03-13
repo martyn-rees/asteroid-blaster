@@ -1,5 +1,3 @@
-// TODO: these functions should be passed in as a callback to the ship, rock and bullet classes so that they can be used in the update and render methods of those classes
-
 export const constrainNumber = (
   n: number,
   min: number,
