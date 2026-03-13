@@ -27,7 +27,11 @@ export const renderThrust = (thrustPower: number) => {
 // DOM functions
 export function addToScreen(newEl: HTMLElement, screenId: string) {
   let screenNode = document.getElementById(screenId);
-  screenNode!.appendChild(newEl);
+  if (screenNode) {
+    screenNode.appendChild(newEl);
+  } else {
+    console.error("no parent node with id:", screenId);
+  }
 }
 
 // create a div with id and class and internal style as parent for SVG graphic

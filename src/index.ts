@@ -3,9 +3,8 @@ import Ship, { ShipActions } from "./modules/ship.ts";
 import Gun from "./modules/gun.ts";
 import Bullet from "./modules/bullet.ts";
 import GameScreen from "./modules/gamescreen.ts";
-import { addToScreen, removeFromScreen, createElement } from "./render.ts";
+import { addToScreen, removeFromScreen } from "./render.ts";
 import { constrainNumber, testCollision } from "./helper.ts";
-import { shipSVG } from "./graphics.ts";
 import {
   bulletSpecs,
   shipSpecs,
@@ -20,7 +19,6 @@ import { GameState, gameState, changeGameState } from "./gameState.ts";
 
 // TODO: Position and Velocity types should be shared across modules
 var animationId: number;
-let isGamePlaying = false;
 let shipActions: ShipActions = {
   thrust: false,
   shoot: false,
@@ -184,46 +182,26 @@ function gameLoop() {
   animationId = window.requestAnimationFrame(step);
 }
 
-/* handlers */
-// TODO: uses render methods
-function startButtonHandler() {
-  isGamePlaying = true;
-  setUpGameScreen();
-  removeFromScreen("startButton");
-}
-
-function pauseButtonHandler() {
-  isGamePlaying = false;
-  cancelAnimationFrame(animationId);
-  removeFromScreen("pauseButton");
-  const resumeButton = createButton({
-    label: "resume",
-    id: "resumeButton",
-    className: "pause-button",
-    buttonCallback: resumeButtonHandler,
-  });
-  addToScreen(resumeButton, gameScreen.id);
-}
-
-function resumeButtonHandler() {
-  isGamePlaying = true;
-  cancelAnimationFrame(animationId);
-  animationId = requestAnimationFrame(step);
-  removeFromScreen("resumeButton");
-  const pauseButton = createButton({
-    label: "pause",
-    id: "pauseButton",
-    className: "pause-button",
-    buttonCallback: pauseButtonHandler,
-  });
-  addToScreen(pauseButton, gameScreen.id);
-}
-/* end of handlers */
-
 /* set up game */
 //TODO: uses render method
 // add start button, instructions, clear up old events and score
-function setUpStartScreen() {
+function startButtonHandler() {
+  // set state to "game-screen" - exit currentScreen,  enter nextScreen, set currentScreen to nextScreen
+  exitStartScreen();
+  enterGameScreen();
+}
+
+function pauseButtonHandler() {
+  exitPlayGameScreen();
+  enterPauseGameScreen();
+}
+
+function resumeButtonHandler() {
+  exitPauseGameScreen();
+  enterPlayGameScreen();
+}
+
+function enterStartScreen() {
   const startButton = createButton({
     label: "start",
     id: "startButton",
@@ -233,8 +211,27 @@ function setUpStartScreen() {
   addToScreen(startButton, gameScreen.id);
 }
 
-// TODO: uses render method
-function setUpGameScreen() {
+function exitStartScreen() {
+  removeFromScreen("startButton");
+}
+
+function enterPauseGameScreen() {
+  const resumeButton = createButton({
+    label: "resume",
+    id: "resumeButton",
+    className: "pause-button",
+    buttonCallback: resumeButtonHandler,
+  });
+  addToScreen(resumeButton, gameScreen.id);
+}
+
+function exitPauseGameScreen() {
+  cancelAnimationFrame(animationId);
+  animationId = requestAnimationFrame(step);
+  removeFromScreen("resumeButton");
+}
+
+function enterPlayGameScreen() {
   const pauseButton = createButton({
     label: "pause",
     id: "pauseButton",
@@ -242,16 +239,28 @@ function setUpGameScreen() {
     buttonCallback: pauseButtonHandler,
   });
   addToScreen(pauseButton, gameScreen.id);
-  addEvents();
+}
+
+function exitPlayGameScreen() {
+  cancelAnimationFrame(animationId);
+  removeFromScreen("pauseButton");
+}
+
+/* end of handlers */
+// TODO: uses render method
+function enterGameScreen() {
+  enterPlayGameScreen();
+
   changeGameState({ action: "score", gameElement: 0 });
+
+  // create ship and add controls
   const pos = gameScreen.getScreenCentre();
-  // create ship
   const ship: Ship = initShip(pos);
   changeGameState({ action: "add ship", gameElement: ship });
-  // add new ship to screen
-  const shipEl = createElement("ship", "ship", null, shipSVG());
-  addToScreen(shipEl, gameScreen.id);
+  addShipControlEvents();
+
   setTimeout(() => createRocksForNewLevel({ rockAmount: 8 }), 1000);
+
   cancelAnimationFrame(animationId);
   animationId = requestAnimationFrame(step);
 }
@@ -264,15 +273,24 @@ function init() {
     setGameScreenSize(gameScreen);
   });
   setGameScreenSize(gameScreen);
-  setUpStartScreen();
+  enterStartScreen();
 }
 /* end of set up game */
 
 init();
-// end of GAME loop code
 
 // events code
-function keyEvent(ev: KeyboardEvent, isKeyDown: boolean) {
+// TODO: get game screen size and set dimesniosn of GameScreen instance
+export function setGameScreenSize(screen: GameScreen) {
+  let screenNode: HTMLElement = document.getElementById(screen.id)!;
+  screen.setGameScreenDimensions(
+    screenNode.offsetWidth,
+    screenNode.offsetHeight,
+  );
+}
+
+// uses global shipActions and imports keyBindings
+function shipControlKeyEvent(ev: KeyboardEvent, isKeyDown: boolean) {
   var key = ev.code;
   if (key == keyBindings.rotateLeft) {
     shipActions.rotateCounterClockwise = isKeyDown;
@@ -288,22 +306,13 @@ function keyEvent(ev: KeyboardEvent, isKeyDown: boolean) {
   }
 }
 
-// TODO: there are now container size options instead of offsetWidth
-export function setGameScreenSize(screen: GameScreen) {
-  let screenNode: HTMLElement = document.getElementById(screen.id)!;
-  screen.setGameScreenDimensions(
-    screenNode.offsetWidth,
-    screenNode.offsetHeight,
-  );
-}
-
-function addEvents() {
+function addShipControlEvents() {
   window.addEventListener("keydown", function (ev) {
-    keyEvent(ev, true);
+    shipControlKeyEvent(ev, true);
   });
 
   window.addEventListener("keyup", function (ev) {
-    keyEvent(ev, false);
+    shipControlKeyEvent(ev, false);
   });
 }
 // end of events code

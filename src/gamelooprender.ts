@@ -1,3 +1,5 @@
+import { Rocks } from "./gameState.js";
+
 import {
   addToScreen,
   removeFromScreen,
@@ -9,28 +11,21 @@ import {
   displayScore,
 } from "./render.js";
 
-import { asteroidsSVG } from "./graphics.js";
+import { asteroidsSVG, shipSVG } from "./graphics.js";
 import { GameState } from "./gameState.js";
 
-/* RENDER CODEE */
-// disply game elements, ship, rocks and bullets
-// TODO: pass in gameElelemtns object with single items and arrays which get displayed using generic functions
-// TODO - keep a copy of rocks and bullets from previous frame and compare to current list to decide which elements to add, update and remove
-// can then remove oldBullets, oldRocks and newBullets
-//
-export function gameLoopRender(gameState: GameState, screenId: string) {
-  const {
-    bullets,
-    newBullets,
-    oldBullets,
-    rocks,
-    newRocks,
-    oldRocks,
-    ship,
-    score,
-  } = gameState;
+function addNewItems(
+  newShips: string[],
+  newBullets: string[],
+  newRocks: string[],
+  screenId: string,
+  rocks: Rocks,
+) {
+  newShips.forEach((shipId) => {
+    const shipEl = createElement(shipId, "ship", null, shipSVG());
+    addToScreen(shipEl, screenId);
+  });
 
-  // ADD NEW ITEMS
   newBullets.forEach((bulletId) => {
     const el = createElement(bulletId, "bullet", null, null);
     addToScreen(el, screenId);
@@ -47,6 +42,29 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
     });
     addToScreen(el, screenId);
   });
+}
+
+/* RENDER CODEE */
+// disply game elements, ship, rocks and bullets
+// TODO: pass in gameElelemtns object with single items and arrays which get displayed using generic functions
+// TODO - keep a copy of rocks and bullets from previous frame and compare to current list to decide which elements to add, update and remove
+// can then remove oldBullets, oldRocks and newBullets
+//
+export function gameLoopRender(gameState: GameState, screenId: string) {
+  const {
+    bullets,
+    newBullets,
+    oldBullets,
+    rocks,
+    newRocks,
+    oldRocks,
+    ship,
+    newShips,
+    score,
+  } = gameState;
+
+  // ADD NEW ITEMS
+  addNewItems(newShips, newBullets, newRocks, screenId, rocks);
 
   // REMOVE OLD ITEMS
   // remove dead bullets

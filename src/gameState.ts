@@ -3,7 +3,7 @@ import Ship from "./modules/ship.js";
 import Bullet from "./modules/bullet.js";
 import GameScreen from "./modules/gamescreen.js";
 
-interface Rocks {
+export interface Rocks {
   [index: string]: Rock;
 }
 
@@ -15,6 +15,8 @@ export type GameState = {
   gameScreen: GameScreen;
   score: number;
   ship: Ship | undefined;
+  newShips: string[];
+  oldShips: string[];
   rocks: Rocks;
   oldRocks: string[];
   newRocks: string[];
@@ -31,6 +33,8 @@ export let gameState: GameState = {
   score: 0,
   ship: undefined,
   rocks: {},
+  newShips: [],
+  oldShips: [],
   oldRocks: [],
   newRocks: [],
   bullets: {},
@@ -48,6 +52,12 @@ export function changeGameState({ action, gameElement }: gameStateChanger) {
     case "add ship":
       const ship = gameElement as Ship;
       gameState.ship = ship;
+      gameState.newShips.push(ship.id);
+      break;
+    case "delete shp":
+      const oldShip = gameElement as Rock;
+      gameState.oldShips.push(oldShip.id);
+      delete gameState.ship;
       break;
     case "add rock":
       const rock = gameElement as Rock;
@@ -77,6 +87,8 @@ export function changeGameState({ action, gameElement }: gameStateChanger) {
       gameState.newBullets = [];
       gameState.oldBullets = [];
       gameState.oldRocks = [];
+      gameState.oldShips = [];
+      gameState.newShips = [];
       break;
   }
 }
