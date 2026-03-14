@@ -35,10 +35,29 @@ function initRock(size: string, pos: { x: number; y: number }) {
   changeGameState({ action: "add rock", gameElement: rock });
 }
 
+const getRandom = (n: number): number => Math.floor(Math.random() * (n + 1));
+
+function getEdgePosition(edge: string): { x: number; y: number } {
+  const { screenWidth, screenHeight } = gameScreen.screenSize;
+  switch (edge) {
+    case "top":
+      return { x: getRandom(screenWidth), y: 0 };
+    case "right":
+      return { x: screenWidth, y: getRandom(screenHeight) };
+    case "bottom":
+      return { x: getRandom(screenWidth), y: screenHeight };
+    case "left":
+      return { x: 0, y: getRandom(screenHeight) };
+  }
+  return { x: getRandom(screenWidth), y: 0 };
+}
+
 // TODO: needs gamescreen to get random edge start position
 function createRocksForNewLevel({ rockAmount }: { rockAmount: number }) {
   for (let i = 0; i < rockAmount; i++) {
-    const posXY = gameScreen.getRandomEdgePosition();
+    const borders: string[] = ["top", "right", "bottom", "left"];
+    const edge = borders[i % 4];
+    const posXY = getEdgePosition(edge);
     initRock("large", posXY);
   }
 }
@@ -245,7 +264,7 @@ function enterGameScreen() {
   enterPlayGameScreen();
   changeGameState({ action: "score", gameElement: 0 });
   // create ship and add controls
-  const pos = gameScreen.getScreenCentre();
+  const pos = gameScreen.screenCentre;
   const ship: Ship = initShip(pos);
   changeGameState({ action: "add ship", gameElement: ship });
 
@@ -273,9 +292,9 @@ init();
 // TODO: get game screen size and set dimesniosn of GameScreen instance
 export function setGameScreenSize(screen: GameScreen) {
   let screenNode: HTMLElement = document.getElementById(screen.id)!;
-  screen.setGameScreenDimensions(
-    screenNode.offsetWidth,
-    screenNode.offsetHeight,
-  );
+  screen.screenSize = {
+    w: screenNode.offsetWidth,
+    h: screenNode.offsetHeight,
+  };
 }
 // end of events code
