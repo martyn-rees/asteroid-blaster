@@ -1,7 +1,6 @@
 import Rock from "./modules/rock.js";
 import Ship from "./modules/ship.js";
 import Bullet from "./modules/bullet.js";
-import GameScreen from "./modules/gamescreen.js";
 import {
   getShipActions,
   addShipControlEvents,
@@ -15,9 +14,9 @@ export interface Rocks {
 interface Bullets {
   [index: string]: Bullet;
 }
+
 export type GameState = {
   state: string;
-  gameScreen: GameScreen;
   score: number;
   ship: Ship | undefined;
   newShips: string[];
@@ -30,11 +29,8 @@ export type GameState = {
   oldBullets: string[];
 };
 
-let gameScreen = new GameScreen("gameScreen", 800, 400);
-
 export let gameState: GameState = {
   state: "start",
-  gameScreen: gameScreen,
   score: 0,
   ship: undefined,
   rocks: {},
