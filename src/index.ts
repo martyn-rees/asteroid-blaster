@@ -1,5 +1,5 @@
 import Rock from "./modules/rock.ts";
-import Ship, { ShipActions } from "./modules/ship.ts";
+import Ship from "./modules/ship.ts";
 import Gun from "./modules/gun.ts";
 import Bullet from "./modules/bullet.ts";
 import GameScreen from "./modules/gamescreen.ts";
@@ -9,7 +9,6 @@ import {
   bulletSpecs,
   shipSpecs,
   gunSpec,
-  keyBindings,
   getRockData,
   getRockValue,
 } from "./gamedata.js";
@@ -17,14 +16,7 @@ import { createButton } from "./ui/button.ts";
 import { gameLoopRender } from "./gamelooprender.ts";
 import { GameState, gameState, changeGameState } from "./gameState.ts";
 
-// TODO: Position and Velocity types should be shared across modules
 var animationId: number;
-let shipActions: ShipActions = {
-  thrust: false,
-  shoot: false,
-  rotateClockwise: false,
-  rotateCounterClockwise: false,
-};
 
 let gameScreen = new GameScreen("gameScreen", 800, 400);
 
@@ -91,7 +83,7 @@ function updateMotionStates(gameState: GameState) {
   ship!.update(warpX, warpY);
 
   // update position of bullet based on motion state
-  for (var bulletId in gameState.bullets) {
+  for (var bulletId in bullets) {
     bullets[bulletId].update(warpX, warpY);
   }
 
@@ -103,7 +95,7 @@ function updateMotionStates(gameState: GameState) {
 }
 
 function gameLoopUpdate() {
-  gameState.ship!.updateActions(shipActions);
+  changeGameState({ action: "ship actions" });
   updateMotionStates(gameState);
   // - add new bullets - if ACTION.shoot
   const shipGun: Gun | null = gameState.ship!.gun;
@@ -152,6 +144,7 @@ function gameLoopUpdate() {
         gameState.ship!.boundary(),
       );
       if (hasRockCollided) {
+        changeGameState({ action: "delete ship" });
         // add ship collision code
         // explodeShip(); or reduceShields() - or use one of the automaticshields that gives invincibility for a few seconds
       }
@@ -250,14 +243,11 @@ function exitPlayGameScreen() {
 // TODO: uses render method
 function enterGameScreen() {
   enterPlayGameScreen();
-
   changeGameState({ action: "score", gameElement: 0 });
-
   // create ship and add controls
   const pos = gameScreen.getScreenCentre();
   const ship: Ship = initShip(pos);
   changeGameState({ action: "add ship", gameElement: ship });
-  addShipControlEvents();
 
   setTimeout(() => createRocksForNewLevel({ rockAmount: 8 }), 1000);
 
@@ -287,32 +277,5 @@ export function setGameScreenSize(screen: GameScreen) {
     screenNode.offsetWidth,
     screenNode.offsetHeight,
   );
-}
-
-// uses global shipActions and imports keyBindings
-function shipControlKeyEvent(ev: KeyboardEvent, isKeyDown: boolean) {
-  var key = ev.code;
-  if (key == keyBindings.rotateLeft) {
-    shipActions.rotateCounterClockwise = isKeyDown;
-  }
-  if (key == keyBindings.rotateRight) {
-    shipActions.rotateClockwise = isKeyDown;
-  }
-  if (key == keyBindings.thrust) {
-    shipActions.thrust = isKeyDown;
-  }
-  if (key == keyBindings.shoot) {
-    shipActions.shoot = isKeyDown;
-  }
-}
-
-function addShipControlEvents() {
-  window.addEventListener("keydown", function (ev) {
-    shipControlKeyEvent(ev, true);
-  });
-
-  window.addEventListener("keyup", function (ev) {
-    shipControlKeyEvent(ev, false);
-  });
 }
 // end of events code

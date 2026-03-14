@@ -2,12 +2,7 @@ import Gun, { MotionState } from "./gun";
 
 const FULLDEGREE = 360;
 type Directions = { degrees: number; radians: number };
-export type ShipActions = {
-  thrust: boolean;
-  rotateCounterClockwise: boolean;
-  rotateClockwise: boolean;
-  shoot: boolean;
-};
+
 type ShipSpecs = {
   speedMax: number;
   drag: number;
@@ -115,8 +110,17 @@ export default class Ship {
     }
   }
 
-  updateActions(ACTIONS: ShipActions) {
-    const { thrust, rotateCounterClockwise, rotateClockwise, shoot } = ACTIONS;
+  updateActions({
+    thrust,
+    rotateCounterClockwise,
+    rotateClockwise,
+    shoot,
+  }: {
+    thrust: boolean;
+    rotateCounterClockwise: boolean;
+    rotateClockwise: boolean;
+    shoot: boolean;
+  }) {
     this.thrustPower = thrust ? this.thrustMax : 0;
     if (rotateCounterClockwise) {
       this.changeShipRotation(-this.rotationSpeed);
