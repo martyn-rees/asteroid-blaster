@@ -22,6 +22,11 @@ function setUp() {
     rotationSpeed: 45,
   };
 
+  const ship = new Ship({ x: 100, y: 100 }, "ship", shipSpecs);
+  return ship;
+}
+
+function setUpGun() {
   // TODO: this isn't good that I need to recreate methods in gun class
   const gun = {
     gunSpecs: { barrelOffset: { x: 0, y: 6 }, speed: 6, reloadTime: 10 },
@@ -29,12 +34,11 @@ function setUp() {
     update: vi.fn(),
     updateMotionState: vi.fn(),
   };
-  return { shipSpecs, gun };
+  return gun;
 }
 
 test("create a new ship", () => {
-  const { shipSpecs } = setUp();
-  const ship = new Ship({ x: 100, y: 100 }, "ship", shipSpecs);
+  const ship = setUp();
   expect(ship).toEqual({
     id: "ship",
     position: { x: 100, y: 100 },
@@ -58,14 +62,12 @@ test("create a new ship", () => {
 });
 
 test("boundary of ship", () => {
-  const { shipSpecs } = setUp();
-  const ship = new Ship({ x: 100, y: 100 }, "ship", shipSpecs);
+  const ship = setUp();
   expect(ship.boundary()).toStrictEqual({ x: 100, y: 100, r: 6 });
 });
 
 test("get motion state", () => {
-  const { shipSpecs } = setUp();
-  const ship = new Ship({ x: 100, y: 100 }, "ship", shipSpecs);
+  const ship = setUp();
   const motionstate = ship.getShipMotionState();
   expect(motionstate).toStrictEqual({
     position: { x: 100, y: 100 },
@@ -78,8 +80,8 @@ test("get motion state", () => {
 });
 
 test("attach a gun to ship and fire it", () => {
-  const { shipSpecs, gun } = setUp();
-  const ship = new Ship({ x: 100, y: 100 }, "ship", shipSpecs);
+  const ship = setUp();
+  const gun = setUpGun();
   ship.attachGun(gun);
   expect(ship.gun).not.toBe(null);
   const ACTIONS = newActions({ shoot: true });
@@ -89,8 +91,7 @@ test("attach a gun to ship and fire it", () => {
 });
 
 test("rotate ship and then thrust", () => {
-  const { shipSpecs } = setUp();
-  const ship = new Ship({ x: 100, y: 100 }, "ship", shipSpecs);
+  const ship = setUp();
   const mockRenderCallback = vi.fn();
   const mockRenderThrustCallback = vi.fn();
   // render ship before any actions
@@ -121,8 +122,7 @@ test("rotate ship and then thrust", () => {
 });
 
 test("ship doesn't move beyond its max speed", () => {
-  const { shipSpecs } = setUp();
-  const ship = new Ship({ x: 100, y: 100 }, "ship", shipSpecs);
+  const ship = setUp();
   // render ship before any actions
   expect(ship.shipSpeed).toBe(0);
   // thrust ship - speed should be 1
@@ -154,8 +154,7 @@ test("ship doesn't move beyond its max speed", () => {
 
 // TODO: this is implementation details so don't really want this test
 test("ships rotation resets after 360 degrees", () => {
-  const { shipSpecs } = setUp();
-  const ship = new Ship({ x: 100, y: 100 }, "ship", shipSpecs);
+  const ship = setUp();
   expect(ship.rotation.degrees).toBe(0);
   ship.updateActions(newActions({ rotateClockwise: true }));
   ship.update();
@@ -187,8 +186,7 @@ test("ship movement after 2 frames with transform", () => {
   const transformCallback = (x) => {
     return 10;
   };
-  const { shipSpecs } = setUp();
-  const ship = new Ship({ x: 100, y: 100 }, "ship", shipSpecs);
+  const ship = setUp();
   ship.updateActions(
     newActions({
       thrust: true,
