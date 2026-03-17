@@ -1,3 +1,5 @@
+// use left-hand cartesian coords (standard screen coords with +ve y axis pointing down)
+// rotation angles: 0 - east, 90 - south, 180 - west, 270 - north
 import { Circle, Position, Velocity } from "./types";
 
 export default class Rock {
@@ -55,10 +57,9 @@ export default class Rock {
   }
 
   update(transformXCallback?: Function, transformYCallback?: Function) {
-    // update new position of rock based on velocity
     const radians = this.convertDegreestoRadians(this.velocity.direction);
-    const dx = this.velocity.speed * Math.sin(radians);
-    const dy = this.velocity.speed * Math.cos(radians);
+    const dx = this.velocity.speed * Math.cos(radians);
+    const dy = this.velocity.speed * Math.sin(radians);
     let newX = this.position.x + dx;
     let newY = this.position.y + dy;
     this.rotation += this.rotationRate;
