@@ -1,3 +1,8 @@
+// reverse y-axis (scren coords) compared to y axis (maths coords)
+// sin(angle) and tan(angle) reverse sign
+// cos(angle) remains unchanged
+// angles increase clockwise (reverse y-axis), increase counter-clockwise (positive y-axis)
+
 // gun specs of gun that can be attached to ship
 
 // TODO: Position and Velocity types should be shared across modules
@@ -79,6 +84,19 @@ export default class Gun {
     rotation && this.updateGunRotation(rotation);
   }
 
+  getMotionStateGun(): {
+    position: Position;
+    velocity: Velocity;
+    rotation: number;
+  } {
+    return {
+      position: this.position,
+      velocity: this.velocity,
+      rotation: this.rotation,
+    };
+  }
+
+  // updates gun state not position.
   update(shoot: boolean) {
     if (shoot && this.state === "loaded") {
       this.state = "firing";
@@ -93,10 +111,14 @@ export default class Gun {
   }
 
   // TODO: calculate gun position when off the x axis
-  private getGunPosition(): Position {
+  private getMuzzlePosition(): Position {
     const gunlength = this.barrelOffset.y;
-    const x = this.position.x + gunlength * Math.sin(this.rotation);
-    const y = this.position.y - gunlength * Math.cos(this.rotation);
+    const x = parseFloat(
+      (this.position.x + gunlength * Math.sin(this.rotation)).toFixed(1),
+    );
+    const y = parseFloat(
+      (this.position.y - gunlength * Math.cos(this.rotation)).toFixed(1),
+    );
     return { x, y };
   }
 
@@ -110,8 +132,8 @@ export default class Gun {
     const bulletVx = this.muzzleSpeed * Math.sin(this.rotation);
     const bulletVy = this.muzzleSpeed * Math.cos(this.rotation);
     // Create component velocity of bullet
-    const dx = gunVx + bulletVx;
-    const dy = gunVy + bulletVy;
+    const dx: number = parseFloat((gunVx + bulletVx).toFixed(1));
+    const dy: number = parseFloat((gunVy + bulletVy).toFixed(1));
 
     return {
       dx,
@@ -119,12 +141,12 @@ export default class Gun {
     };
   }
 
-  public getNewBullet(): {
+  public getInitialMotionStateOfBullet(): {
     bulletPosition: Position;
     bulletDxDy: { dx: number; dy: number };
     bulletVelocity: { speed: number; direction: number };
   } {
-    const bulletPosition: Position = this.getGunPosition();
+    const bulletPosition: Position = this.getMuzzlePosition();
     const bulletDxDy = this.getBulletDxDy();
     // create velocity of bullet fired from moving gun
     const newSpeed = Math.sqrt(bulletDxDy.dx ** 2 + bulletDxDy.dy ** 2);

@@ -121,7 +121,7 @@ function gameLoopUpdate() {
   if (shipGun && shipGun.state === "firing") {
     // get position of gun attached to ship as the starting position of new bullet
     const { bulletPosition, bulletDxDy, bulletVelocity } =
-      shipGun.getNewBullet();
+      shipGun.getInitialMotionStateOfBullet();
     const bullet = new Bullet({
       initialPosition: bulletPosition,
       dxdy: bulletDxDy,
