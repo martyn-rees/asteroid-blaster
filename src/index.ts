@@ -15,7 +15,7 @@ import {
 import { createButton } from "./ui/button.ts";
 import { gameLoopRender } from "./gamelooprender.ts";
 import { GameState, gameState, changeGameState } from "./gameState.ts";
-
+import { Position } from "./modules/types.ts";
 var animationId: number;
 
 let gameScreen = new GameScreen("gameScreen", 800, 400);
@@ -23,7 +23,7 @@ let gameScreen = new GameScreen("gameScreen", 800, 400);
 // ----  Rock code ----
 
 // this function does several things - creates a rock with random properties, adds it to the rock list, creates a game element for the rock and adds it to the game screen
-function initRock(size: string, pos: { x: number; y: number }) {
+function initRock(size: string, pos: Position) {
   const { velocity, r, rotationRate } = getRockData(size);
   const rock = new Rock({
     initialPosition: pos,

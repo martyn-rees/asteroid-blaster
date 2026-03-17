@@ -1,11 +1,13 @@
+import { Circle, Position, Velocity } from "./types";
+
 export default class Rock {
   static rockIDCounter = 0;
   public id: string;
   public size: string;
   public r: number;
   public rotationRate: number;
-  private velocity: { speed: number; direction: number };
-  private position: { x: number; y: number };
+  private velocity: Velocity;
+  private position: Position;
   public rotation: number;
 
   constructor({
@@ -15,8 +17,8 @@ export default class Rock {
     r,
     rotationRate,
   }: {
-    initialPosition: { x: number; y: number };
-    initialVelocity: { speed: number; direction: number };
+    initialPosition: Position;
+    initialVelocity: Velocity;
     size: string;
     r: number;
     rotationRate: number;
@@ -36,7 +38,7 @@ export default class Rock {
     this.rotation = 0;
   }
 
-  public get rockPosition(): { x: number; y: number } {
+  public get rockPosition(): Position {
     return this.position;
   }
 
@@ -44,7 +46,7 @@ export default class Rock {
     return 0.0174533 * degrees;
   }
 
-  boundary(): { x: number; y: number; r: number } {
+  boundary(): Circle {
     return {
       x: this.position.x,
       y: this.position.y,

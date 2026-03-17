@@ -1,7 +1,7 @@
-import Gun, { MotionState } from "./gun";
+import Gun from "./gun";
+import { Position, Velocity, Directions, MotionState, Circle } from "./types";
 
 const FULLDEGREE = 360;
-type Directions = { degrees: number; radians: number };
 
 type ShipSpecs = {
   speedMax: number;
@@ -13,7 +13,7 @@ type ShipSpecs = {
 
 export default class Ship {
   public id: string;
-  public position: { x: number; y: number };
+  public position: Position;
   private speedMax: number;
   private drag: number;
   private thrustMax: number;
@@ -26,7 +26,7 @@ export default class Ship {
   public gun: Gun | null;
   public isTriggerPressed: boolean;
 
-  constructor(pos: { x: number; y: number }, id: string, shipSpecs: ShipSpecs) {
+  constructor(pos: Position, id: string, shipSpecs: ShipSpecs) {
     this.id = id;
     // position
     this.position = pos;
@@ -62,7 +62,7 @@ export default class Ship {
     };
   }
 
-  boundary(): { x: number; y: number; r: number } {
+  boundary(): Circle {
     return {
       x: this.position.x,
       y: this.position.y,

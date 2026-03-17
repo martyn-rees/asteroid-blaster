@@ -5,22 +5,7 @@
 
 // gun specs of gun that can be attached to ship
 
-// TODO: Position and Velocity types should be shared across modules
-export type Position = {
-  x: number;
-  y: number;
-};
-
-export type Velocity = {
-  speed: number;
-  direction: number;
-};
-
-export type MotionState = {
-  position: Position;
-  velocity: Velocity;
-  rotation: number;
-};
+import { Position, Velocity, MotionState } from "./types";
 
 export type GunState =
   | "nogun"
@@ -144,7 +129,7 @@ export default class Gun {
   public getInitialMotionStateOfBullet(): {
     bulletPosition: Position;
     bulletDxDy: { dx: number; dy: number };
-    bulletVelocity: { speed: number; direction: number };
+    bulletVelocity: Velocity;
   } {
     const bulletPosition: Position = this.getMuzzlePosition();
     const bulletDxDy = this.getBulletDxDy();

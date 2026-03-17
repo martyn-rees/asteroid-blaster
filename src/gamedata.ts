@@ -1,3 +1,5 @@
+import { Velocity } from "./modules/types";
+
 export const bulletSpecs = {
   r: 2,
   endurance: 90,
@@ -64,7 +66,7 @@ function getRandomNumber(min: number, max: number): number {
 }
 
 export function getRockData(size: string): {
-  velocity: { speed: number; direction: number };
+  velocity: Velocity;
   r: number;
   rotationRate: number;
 } {

@@ -9,6 +9,8 @@
     power: number = 1,
 */
 
+import { Circle, Position, Velocity } from "./types";
+
 // position is the x,y position on the game screen
 // dxdy is the dx,dy change in position every frame.
 // velocity should be speed and direction from which dx and dy can be calcualted
@@ -20,8 +22,8 @@ export default class Bullet {
   public dxdy: { dx: number; dy: number };
   // TODO: calculations that create testdxdy should result in the same value as dxdy
   public testdxdy: { dx: number; dy: number };
-  public velocity: { speed: number; direction: number };
-  public position: { x: number; y: number };
+  public velocity: Velocity;
+  public position: Position;
   public endurance: number;
   public r: number;
 
@@ -33,15 +35,12 @@ export default class Bullet {
       velocity,
       bulletSpecs,
     }: {
-      initialPosition: { x: number; y: number };
+      initialPosition: Position;
       dxdy: {
         dx: number;
         dy: number;
       };
-      velocity: {
-        speed: number;
-        direction: number;
-      };
+      velocity: Velocity;
       bulletSpecs: { r: number; endurance: number; power: number };
     },
   ) {
@@ -59,7 +58,7 @@ export default class Bullet {
     this.r = bulletSpecs.r;
   }
 
-  boundary(): { x: number; y: number; r: number } {
+  boundary(): Circle {
     return {
       x: this.position.x,
       y: this.position.y,
