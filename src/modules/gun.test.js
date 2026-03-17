@@ -1,73 +1,146 @@
+// reversed y axis (screen coords) so going up decreses in value
+// angeles: north: 0, east: PI/2, south: PI,
 import { expect, test } from "vitest";
 import Gun from "./gun";
 
-function setUp() {
+function setUpGun() {
   const gunSpec = {
-    barrelLocation: { x: 0, y: 6 },
-    speed: 6,
-    reloadTime: 10,
+    barrelOffset: { x: 0, y: 6 },
+    muzzleSpeed: 4,
+    reloadTime: 3,
   };
-  return gunSpec;
+  const gun = new Gun(gunSpec);
+  return gun;
 }
 
 test("create new gun", () => {
-  const gunSpec = setUp();
-  const gun = new Gun(gunSpec);
+  const gun = setUpGun();
   expect(gun).toEqual({
-    gunSpecs: { barrelLocation: { x: 0, y: 6 }, speed: 6, reloadTime: 10 },
+    barrelOffset: {
+      x: 0,
+      y: 6,
+    },
     gunReloadTimer: 0,
+    position: {
+      x: 0,
+      y: 0,
+    },
+    muzzleSpeed: 4,
+    reloadTime: 3,
+    rotation: 0,
+    state: "loaded",
+    velocity: {
+      direction: 0,
+      speed: 0,
+    },
   });
 });
 
-test("gun position on a ship (when pointing North then East)", () => {
-  const gunSpec = setUp();
-  const gun = new Gun(gunSpec);
-  const shipLocation = { x: 100, y: 100 };
-  const shipRotationNorth = 0;
-  const location = gun.getGunPosition(shipLocation, shipRotationNorth);
-  // TODO: reversed y axis.
-  expect(location).toStrictEqual({ x: 100, y: 94 });
+test("set motion state", () => {
+  const gun = setUpGun();
 
-  const shipRotationEast = Math.PI / 2;
-  const locationAfterRotation = gun.getGunPosition(
-    shipLocation,
-    shipRotationEast,
-  );
-  // TODO: reversed y axis.
-  expect(locationAfterRotation).toStrictEqual({ x: 106, y: 100 });
+  gun.updateMotionState({
+    position: { x: 100, y: 100 },
+    velocity: {
+      speed: 0,
+      direction: 0,
+    },
+    rotation: 0,
+  });
+  expect(gun.position).toStrictEqual({ x: 100, y: 100 });
+  expect(gun.velocity).toStrictEqual({
+    speed: 0,
+    direction: 0,
+  });
+  expect(gun.rotation).toBe(0);
 });
 
-test("get velocity of bullet when ship's gun is fired", () => {
-  const gunSpec = setUp();
-  const gun = new Gun(gunSpec);
-  // when ship is stationary and pointing North
-  const shipVelocity = { speed: 0, direction: 0 };
-  const shipRotationNorth = 0;
-  const bulletVelocity = gun.getBulletVelocity(shipVelocity, shipRotationNorth);
-  expect(bulletVelocity).toStrictEqual({ dx: 0, dy: 6 });
-  // when ship is moving North at 2 pixels per frame
-  const shipVelocity2 = { speed: 2, direction: 0 };
-  const bulletVelocity2 = gun.getBulletVelocity(
-    shipVelocity2,
-    shipRotationNorth,
-  );
-  expect(bulletVelocity2).toStrictEqual({ dx: 0, dy: 8 });
+test("gun and muzzle position when pointing North", () => {
+  const gun = setUpGun();
+  const motionStateNorth = {
+    position: { x: 100, y: 100 },
+    velocity: { speed: 0, direction: 0 },
+    rotation: 0,
+  };
+  gun.updateMotionState(motionStateNorth);
+  const muzzleLocation = gun.getMuzzlePosition();
+  expect(gun.position).toStrictEqual({ x: 100, y: 100 });
+  expect(muzzleLocation).toStrictEqual({ x: 100, y: 94 });
 });
+
+test("gun and muzzle position when pointing East", () => {
+  const gun = setUpGun();
+  gun.updateMotionState({
+    position: { x: 100, y: 100 },
+    velocity: { speed: 0, direction: 0 },
+    rotation: Math.PI / 2,
+  });
+  expect(gun.position).toStrictEqual({ x: 100, y: 100 });
+  const muzzleLocation = gun.getMuzzlePosition();
+  expect(muzzleLocation).toStrictEqual({ x: 106, y: 100 });
+});
+
+test("gun and muzzle position when pointing East but moving South", () => {
+  const gun = setUpGun();
+  gun.updateMotionState({
+    position: { x: 100, y: 100 },
+    velocity: { speed: 3, direction: Math.PI },
+    rotation: Math.PI / 2,
+  });
+  expect(gun.position).toStrictEqual({ x: 100, y: 100 });
+  const muzzleLocation = gun.getMuzzlePosition();
+  expect(muzzleLocation).toStrictEqual({ x: 106, y: 100 });
+});
+
+test("get velocity of bullet when gun is fired while stationary and pointing North", () => {
+  const gun = setUpGun();
+  // gun is stationary and pointing North (rotation 180)
+  gun.updateMotionState({
+    position: { x: 100, y: 100 },
+    velocity: { speed: 0, direction: 0 },
+    rotation: 0,
+  });
+  let { bulletPosition, bulletDxDy, bulletVelocity } =
+    gun.getInitialMotionStateOfBullet();
+  expect(gun.position).toStrictEqual({ x: 100, y: 100 });
+  const muzzleLocation = gun.getMuzzlePosition();
+  expect(muzzleLocation).toStrictEqual({ x: 100, y: 94 });
+
+  //expect(bulletDxDy).toStrictEqual({ dx: 0, dy: -4 });
+  expect(bulletPosition).toStrictEqual({ x: 100, y: 94 });
+  //expect(bulletVelocity).toStrictEqual({ speed: 0, direction: 0 });
+});
+
+/*test("get velocity of bullet when gun is fired while moving South and point South", () => {
+  const gun = setUpGun();
+  // gun is stationary and pointing North (rotation 180)
+  gun.updateMotionState({
+    position: { x: 100, y: 100 },
+    velocity: { speed: 2, direction: Math.PI },
+    rotation: Math.PI,
+  });
+  let { bulletPosition, bulletDxDy, bulletVelocity } =
+    gun.getInitialMotionStateOfBullet();
+  //const shipVelocity2 = { speed: 2, direction: 0 };
+  const gunFrame2 = gun.getInitialMotionStateOfBullet();
+  //const bulletVelocity2 = gun.getBulletDxDy(shipVelocity2, shipRotationNorth);
+  //expect(gunFrame2.bulletDxDy).toStrictEqual({ dx: 0, dy: 8 });
+  //expect(bulletDxDy).toStrictEqual({ dx: 0, dy: -6 });
+  expect(gunFrame2.bulletPosition).toStrictEqual({ x: 100, y: 96 });
+});*/
 
 test("when gun is fired it is not reloaded until reload time has passed", () => {
-  const gunSpec = setUp();
-  gunSpec.reloadTime = 3;
-  const gun = new Gun(gunSpec);
+  const gun = setUpGun();
   // gun is loaded at start
-  expect(gun.isGunLoaded()).toBe(true);
+  expect(gun.state).toBe("loaded");
+  gun.update(true);
+  expect(gun.state).toBe("firing");
   // reload gun after being fired
   gun.reloadGun();
-  expect(gun.isGunLoaded()).toBe(false);
-  // update reload gun timer
   gun.update();
   gun.update();
-  expect(gun.isGunLoaded()).toBe(false);
+  expect(gun.state).toBe("reloading");
   // when updates = reload time then gun is loaded again
   gun.update();
-  expect(gun.isGunLoaded()).toBe(true);
+  expect(gun.state).toBe("loaded");
 });

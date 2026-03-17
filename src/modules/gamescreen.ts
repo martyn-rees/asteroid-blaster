@@ -9,34 +9,16 @@ export default class GameScreen {
     this.height = h;
   }
 
-  setGameScreenDimensions(w: number, h: number) {
+  set screenSize({ w, h }: { w: number; h: number }) {
     this.width = w;
     this.height = h;
   }
 
-  getScreenCentre() {
+  get screenSize(): { screenWidth: number; screenHeight: number } {
+    return { screenWidth: this.width, screenHeight: this.height };
+  }
+
+  get screenCentre(): { x: number; y: number } {
     return { x: this.width / 2, y: this.height / 2 };
-  }
-
-  getRandomScreenPosition(): { x: number; y: number } {
-    return {
-      x: Math.random() * this.width,
-      y: Math.random() * this.height,
-    };
-  }
-
-  getRandomEdgePosition(edge: string): { x: number; y: number } {
-    let { x, y } = this.getRandomScreenPosition();
-    switch (edge) {
-      case "top":
-        return { x: x, y: 0 };
-      case "right":
-        return { x: this.width, y: y };
-      case "bottom":
-        return { x: x, y: this.height };
-      case "left":
-        return { x: 0, y: y };
-    }
-    return { x, y };
   }
 }

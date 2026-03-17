@@ -1,58 +1,166 @@
+// reverse y-axis (scren coords) compared to y axis (maths coords)
+// sin(angle) and tan(angle) reverse sign
+// cos(angle) remains unchanged
+// angles increase clockwise (reverse y-axis), increase counter-clockwise (positive y-axis)
+
 // gun specs of gun that can be attached to ship
-type Location = {
+
+// TODO: Position and Velocity types should be shared across modules
+export type Position = {
   x: number;
   y: number;
 };
 
-type Velocity = {
+export type Velocity = {
   speed: number;
   direction: number;
 };
 
-type GunSpec = {
-  barrelLocation: Location;
-  speed: number;
-  reloadTime: number;
+export type MotionState = {
+  position: Position;
+  velocity: Velocity;
+  rotation: number;
 };
 
-export default class Gun {
-  private gunSpecs: GunSpec;
-  private gunReloadTimer: number;
+export type GunState =
+  | "nogun"
+  | "loaded"
+  | "firing"
+  | "reloading"
+  | "malfunction";
 
-  constructor(gunSpecs: GunSpec) {
-    this.gunSpecs = gunSpecs;
+export default class Gun {
+  private gunReloadTimer: number;
+  public state: GunState;
+  private barrelOffset: Position;
+  private muzzleSpeed: number;
+  private reloadTime: number;
+  private position: Position;
+  private velocity: Velocity;
+  private rotation: number;
+
+  constructor({
+    barrelOffset,
+    muzzleSpeed,
+    reloadTime,
+  }: {
+    barrelOffset: Position;
+    muzzleSpeed: number;
+    reloadTime: number;
+  }) {
+    this.barrelOffset = barrelOffset;
+    this.muzzleSpeed = muzzleSpeed;
+    this.reloadTime = reloadTime;
     this.gunReloadTimer = 0;
+    this.state = "loaded";
+    this.position = { x: 0, y: 0 };
+    this.velocity = { speed: 0, direction: 0 };
+    this.rotation = 0;
   }
 
-  update() {
-    this.gunReloadTimer--;
+  private updateGunLocation(position: Position) {
+    this.position = position;
+  }
+
+  private updateGunVelocity(velocity: Velocity) {
+    this.velocity = velocity;
+  }
+
+  private updateGunRotation(rotation: number) {
+    this.rotation = rotation;
+  }
+
+  updateMotionState({
+    position,
+    velocity,
+    rotation,
+  }: {
+    position?: Position;
+    velocity?: Velocity;
+    rotation?: number;
+  }) {
+    position && this.updateGunLocation(position);
+    velocity && this.updateGunVelocity(velocity);
+    rotation && this.updateGunRotation(rotation);
+  }
+
+  getMotionStateGun(): {
+    position: Position;
+    velocity: Velocity;
+    rotation: number;
+  } {
+    return {
+      position: this.position,
+      velocity: this.velocity,
+      rotation: this.rotation,
+    };
+  }
+
+  // updates gun state not position.
+  update(shoot: boolean) {
+    if (shoot && this.state === "loaded") {
+      this.state = "firing";
+    }
+
+    if (this.state == "reloading") {
+      this.gunReloadTimer--;
+      if (this.gunReloadTimer <= 0) {
+        this.state = "loaded";
+      }
+    }
   }
 
   // TODO: calculate gun position when off the x axis
-  getGunPosition(shipLocation: Location, shipRotation: number): Location {
-    const gunlength = this.gunSpecs.barrelLocation.y;
-    const x = shipLocation.x + gunlength * Math.sin(shipRotation);
-    const y = shipLocation.y - gunlength * Math.cos(shipRotation);
+  private getMuzzlePosition(): Position {
+    const gunlength = this.barrelOffset.y;
+    const x = parseFloat(
+      (this.position.x + gunlength * Math.sin(this.rotation)).toFixed(1),
+    );
+    const y = parseFloat(
+      (this.position.y - gunlength * Math.cos(this.rotation)).toFixed(1),
+    );
     return { x, y };
   }
-  // gun is attached to ship so its velocity is the same as ship velocity
-  // bullet velocity is related to gun speed (power) and direction that gun is pointing and relative to ships velocity
-  getBulletVelocity(shipVelocity: Velocity, shipRotation: number) {
-    const shipVelocityX = shipVelocity.speed * Math.sin(shipVelocity.direction);
-    const shipVelocityY = shipVelocity.speed * Math.cos(shipVelocity.direction);
-    const dx = shipVelocityX + this.gunSpecs.speed * Math.sin(shipRotation);
-    const dy = shipVelocityY + this.gunSpecs.speed * Math.cos(shipRotation);
+
+  // --- methods related to bullet motionstate when gun is fired
+  // TODO: this should be replaced with returning real speed and velocity
+  // bullet velocity is related to gun's motion state plus rotation and power of gun
+  private getBulletDxDy(): { dx: number; dy: number } {
+    // Convert speed and direction to velocity components (vx, vy)
+    const gunVx = this.velocity.speed * Math.sin(this.velocity.direction);
+    const gunVy = this.velocity.speed * Math.cos(this.velocity.direction);
+    const bulletVx = this.muzzleSpeed * Math.sin(this.rotation);
+    const bulletVy = this.muzzleSpeed * Math.cos(this.rotation);
+    // Create component velocity of bullet
+    const dx: number = parseFloat((gunVx + bulletVx).toFixed(1));
+    const dy: number = parseFloat((gunVy + bulletVy).toFixed(1));
+
     return {
       dx,
       dy,
     };
   }
 
-  reloadGun() {
-    this.gunReloadTimer = this.gunSpecs.reloadTime;
+  public getInitialMotionStateOfBullet(): {
+    bulletPosition: Position;
+    bulletDxDy: { dx: number; dy: number };
+    bulletVelocity: { speed: number; direction: number };
+  } {
+    const bulletPosition: Position = this.getMuzzlePosition();
+    const bulletDxDy = this.getBulletDxDy();
+    // create velocity of bullet fired from moving gun
+    const newSpeed = Math.sqrt(bulletDxDy.dx ** 2 + bulletDxDy.dy ** 2);
+    // TODO: write test to check if this is correct
+    const newDirection = Math.atan2(bulletDxDy.dy, bulletDxDy.dx);
+    const bulletVelocity = { speed: newSpeed, direction: newDirection };
+
+    this.reloadGun();
+    // TODO: could remove dxdy if motionState works
+    return { bulletPosition, bulletDxDy, bulletVelocity };
   }
 
-  isGunLoaded(): Boolean {
-    return this.gunReloadTimer <= 0;
+  reloadGun() {
+    this.gunReloadTimer = this.reloadTime;
+    this.state = "reloading";
   }
 }

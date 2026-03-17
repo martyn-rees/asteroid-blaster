@@ -1,5 +1,8 @@
+import Gun, { MotionState } from "./gun";
+
 const FULLDEGREE = 360;
 type Directions = { degrees: number; radians: number };
+
 type ShipSpecs = {
   speedMax: number;
   drag: number;
@@ -7,18 +10,10 @@ type ShipSpecs = {
   radius: number;
   rotationSpeed: number;
 };
-type GunType = {
-  getGunPosition: Function;
-  getBulletVelocity: Function;
-  update: Function;
-  isGunLoaded: Function;
-  reloadGun: Function;
-};
 
 export default class Ship {
   public id: string;
-  public x: number;
-  public y: number;
+  public position: { x: number; y: number };
   private speedMax: number;
   private drag: number;
   private thrustMax: number;
@@ -28,13 +23,13 @@ export default class Ship {
   public thrustPower: number;
   public direction: Directions;
   public shipSpeed: number;
-  public gun: GunType | null;
+  public gun: Gun | null;
+  public isTriggerPressed: boolean;
 
   constructor(pos: { x: number; y: number }, id: string, shipSpecs: ShipSpecs) {
     this.id = id;
     // position
-    this.x = pos.x;
-    this.y = pos.y;
+    this.position = pos;
     // ship specifications - this can be passed in for different ships
     this.speedMax = shipSpecs.speedMax;
     this.drag = shipSpecs.drag;
@@ -49,42 +44,30 @@ export default class Ship {
     this.shipSpeed = 0;
     // gun specifications - this can be passed in for different gunpower and position. Need to use array if more than one gun
     this.gun = null;
+    this.isTriggerPressed = false;
   }
 
-  attachGun(gun: GunType) {
+  attachGun(gun: Gun) {
     this.gun = gun;
   }
 
-  // calculate iniital position and velocity of bullet when ship's gun is fired
-  gunFired() {
-    const shipLocation = { x: this.x, y: this.y };
-    const shipRotation = this.rotation.radians;
-    const shipVelocity = {
-      speed: this.shipSpeed,
-      direction: this.direction.radians,
+  getShipMotionState(): MotionState {
+    return {
+      position: this.position,
+      velocity: {
+        speed: this.shipSpeed,
+        direction: this.direction.radians,
+      },
+      rotation: this.rotation.radians,
     };
-
-    const bulletPosition = this.gun!.getGunPosition(shipLocation, shipRotation);
-    const bulletVelocity = this.gun!.getBulletVelocity(
-      shipVelocity,
-      shipRotation,
-    );
-    return { bulletPosition, bulletVelocity };
   }
 
-  //TODO: ACTIONS should be moved in to update(ACTIONS)
-  updateShipActions(
-    thrust: boolean,
-    rotateCounterClockwise: boolean,
-    rotateClockwise: boolean,
-  ) {
-    this.thrustPower = thrust ? this.thrustMax : 0;
-    if (rotateCounterClockwise) {
-      this.changeShipRotation(-this.rotationSpeed);
-    }
-    if (rotateClockwise) {
-      this.changeShipRotation(this.rotationSpeed);
-    }
+  boundary(): { x: number; y: number; r: number } {
+    return {
+      x: this.position.x,
+      y: this.position.y,
+      r: this.r,
+    };
   }
 
   convertDegreestoRadians(degrees: number) {
@@ -127,31 +110,46 @@ export default class Ship {
     }
   }
 
-  // TODO: consider moving screen dimensions out of here
-  // instead create a function to get and set ship location
-  // in index.js get ship location and if needed reset location if off screen
-  // this ship shouldn't care about screen dimensions to give it the option of adding a scrolling screen
-  update(SCREEN_WIDTH: number, SCREEN_HEIGHT: number) {
-    if (this.gun !== null) {
-      this.gun.update();
+  updateActions({
+    thrust,
+    rotateCounterClockwise,
+    rotateClockwise,
+    shoot,
+  }: {
+    thrust: boolean;
+    rotateCounterClockwise: boolean;
+    rotateClockwise: boolean;
+    shoot: boolean;
+  }) {
+    this.thrustPower = thrust ? this.thrustMax : 0;
+    if (rotateCounterClockwise) {
+      this.changeShipRotation(-this.rotationSpeed);
     }
+    if (rotateClockwise) {
+      this.changeShipRotation(this.rotationSpeed);
+    }
+    this.isTriggerPressed = shoot;
+  }
 
+  update(transformXCallback?: Function, transformYCallback?: Function) {
+    // update Motion State
     this.calculateNewVelocity();
-    this.x += this.shipSpeed * Math.sin(this.direction.radians);
-    this.y -= this.shipSpeed * Math.cos(this.direction.radians);
+    const newX =
+      this.position.x + this.shipSpeed * Math.sin(this.direction.radians);
+    const newY =
+      this.position.y - this.shipSpeed * Math.cos(this.direction.radians);
+    // use transforms to update position of rock on game screen
+    this.position.x = transformXCallback ? transformXCallback(newX) : newX;
+    this.position.y = transformYCallback ? transformYCallback(newY) : newY;
 
-    //amend x,y values to keep ship on screen
-    // this moves to screen edge but should move the amount it's past the screen boundary e.g. this.x -= SCREEN_WIDTH
-    if (this.x < 0) {
-      this.x += SCREEN_WIDTH;
-    } else if (this.x > SCREEN_WIDTH) {
-      this.x -= SCREEN_WIDTH;
-    }
-
-    if (this.y < 0) {
-      this.y += SCREEN_HEIGHT;
-    } else if (this.y > SCREEN_HEIGHT) {
-      this.y -= SCREEN_HEIGHT;
+    // update gun state
+    if (this.gun !== null) {
+      this.gun.updateMotionState({
+        position: this.position,
+        velocity: { speed: this.shipSpeed, direction: this.direction.radians },
+        rotation: this.rotation.radians,
+      });
+      this.gun.update(this.isTriggerPressed);
     }
   }
 
@@ -166,7 +164,12 @@ export default class Ship {
   }
 
   render(renderCallback: Function, renderThrustCallback: Function) {
-    renderCallback(this.id, this.x, this.y, this.rotation.degrees);
+    renderCallback(
+      this.id,
+      this.position.x,
+      this.position.y,
+      this.rotation.degrees,
+    );
     renderThrustCallback(this.thrustPower);
   }
 }

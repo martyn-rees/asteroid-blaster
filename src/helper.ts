@@ -1,4 +1,3 @@
-// TODO: rewrite so this accepts location and screen coords and returns new location if off edge of screen
 export const constrainNumber = (
   n: number,
   min: number,
@@ -12,6 +11,20 @@ export const constrainNumber = (
   }
   return constrainedNumber;
 };
+
+// alternatrive to warping to other side of screen
+/*bounceOffWalls(screenWidth, screenHeight) {
+    if (this.x - this.r < 0) {
+      this.velocity.dx = Math.abs(this.velocity.dx);
+    } else if (this.x + this.r > screenWidth) {
+      this.velocity.dx = -Math.abs(this.velocity.dx);
+    }
+    if (this.y - this.r < 0) {
+      this.velocity.dy = Math.abs(this.velocity.dy);
+    } else if (this.y + this.r > screenHeight) {
+      this.velocity.dy = -Math.abs(this.velocity.dy);
+    }
+  }*/
 
 // position: {x,y} - the position of the object that has gone off the screen
 // boundingBox: {w,h} - the width and height of the game screen
@@ -34,17 +47,17 @@ export const constrainNumber = (
 const distanceBetweenPoints = (
   p1: { x: number; y: number },
   p2: { x: number; y: number },
-) => {
+): number => {
   let dx = p1.x - p2.x;
   let dy = p1.y - p2.y;
   return Math.sqrt(dx * dx + dy * dy);
 };
 
 // c1 and c2 are objects with x, y and r properties
-export const doCirclesCollide = (
+export const testCollision = (
   c1: { x: number; y: number; r: number },
   c2: { x: number; y: number; r: number },
-) => {
+): boolean => {
   let minDistance = c1.r + c2.r;
   return distanceBetweenPoints(c1, c2) < minDistance ? true : false;
 };
