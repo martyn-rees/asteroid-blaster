@@ -39,7 +39,7 @@ test("get position", () => {
   expect(rock.rockPosition).toStrictEqual({ x: 100, y: 100 });
 });
 
-test.only("rock movement after 2 frames moving East", () => {
+test("rock movement after 2 frames moving East", () => {
   const rock = setUp();
   rock.update();
   rock.update();
@@ -57,7 +57,7 @@ test("rock movement after 2 frames moving SouthWest", () => {
   const rock = setUp(135);
   rock.update();
   rock.update();
-  expect(rock.rockPosition).toStrictEqual({ x: 98.586, y: 101.414 });
+  expect(rock.rockPosition).toStrictEqual({ x: 98.6, y: 101.4 });
 });
 
 test("rock movement after 2 frames moving North", () => {
@@ -80,14 +80,15 @@ test("rock movement after 2 frames with transform", () => {
 test("render calls callback function with id, position and rotation", () => {
   const mockRenderCallback = vi.fn();
   const rock = setUp();
-
+  expect(rock.rockPosition).toStrictEqual({ x: 100, y: 100 });
   //expect renderCallback to be called with id,x,y parameters
   rock.render(mockRenderCallback);
   expect(mockRenderCallback).toHaveBeenCalledTimes(1);
   expect(mockRenderCallback).toHaveBeenLastCalledWith("rock0", 100, 100, 0);
   // after a frame update the x,y position and rotation parameters have been updated
   rock.update();
+  expect(rock.rockPosition).toStrictEqual({ x: 101, y: 100 });
   rock.render(mockRenderCallback);
   expect(mockRenderCallback).toHaveBeenCalledTimes(2);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("rock0", 100, 101, 1.5);
+  expect(mockRenderCallback).toHaveBeenLastCalledWith("rock0", 101, 100, 1.5);
 });

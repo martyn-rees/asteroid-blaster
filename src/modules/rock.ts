@@ -45,7 +45,7 @@ export default class Rock {
   }
 
   convertDegreestoRadians(degrees: number) {
-    return 0.0174533 * degrees;
+    return 0.01745329252 * degrees;
   }
 
   boundary(): Circle {
@@ -56,16 +56,36 @@ export default class Rock {
     };
   }
 
+  // return new position rounds to 1 decimal place
+  calculateNewPosition({
+    position,
+    velocity,
+  }: {
+    position: Position;
+    velocity: Velocity;
+  }): Position {
+    const radians = this.convertDegreestoRadians(velocity.direction);
+    const dx = velocity.speed * Math.cos(radians);
+    const dy = velocity.speed * Math.sin(radians);
+    // toFixed returns a string .e.g. "1.5", the pre-pended plus turns it back in to a number 1.5 (losing any trailing 0's)
+    let x = +(position.x + dx).toFixed(1);
+    let y = +(position.y + dy).toFixed(1);
+    return { x, y };
+  }
+
   update(transformXCallback?: Function, transformYCallback?: Function) {
-    const radians = this.convertDegreestoRadians(this.velocity.direction);
-    const dx = this.velocity.speed * Math.cos(radians);
-    const dy = this.velocity.speed * Math.sin(radians);
-    let newX = this.position.x + dx;
-    let newY = this.position.y + dy;
+    const newPosition = this.calculateNewPosition({
+      position: this.position,
+      velocity: this.velocity,
+    });
     this.rotation += this.rotationRate;
     // use transforms to update position of rock on game screen
-    this.position.x = transformXCallback ? transformXCallback(newX) : newX;
-    this.position.y = transformYCallback ? transformYCallback(newY) : newY;
+    this.position.x = transformXCallback
+      ? transformXCallback(newPosition.x)
+      : newPosition.x;
+    this.position.y = transformYCallback
+      ? transformYCallback(newPosition.y)
+      : newPosition.y;
   }
 
   render(renderCallback: Function) {
