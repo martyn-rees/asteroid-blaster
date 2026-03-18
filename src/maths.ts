@@ -12,39 +12,65 @@ function getComponentVelocity(
   v1: Velocity,
   v2: Velocity,
 ): { dx: number; dy: number } {
+  // javascript math issues
+  // NB: if direction is North (degrees:270, radians: 1.5 * Math.PI) then Math.cos(v1.direction) can be close to -0.000000000001 instead of 0
   const v1x = v1.speed * Math.cos(v1.direction);
   const v1y = v1.speed * Math.sin(v1.direction);
 
   const v2x = v2.speed * Math.cos(v2.direction);
   const v2y = v2.speed * Math.sin(v2.direction);
 
-  let dx = +(v1x + v2x).toFixed(1);
-  let dy = +(v1y + v2y).toFixed(1);
+  let dx = +(v1x + v2x).toFixed(3);
+  let dy = +(v1y + v2y).toFixed(3);
 
+  // fix issue with javascript maths
+  // NB: if direction is North (degrees:270, radians: 1.5 * Math.PI) then velocity can be close to -0.000000000001 instead of 0
+  // which returns a component value of -0 instead of 0
+  if (dx == -0) {
+    dx = 0;
+  }
+  if (dy === -0) {
+    dy = 0;
+  }
   return { dx, dy };
 }
 
+// calculate new speed and direction
+function calculateNewVelocity(
+  v1: Velocity,
+  v2: Velocity,
+  maxSpeed: number,
+): Velocity {
+  let { dx, dy } = getComponentVelocity(v1, v2);
+  // shipSpeed
+  let speed = Math.sqrt(dx * dx + dy * dy);
+  if (speed > maxSpeed) {
+    speed = maxSpeed;
+  }
+
+  const radians = getDirectionRadians(dx, dy);
+  return { speed: speed, direction: radians };
+}
+
 //TODO: this provides direction basded on change of movement along x and y axis but it could also return speed as well therefore returning velocity
-function getDirection(dx: number, dy: number): Directions {
-  let direction: Directions = { radians: 0, degrees: 0 };
-  let speed: number = 0;
+function getDirectionRadians(dx: number, dy: number): number {
+  let radians = 0;
 
   if (dx > 0) {
-    direction.radians = Math.atan(dy / dx);
+    radians = Math.atan(dy / dx);
   } else if (dx < 0) {
-    direction.radians = Math.PI + Math.atan(dy / dx);
+    radians = Math.PI + Math.atan(dy / dx);
   } else {
     if (dy < 0) {
-      direction.radians = 1.5 * Math.PI;
+      radians = 1.5 * Math.PI;
     } else if (dy > 0) {
-      direction.radians = Math.PI / 2;
+      radians = Math.PI / 2;
     } else {
-      direction.radians = 1.5 * Math.PI;
+      radians = 1.5 * Math.PI;
     }
   }
 
-  direction.degrees = convertRadiansToDegrees(direction.radians);
-  return direction;
+  return radians;
 }
 
 function changeRotation(
@@ -64,9 +90,10 @@ function changeRotation(
 }
 
 export {
+  calculateNewVelocity,
   convertDegreestoRadians,
   convertRadiansToDegrees,
   getComponentVelocity,
-  getDirection,
+  getDirectionRadians,
   changeRotation,
 };

@@ -1,6 +1,10 @@
 import { describe, expect, test } from "vitest";
 import { Directions } from "./modules/types";
-import { changeRotation, getDirection } from "./maths";
+import {
+  changeRotation,
+  getComponentVelocity,
+  getDirectionRadians,
+} from "./maths";
 
 describe("updating rotation", () => {
   test("change rotation from north to west", () => {
@@ -23,35 +27,52 @@ describe("updating rotation", () => {
   });
 });
 
+describe("get component velocitiy from 2 velocities", () => {
+  test("component velocity while heading North", () => {
+    const v1 = { speed: 1, direction: 1.5 * Math.PI };
+    const v2 = { speed: 0.5, direction: Math.PI / 2 };
+    const { dx, dy } = getComponentVelocity(v1, v2);
+    expect(dx).toBe(0);
+    expect(dy).toBe(-0.5);
+  });
+  test("component velocity while heading SouthEast", () => {
+    const v1 = { speed: 1, direction: Math.PI / 2 };
+    const v2 = { speed: 1, direction: Math.PI };
+    const { dx, dy } = getComponentVelocity(v1, v2);
+    expect(dx).toBe(-1);
+    expect(dy).toBe(1);
+  });
+});
+
 describe("get velocity from changes in x and y positions", () => {
   test("angle of direction pointing East", () => {
-    const angle: Directions = getDirection(1, 0);
-    expect(angle.degrees).toBe(0);
-    expect(angle.radians).toBe(0);
+    const radians: number = getDirectionRadians(1, 0);
+    //expect(angle.degrees).toBe(0);
+    expect(radians).toBe(0);
   });
   test("angle of direction pointing North", () => {
-    const angle: Directions = getDirection(0, -1);
-    expect(angle.degrees).toBe(270);
-    expect(angle.radians).toBe(1.5 * Math.PI);
+    const radians: number = getDirectionRadians(0, -1);
+    //expect(angle.degrees).toBe(270);
+    expect(radians).toBe(1.5 * Math.PI);
   });
   test("angle of direction pointing West", () => {
-    const angle: Directions = getDirection(-1, 0);
-    expect(angle.degrees).toBe(180);
-    expect(angle.radians).toBe(Math.PI);
+    const radians: number = getDirectionRadians(-1, 0);
+    //expect(angle.degrees).toBe(180);
+    expect(radians).toBe(Math.PI);
   });
   test("angle of direction pointing South", () => {
-    const angle: Directions = getDirection(0, 1);
-    expect(angle.degrees).toBe(90);
-    expect(angle.radians).toBe(Math.PI / 2);
+    const radians: number = getDirectionRadians(0, 1);
+    //expect(angle.degrees).toBe(90);
+    expect(radians).toBe(Math.PI / 2);
   });
   test("set angle of direction to North when dx,dy is 0", () => {
-    const angle: Directions = getDirection(0, 0);
-    expect(angle.degrees).toBe(270);
-    expect(angle.radians).toBe(1.5 * Math.PI);
+    const radians: number = getDirectionRadians(0, 0);
+    //expect(angle.degrees).toBe(270);
+    expect(radians).toBe(1.5 * Math.PI);
   });
   test("angle of direction 2 parts East 1 part South ", () => {
-    const angle: Directions = getDirection(2, 1);
-    expect(angle.degrees).toBe(26.6);
-    expect(angle.radians).toBeCloseTo(0.4636);
+    const radians: number = getDirectionRadians(2, 1);
+    // expect(angle.degrees).toBe(26.6);
+    expect(radians).toBeCloseTo(0.4636);
   });
 });

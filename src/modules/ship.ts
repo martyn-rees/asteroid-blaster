@@ -1,5 +1,9 @@
 import Gun from "./gun";
-import { getComponentVelocity, getDirection, changeRotation } from "../maths";
+import {
+  calculateNewVelocity,
+  convertRadiansToDegrees,
+  changeRotation,
+} from "../maths";
 import { Position, Velocity, Directions, MotionState, Circle } from "./types";
 
 type ShipSpecs = {
@@ -69,30 +73,6 @@ export default class Ship {
     };
   }
 
-  // calculate new speed and direction
-  calculateNewVelocity(): Velocity {
-    const driftSpeed =
-      this.shipSpeed > this.drag ? this.shipSpeed - this.drag : 0;
-    const shipVelocity: Velocity = {
-      speed: driftSpeed,
-      direction: this.direction.radians,
-    };
-    const thrustVelocity: Velocity = {
-      speed: this.thrustPower,
-      direction: this.rotation.radians,
-    };
-
-    let { dx, dy } = getComponentVelocity(shipVelocity, thrustVelocity);
-    // shipSpeed
-    this.shipSpeed = Math.sqrt(dx * dx + dy * dy);
-    if (this.shipSpeed > this.speedMax) {
-      this.shipSpeed = this.speedMax;
-    }
-
-    this.direction = getDirection(dx, dy);
-    return { speed: this.shipSpeed, direction: this.direction.radians };
-  }
-
   updateActions({
     thrust,
     rotateCounterClockwise,
@@ -118,15 +98,29 @@ export default class Ship {
   }
 
   update(transformXCallback?: Function, transformYCallback?: Function) {
+    const maxSpeed = this.speedMax;
+    let driftSpeed: number = this.shipSpeed - this.drag;
+    if (driftSpeed < 0) driftSpeed = 0;
+    const driftDirection = this.direction.radians;
+    const thrustDirection = this.rotation.radians;
+
     // update Motion State
-    this.calculateNewVelocity();
-    const newX =
-      this.position.x + this.shipSpeed * Math.cos(this.direction.radians);
-    const newY =
-      this.position.y + this.shipSpeed * Math.sin(this.direction.radians);
+    const newVelocity: Velocity = calculateNewVelocity(
+      { speed: driftSpeed, direction: driftDirection },
+      { speed: this.thrustPower, direction: thrustDirection },
+      maxSpeed,
+    );
+
+    const radians = newVelocity.direction;
+    const degrees = convertRadiansToDegrees(radians);
+    const newX = this.position.x + newVelocity.speed * Math.cos(radians);
+    const newY = this.position.y + newVelocity.speed * Math.sin(radians);
     // use transforms to update position of rock on game screen
+    // update x,y,shipSpeed and direction
     this.position.x = transformXCallback ? transformXCallback(newX) : newX;
     this.position.y = transformYCallback ? transformYCallback(newY) : newY;
+    this.shipSpeed = newVelocity.speed;
+    this.direction = { degrees, radians };
 
     // update gun state
     if (this.gun !== null) {
