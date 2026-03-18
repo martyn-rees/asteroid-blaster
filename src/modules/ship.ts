@@ -1,7 +1,6 @@
 import Gun from "./gun";
+import { getComponentVelocity, getDirection, changeRotation } from "../maths";
 import { Position, Velocity, Directions, MotionState, Circle } from "./types";
-
-const FULLDEGREE = 360;
 
 type ShipSpecs = {
   speedMax: number;
@@ -70,50 +69,27 @@ export default class Ship {
     };
   }
 
-  convertDegreestoRadians(degrees: number) {
-    return 0.0174533 * degrees;
-  }
-  convertRadiansToDegrees(radians: number) {
-    return +(57.2958 * radians).toFixed(1);
-  }
-
-  getDirection(dx: number, dy: number): Directions {
-    let direction: Directions = { radians: 0, degrees: 0 };
-
-    if (dx > 0) {
-      direction.radians = Math.atan(dy / dx);
-    } else if (dx < 0) {
-      direction.radians = Math.PI + Math.atan(dy / dx);
-    } else {
-      if (dy <= 0) {
-        direction.radians = 1.5 * Math.PI;
-      } else if (dy > 0) {
-        direction.radians = Math.PI / 2;
-      }
-    }
-
-    direction.degrees = this.convertRadiansToDegrees(direction.radians);
-    return direction;
-  }
   // calculate new speed and direction
   calculateNewVelocity(): Velocity {
     const driftSpeed =
       this.shipSpeed > this.drag ? this.shipSpeed - this.drag : 0;
-    const driftX = driftSpeed * Math.cos(this.direction.radians);
-    const driftY = driftSpeed * Math.sin(this.direction.radians);
+    const shipVelocity: Velocity = {
+      speed: driftSpeed,
+      direction: this.direction.radians,
+    };
+    const thrustVelocity: Velocity = {
+      speed: this.thrustPower,
+      direction: this.rotation.radians,
+    };
 
-    const thrustX = this.thrustPower * Math.cos(this.rotation.radians);
-    const thrustY = this.thrustPower * Math.sin(this.rotation.radians);
-
-    let dx = +(driftX + thrustX).toFixed(1);
-    let dy = +(driftY + thrustY).toFixed(1);
+    let { dx, dy } = getComponentVelocity(shipVelocity, thrustVelocity);
     // shipSpeed
     this.shipSpeed = Math.sqrt(dx * dx + dy * dy);
     if (this.shipSpeed > this.speedMax) {
       this.shipSpeed = this.speedMax;
     }
 
-    this.direction = this.getDirection(dx, dy);
+    this.direction = getDirection(dx, dy);
     return { speed: this.shipSpeed, direction: this.direction.radians };
   }
 
@@ -130,10 +106,13 @@ export default class Ship {
   }) {
     this.thrustPower = thrust ? this.thrustMax : 0;
     if (rotateCounterClockwise) {
-      this.changeShipRotation(-this.rotationSpeed);
+      this.rotation = changeRotation(
+        -this.rotationSpeed,
+        this.rotation.degrees,
+      );
     }
     if (rotateClockwise) {
-      this.changeShipRotation(this.rotationSpeed);
+      this.rotation = changeRotation(this.rotationSpeed, this.rotation.degrees);
     }
     this.isTriggerPressed = shoot;
   }
@@ -158,16 +137,6 @@ export default class Ship {
       });
       this.gun.update(this.isTriggerPressed);
     }
-  }
-
-  changeShipRotation(dRot: number) {
-    this.rotation.degrees += dRot;
-    if (this.rotation.degrees < 0) {
-      this.rotation.degrees += FULLDEGREE;
-    } else if (this.rotation.degrees >= FULLDEGREE) {
-      this.rotation.degrees -= FULLDEGREE;
-    }
-    this.rotation.radians = this.convertDegreestoRadians(this.rotation.degrees);
   }
 
   render(renderCallback: Function, renderThrustCallback: Function) {

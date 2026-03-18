@@ -1,3 +1,4 @@
+import { convertDegreestoRadians } from "../maths";
 // use left-hand cartesian coords (standard screen coords with +ve y axis pointing down)
 // rotation angles: 0 - east, 90 - south, 180 - west, 270 - north
 import { Circle, Position, Velocity } from "./types";
@@ -44,10 +45,6 @@ export default class Rock {
     return this.position;
   }
 
-  convertDegreestoRadians(degrees: number) {
-    return 0.01745329252 * degrees;
-  }
-
   boundary(): Circle {
     return {
       x: this.position.x,
@@ -64,7 +61,7 @@ export default class Rock {
     position: Position;
     velocity: Velocity;
   }): Position {
-    const radians = this.convertDegreestoRadians(velocity.direction);
+    const radians = convertDegreestoRadians(velocity.direction);
     const dx = velocity.speed * Math.cos(radians);
     const dy = velocity.speed * Math.sin(radians);
     // toFixed returns a string .e.g. "1.5", the pre-pended plus turns it back in to a number 1.5 (losing any trailing 0's)
