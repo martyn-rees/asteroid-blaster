@@ -18,9 +18,13 @@ const asteroid3SVG = `
 
 export const asteroidsSVG = [asteroid1SVG, asteroid2SVG, asteroid3SVG];
 
+// left-handed cartesian coords has 0 degrees pointing east and angles increasing clockwise
+// the ship graphic points north so need to rotate 90 degrees around centre (6,6) so it points east as default position
 export const shipSVG = () => `
 <svg viewBox="0 0 12 12" version="1.1">
+<g transform="rotate(90,6,6)">
 	<path d="M6,0 L12,12 L6,6 L0,12 L6,0 Z"></path>
 	<path id="thrust" d="M6,8 L7,11 L5,11 L6,8 Z"></path>
+</g>
 </svg>
 `;

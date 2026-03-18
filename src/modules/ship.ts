@@ -36,11 +36,11 @@ export default class Ship {
     this.thrustMax = shipSpecs.thrustMax;
     this.r = shipSpecs.radius;
     this.rotationSpeed = shipSpecs.rotationSpeed;
-    // ship state
-    this.rotation = { degrees: 0, radians: 0 };
+    // ship state // point North
+    this.rotation = { degrees: 270, radians: 1.5 * Math.PI };
     this.thrustPower = 0;
-    // velocity
-    this.direction = { degrees: 0, radians: 0 };
+    // velocity // point North
+    this.direction = { degrees: 270, radians: 1.5 * Math.PI };
     this.shipSpeed = 0;
     // gun specifications - this can be passed in for different gunpower and position. Need to use array if more than one gun
     this.gun = null;
@@ -51,7 +51,7 @@ export default class Ship {
     this.gun = gun;
   }
 
-  getShipMotionState(): MotionState {
+  get motionState(): MotionState {
     return {
       position: this.position,
       velocity: {
@@ -74,40 +74,47 @@ export default class Ship {
     return 0.0174533 * degrees;
   }
   convertRadiansToDegrees(radians: number) {
-    return 57.2958 * radians;
+    return +(57.2958 * radians).toFixed(1);
+  }
+
+  getDirection(dx: number, dy: number): Directions {
+    let direction: Directions = { radians: 0, degrees: 0 };
+
+    if (dx > 0) {
+      direction.radians = Math.atan(dy / dx);
+    } else if (dx < 0) {
+      direction.radians = Math.PI + Math.atan(dy / dx);
+    } else {
+      if (dy <= 0) {
+        direction.radians = 1.5 * Math.PI;
+      } else if (dy > 0) {
+        direction.radians = Math.PI / 2;
+      }
+    }
+
+    direction.degrees = this.convertRadiansToDegrees(direction.radians);
+    return direction;
   }
   // calculate new speed and direction
-  calculateNewVelocity() {
+  calculateNewVelocity(): Velocity {
     const driftSpeed =
       this.shipSpeed > this.drag ? this.shipSpeed - this.drag : 0;
-    const driftX = driftSpeed * Math.sin(this.direction.radians);
-    const driftY = driftSpeed * Math.cos(this.direction.radians);
+    const driftX = driftSpeed * Math.cos(this.direction.radians);
+    const driftY = driftSpeed * Math.sin(this.direction.radians);
 
-    const thrustX = this.thrustPower * Math.sin(this.rotation.radians);
-    const thrustY = this.thrustPower * Math.cos(this.rotation.radians);
+    const thrustX = this.thrustPower * Math.cos(this.rotation.radians);
+    const thrustY = this.thrustPower * Math.sin(this.rotation.radians);
 
-    let dx = driftX + thrustX;
-    let dy = driftY + thrustY;
-
+    let dx = +(driftX + thrustX).toFixed(1);
+    let dy = +(driftY + thrustY).toFixed(1);
     // shipSpeed
     this.shipSpeed = Math.sqrt(dx * dx + dy * dy);
     if (this.shipSpeed > this.speedMax) {
       this.shipSpeed = this.speedMax;
     }
 
-    if (dy == 0) {
-      dy = -0.001;
-    }
-    this.direction.radians = Math.atan(dx / dy);
-    this.direction.degrees = this.convertRadiansToDegrees(
-      this.direction.radians,
-    );
-
-    if (dy < 0) {
-      // Add PI radians or 180 degrees
-      this.direction.degrees += 180;
-      this.direction.radians += Math.PI;
-    }
+    this.direction = this.getDirection(dx, dy);
+    return { speed: this.shipSpeed, direction: this.direction.radians };
   }
 
   updateActions({
@@ -135,9 +142,9 @@ export default class Ship {
     // update Motion State
     this.calculateNewVelocity();
     const newX =
-      this.position.x + this.shipSpeed * Math.sin(this.direction.radians);
+      this.position.x + this.shipSpeed * Math.cos(this.direction.radians);
     const newY =
-      this.position.y - this.shipSpeed * Math.cos(this.direction.radians);
+      this.position.y + this.shipSpeed * Math.sin(this.direction.radians);
     // use transforms to update position of rock on game screen
     this.position.x = transformXCallback ? transformXCallback(newX) : newX;
     this.position.y = transformYCallback ? transformYCallback(newY) : newY;

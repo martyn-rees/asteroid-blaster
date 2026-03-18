@@ -37,6 +37,10 @@ function setUpGun() {
   return gun;
 }
 
+// left hand cartesian maths
+// sin (270) = -1
+// cos (270) = 0
+// direction 0=east, 90=south, 180=west, 270=north
 test("create a new ship", () => {
   const ship = setUp();
   expect(ship).toEqual({
@@ -47,18 +51,13 @@ test("create a new ship", () => {
     thrustMax: 1,
     r: 6,
     rotationSpeed: 45,
-    rotation: { degrees: 0, radians: 0 },
+    rotation: { degrees: 270, radians: 1.5 * Math.PI },
     thrustPower: 0,
-    direction: { degrees: 0, radians: 0 },
+    direction: { degrees: 270, radians: 1.5 * Math.PI },
     shipSpeed: 0,
     gun: null,
     isTriggerPressed: false,
   });
-  const mockRenderCallback = vi.fn();
-  const mockRenderThrustCallback = vi.fn();
-  ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 100, 0);
-  expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(0);
 });
 
 test("boundary of ship", () => {
@@ -68,14 +67,14 @@ test("boundary of ship", () => {
 
 test("get motion state", () => {
   const ship = setUp();
-  const motionstate = ship.getShipMotionState();
+  const motionstate = ship.motionState;
   expect(motionstate).toStrictEqual({
     position: { x: 100, y: 100 },
     velocity: {
       speed: 0,
-      direction: 0,
+      direction: 1.5 * Math.PI,
     },
-    rotation: 0,
+    rotation: 1.5 * Math.PI,
   });
 });
 
@@ -90,34 +89,119 @@ test("attach a gun to ship and fire it", () => {
   expect(ship.gun.update).toBeCalled();
 });
 
+test("thrust ship North for 1 frame", () => {
+  const mockRenderCallback = vi.fn();
+  const mockRenderThrustCallback = vi.fn();
+  const ship = setUp();
+
+  const thrustAction = newActions({ thrust: true });
+  ship.updateActions(thrustAction);
+  expect(ship.direction.degrees).toBe(270);
+  ship.update();
+  expect(ship).toEqual({
+    id: "ship",
+    position: { x: 100, y: 99 },
+    speedMax: 4,
+    drag: 0.1,
+    thrustMax: 1,
+    r: 6,
+    rotationSpeed: 45,
+    rotation: { degrees: 270, radians: 1.5 * Math.PI },
+    thrustPower: 1,
+    direction: { degrees: 270, radians: 1.5 * Math.PI },
+    shipSpeed: 1,
+    gun: null,
+    isTriggerPressed: false,
+  });
+
+  expect(ship.direction.degrees).toBe(270);
+  const motionstate = ship.motionState;
+  expect(ship.position.x).toBe(100);
+  expect(ship.position.y).toBe(99);
+  expect(ship.direction.degrees).toBe(270);
+  expect(motionstate).toStrictEqual({
+    position: { x: 100, y: 99 },
+    velocity: {
+      speed: 1,
+      direction: 1.5 * Math.PI,
+    },
+    rotation: 1.5 * Math.PI,
+  });
+  ship.render(mockRenderCallback, mockRenderThrustCallback);
+  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 99, 270);
+  expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(1);
+});
+
+test("thrust ship East for 1 frame", () => {
+  const mockRenderCallback = vi.fn();
+  const mockRenderThrustCallback = vi.fn();
+  const ship = setUp();
+
+  const rotateRightAction = newActions({ rotateClockwise: true });
+  ship.updateActions(rotateRightAction);
+  ship.updateActions(rotateRightAction);
+  expect(ship.rotation.degrees).toBe(0);
+  ship.update();
+  expect(ship.rotation.degrees).toBe(0);
+
+  const thrustAction = newActions({ thrust: true });
+  ship.updateActions(thrustAction);
+  ship.update();
+
+  expect(ship.rotation.degrees).toBe(0);
+  //expect(ship.direction.degrees).toBe(0);
+  const motionstate = ship.motionState;
+  expect(ship.position.x).toBe(101);
+  expect(ship.position.y).toBe(100);
+  expect(ship.direction.degrees).toBe(0);
+  expect(motionstate).toStrictEqual({
+    position: { x: 101, y: 100 },
+    velocity: {
+      speed: 1,
+      direction: 0,
+    },
+    rotation: 0,
+  });
+  ship.render(mockRenderCallback, mockRenderThrustCallback);
+  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 101, 100, 0);
+  expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(1);
+});
+
 test("rotate ship and then thrust", () => {
   const ship = setUp();
+
   const mockRenderCallback = vi.fn();
   const mockRenderThrustCallback = vi.fn();
   // render ship before any actions
   ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 100, 0);
+  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 100, 270);
   expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(0);
+  expect(ship.direction.degrees).toBe(270);
   // rotate ship left
   const rotateLeftAction = newActions({ rotateCounterClockwise: true });
   ship.updateActions(rotateLeftAction);
+  expect(ship.rotation.degrees).toBe(225);
   ship.update();
+  expect(ship.rotation.degrees).toBe(225);
   ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 100, 315);
+  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 100, 225);
   expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(0);
+
   // rotate ship right
   const rotateRightAction = newActions({ rotateClockwise: true });
   ship.updateActions(rotateRightAction);
   ship.update();
   ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 100, 0);
+  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 100, 270);
   expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(0);
+  expect(ship.direction.degrees).toBe(270);
   // thrust ship - for this test it moves 1 pixel up per frame (with reverse y axis so y should be 99)
   const thrustAction = newActions({ thrust: true });
   ship.updateActions(thrustAction);
   ship.update();
+  expect(ship.direction.degrees).toBe(270);
   ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 99, 0);
+  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 99, 270);
   expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(1);
 });
 
@@ -141,7 +225,7 @@ test("ship doesn't move beyond its max speed", () => {
   ship.updateActions(newActions({ thrust: true }));
   ship.update();
   // TODO: this was 3.6999999999999997 instead of 3.7
-  //expect(ship.shipSpeed).toBe(3.7);
+  expect(ship.shipSpeed).toBe(3.7);
   // thrust ship - speed should not exceed maxSpeed (4 for this test)
   ship.updateActions(newActions({ thrust: true }));
   ship.update();
@@ -155,24 +239,6 @@ test("ship doesn't move beyond its max speed", () => {
 // TODO: this is implementation details so don't really want this test
 test("ships rotation resets after 360 degrees", () => {
   const ship = setUp();
-  expect(ship.rotation.degrees).toBe(0);
-  ship.updateActions(newActions({ rotateClockwise: true }));
-  ship.update();
-  expect(ship.rotation.degrees).toBe(45);
-  ship.updateActions(newActions({ rotateClockwise: true }));
-  ship.update();
-  expect(ship.rotation.degrees).toBe(90);
-  ship.updateActions(newActions({ rotateClockwise: true }));
-  ship.update();
-  expect(ship.rotation.degrees).toBe(135);
-  ship.updateActions(newActions({ rotateClockwise: true }));
-  ship.update();
-  expect(ship.rotation.degrees).toBe(180);
-  ship.updateActions(newActions({ rotateClockwise: true }));
-  ship.update();
-  expect(ship.rotation.degrees).toBe(225);
-  ship.updateActions(newActions({ rotateClockwise: true }));
-  ship.update();
   expect(ship.rotation.degrees).toBe(270);
   ship.updateActions(newActions({ rotateClockwise: true }));
   ship.update();
