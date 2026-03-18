@@ -5,7 +5,8 @@
 
 // gun specs of gun that can be attached to ship
 
-import { Position, Velocity, MotionState } from "./types";
+import { getDirectionRadians } from "../maths";
+import { Position, Velocity } from "./types";
 
 export type GunState =
   | "nogun"
@@ -69,7 +70,7 @@ export default class Gun {
     rotation && this.updateGunRotation(rotation);
   }
 
-  getMotionStateGun(): {
+  get motionStateGun(): {
     position: Position;
     velocity: Velocity;
     rotation: number;
@@ -99,10 +100,10 @@ export default class Gun {
   private getMuzzlePosition(): Position {
     const gunlength = this.barrelOffset.y;
     const x = parseFloat(
-      (this.position.x + gunlength * Math.sin(this.rotation)).toFixed(1),
+      (this.position.x + gunlength * Math.cos(this.rotation)).toFixed(1),
     );
     const y = parseFloat(
-      (this.position.y - gunlength * Math.cos(this.rotation)).toFixed(1),
+      (this.position.y + gunlength * Math.sin(this.rotation)).toFixed(1),
     );
     return { x, y };
   }
@@ -112,13 +113,16 @@ export default class Gun {
   // bullet velocity is related to gun's motion state plus rotation and power of gun
   private getBulletDxDy(): { dx: number; dy: number } {
     // Convert speed and direction to velocity components (vx, vy)
-    const gunVx = this.velocity.speed * Math.sin(this.velocity.direction);
-    const gunVy = this.velocity.speed * Math.cos(this.velocity.direction);
-    const bulletVx = this.muzzleSpeed * Math.sin(this.rotation);
-    const bulletVy = this.muzzleSpeed * Math.cos(this.rotation);
+    const gunVx = this.velocity.speed * Math.cos(this.velocity.direction);
+    const gunVy = this.velocity.speed * Math.sin(this.velocity.direction);
+    const bulletVx = this.muzzleSpeed * Math.cos(this.rotation);
+    const bulletVy = this.muzzleSpeed * Math.sin(this.rotation);
     // Create component velocity of bullet
-    const dx: number = parseFloat((gunVx + bulletVx).toFixed(1));
-    const dy: number = parseFloat((gunVy + bulletVy).toFixed(1));
+    let dx: number = parseFloat((gunVx + bulletVx).toFixed(1));
+    let dy: number = parseFloat((gunVy + bulletVy).toFixed(1));
+    if (dx == -0) {
+      dx = 0;
+    }
 
     return {
       dx,
@@ -136,7 +140,8 @@ export default class Gun {
     // create velocity of bullet fired from moving gun
     const newSpeed = Math.sqrt(bulletDxDy.dx ** 2 + bulletDxDy.dy ** 2);
     // TODO: write test to check if this is correct
-    const newDirection = Math.atan2(bulletDxDy.dy, bulletDxDy.dx);
+    //const newDirection = Math.atan2(bulletDxDy.dy, bulletDxDy.dx);
+    const newDirection = getDirectionRadians(bulletDxDy.dx, bulletDxDy.dy);
     const bulletVelocity = { speed: newSpeed, direction: newDirection };
 
     this.reloadGun();

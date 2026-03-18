@@ -59,8 +59,8 @@ test("gun and muzzle position when pointing North", () => {
   const gun = setUpGun();
   const motionStateNorth = {
     position: { x: 100, y: 100 },
-    velocity: { speed: 0, direction: 0 },
-    rotation: 0,
+    velocity: { speed: 0, direction: 1.5 * Math.PI },
+    rotation: 1.5 * Math.PI,
   };
   gun.updateMotionState(motionStateNorth);
   const muzzleLocation = gun.getMuzzlePosition();
@@ -73,7 +73,7 @@ test("gun and muzzle position when pointing East", () => {
   gun.updateMotionState({
     position: { x: 100, y: 100 },
     velocity: { speed: 0, direction: 0 },
-    rotation: Math.PI / 2,
+    rotation: 0,
   });
   expect(gun.position).toStrictEqual({ x: 100, y: 100 });
   const muzzleLocation = gun.getMuzzlePosition();
@@ -84,8 +84,8 @@ test("gun and muzzle position when pointing East but moving South", () => {
   const gun = setUpGun();
   gun.updateMotionState({
     position: { x: 100, y: 100 },
-    velocity: { speed: 3, direction: Math.PI },
-    rotation: Math.PI / 2,
+    velocity: { speed: 3, direction: Math.PI / 2 },
+    rotation: 0,
   });
   expect(gun.position).toStrictEqual({ x: 100, y: 100 });
   const muzzleLocation = gun.getMuzzlePosition();
@@ -94,11 +94,11 @@ test("gun and muzzle position when pointing East but moving South", () => {
 
 test("get velocity of bullet when gun is fired while stationary and pointing North", () => {
   const gun = setUpGun();
-  // gun is stationary and pointing North (rotation 180)
+  // gun is stationary and pointing North (rotation 270)
   gun.updateMotionState({
     position: { x: 100, y: 100 },
     velocity: { speed: 0, direction: 0 },
-    rotation: 0,
+    rotation: 1.5 * Math.PI,
   });
   let { bulletPosition, bulletDxDy, bulletVelocity } =
     gun.getInitialMotionStateOfBullet();
@@ -106,28 +106,24 @@ test("get velocity of bullet when gun is fired while stationary and pointing Nor
   const muzzleLocation = gun.getMuzzlePosition();
   expect(muzzleLocation).toStrictEqual({ x: 100, y: 94 });
 
-  //expect(bulletDxDy).toStrictEqual({ dx: 0, dy: -4 });
+  expect(bulletDxDy).toStrictEqual({ dx: 0, dy: -4 });
   expect(bulletPosition).toStrictEqual({ x: 100, y: 94 });
-  //expect(bulletVelocity).toStrictEqual({ speed: 0, direction: 0 });
+  expect(bulletVelocity).toStrictEqual({ speed: 4, direction: 1.5 * Math.PI });
 });
 
-/*test("get velocity of bullet when gun is fired while moving South and point South", () => {
+test("get velocity of bullet when gun is fired while moving South and point South", () => {
   const gun = setUpGun();
   // gun is stationary and pointing North (rotation 180)
   gun.updateMotionState({
     position: { x: 100, y: 100 },
-    velocity: { speed: 2, direction: Math.PI },
-    rotation: Math.PI,
+    velocity: { speed: 2, direction: Math.PI / 2 },
+    rotation: Math.PI / 2,
   });
   let { bulletPosition, bulletDxDy, bulletVelocity } =
     gun.getInitialMotionStateOfBullet();
-  //const shipVelocity2 = { speed: 2, direction: 0 };
-  const gunFrame2 = gun.getInitialMotionStateOfBullet();
-  //const bulletVelocity2 = gun.getBulletDxDy(shipVelocity2, shipRotationNorth);
-  //expect(gunFrame2.bulletDxDy).toStrictEqual({ dx: 0, dy: 8 });
-  //expect(bulletDxDy).toStrictEqual({ dx: 0, dy: -6 });
-  expect(gunFrame2.bulletPosition).toStrictEqual({ x: 100, y: 96 });
-});*/
+  expect(bulletDxDy).toStrictEqual({ dx: 0, dy: 6 });
+  expect(bulletPosition).toStrictEqual({ x: 100, y: 106 });
+});
 
 test("when gun is fired it is not reloaded until reload time has passed", () => {
   const gun = setUpGun();
