@@ -27,14 +27,11 @@ function setUp() {
 }
 
 function setUpGun() {
-  // TODO: this isn't good that I need to recreate methods in gun class
-  const gun = {
-    gunSpecs: { barrelOffset: { x: 0, y: 6 }, speed: 6, reloadTime: 10 },
+  return {
+    gunSpecs: { muzzleOffset: { x: 0, y: 6 }, speed: 6, reloadTime: 10 },
     gunReloadTimer: 0,
     update: vi.fn(),
-    updateMotionState: vi.fn(),
   };
-  return gun;
 }
 
 // left hand cartesian maths

@@ -57,7 +57,7 @@ test("boundary of bullet", () => {
 
 test("bullet movement after 2 frames", () => {
   const bullet = setUp();
-  // bullet moves dx=4 every frame so should move 8 pixels after 2 frames
+  // bullet moves 4 pixels east every frame so should move 8 pixels after 2 frames
   bullet.update();
   bullet.update();
   expect(bullet.position.x).toBe(108);
@@ -69,7 +69,6 @@ test("bullet movement after 2 frames with transform", () => {
     return 10;
   };
   const bullet = setUp();
-  // bullet moves dx=4 every frame so should move 8 pixels after 2 frames
   bullet.update();
   bullet.update(transformCallback, transformCallback);
   expect(bullet.position.x).toBe(10);

@@ -13,7 +13,7 @@ export const shipSpecs = {
   rotationSpeed: 2,
 };
 export const gunSpec = {
-  barrelOffset: { x: 0, y: 6 },
+  muzzleOffset: { x: 0, y: 6 },
   muzzleSpeed: 6,
   reloadTime: 12,
 };

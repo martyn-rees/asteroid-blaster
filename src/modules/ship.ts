@@ -124,11 +124,11 @@ export default class Ship {
 
     // update gun state
     if (this.gun !== null) {
-      this.gun.updateMotionState({
+      this.gun.motionState = {
         position: this.position,
         velocity: { speed: this.shipSpeed, direction: this.direction.radians },
         rotation: this.rotation.radians,
-      });
+      };
       this.gun.update(this.isTriggerPressed);
     }
   }

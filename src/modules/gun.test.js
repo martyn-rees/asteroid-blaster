@@ -5,7 +5,7 @@ import Gun from "./gun";
 
 function setUpGun() {
   const gunSpec = {
-    barrelOffset: { x: 0, y: 6 },
+    muzzleOffset: { x: 0, y: 6 },
     muzzleSpeed: 4,
     reloadTime: 3,
   };
@@ -16,7 +16,7 @@ function setUpGun() {
 test("create new gun", () => {
   const gun = setUpGun();
   expect(gun).toEqual({
-    barrelOffset: {
+    muzzleOffset: {
       x: 0,
       y: 6,
     },
@@ -39,14 +39,14 @@ test("create new gun", () => {
 test("set motion state", () => {
   const gun = setUpGun();
 
-  gun.updateMotionState({
+  gun.motionState = {
     position: { x: 100, y: 100 },
     velocity: {
       speed: 0,
       direction: 0,
     },
     rotation: 0,
-  });
+  };
   expect(gun.position).toStrictEqual({ x: 100, y: 100 });
   expect(gun.velocity).toStrictEqual({
     speed: 0,
@@ -57,12 +57,11 @@ test("set motion state", () => {
 
 test("gun and muzzle position when pointing North", () => {
   const gun = setUpGun();
-  const motionStateNorth = {
+  gun.motionState = {
     position: { x: 100, y: 100 },
     velocity: { speed: 0, direction: 1.5 * Math.PI },
     rotation: 1.5 * Math.PI,
   };
-  gun.updateMotionState(motionStateNorth);
   const muzzleLocation = gun.getMuzzlePosition();
   expect(gun.position).toStrictEqual({ x: 100, y: 100 });
   expect(muzzleLocation).toStrictEqual({ x: 100, y: 94 });
@@ -70,11 +69,11 @@ test("gun and muzzle position when pointing North", () => {
 
 test("gun and muzzle position when pointing East", () => {
   const gun = setUpGun();
-  gun.updateMotionState({
+  gun.motionState = {
     position: { x: 100, y: 100 },
     velocity: { speed: 0, direction: 0 },
     rotation: 0,
-  });
+  };
   expect(gun.position).toStrictEqual({ x: 100, y: 100 });
   const muzzleLocation = gun.getMuzzlePosition();
   expect(muzzleLocation).toStrictEqual({ x: 106, y: 100 });
@@ -82,11 +81,11 @@ test("gun and muzzle position when pointing East", () => {
 
 test("gun and muzzle position when pointing East but moving South", () => {
   const gun = setUpGun();
-  gun.updateMotionState({
+  gun.motionState = {
     position: { x: 100, y: 100 },
     velocity: { speed: 3, direction: Math.PI / 2 },
     rotation: 0,
-  });
+  };
   expect(gun.position).toStrictEqual({ x: 100, y: 100 });
   const muzzleLocation = gun.getMuzzlePosition();
   expect(muzzleLocation).toStrictEqual({ x: 106, y: 100 });
@@ -95,18 +94,16 @@ test("gun and muzzle position when pointing East but moving South", () => {
 test("get velocity of bullet when gun is fired while stationary and pointing North", () => {
   const gun = setUpGun();
   // gun is stationary and pointing North (rotation 270)
-  gun.updateMotionState({
+  gun.motionState = {
     position: { x: 100, y: 100 },
     velocity: { speed: 0, direction: 0 },
     rotation: 1.5 * Math.PI,
-  });
-  let { bulletPosition, bulletDxDy, bulletVelocity } =
-    gun.getInitialMotionStateOfBullet();
+  };
+  let { bulletPosition, bulletVelocity } = gun.getInitialMotionStateOfBullet();
   expect(gun.position).toStrictEqual({ x: 100, y: 100 });
   const muzzleLocation = gun.getMuzzlePosition();
   expect(muzzleLocation).toStrictEqual({ x: 100, y: 94 });
 
-  expect(bulletDxDy).toStrictEqual({ dx: 0, dy: -4 });
   expect(bulletPosition).toStrictEqual({ x: 100, y: 94 });
   expect(bulletVelocity).toStrictEqual({ speed: 4, direction: 1.5 * Math.PI });
 });
@@ -114,14 +111,12 @@ test("get velocity of bullet when gun is fired while stationary and pointing Nor
 test("get velocity of bullet when gun is fired while moving South and point South", () => {
   const gun = setUpGun();
   // gun is stationary and pointing North (rotation 180)
-  gun.updateMotionState({
+  gun.motionState = {
     position: { x: 100, y: 100 },
     velocity: { speed: 2, direction: Math.PI / 2 },
     rotation: Math.PI / 2,
-  });
-  let { bulletPosition, bulletDxDy, bulletVelocity } =
-    gun.getInitialMotionStateOfBullet();
-  expect(bulletDxDy).toStrictEqual({ dx: 0, dy: 6 });
+  };
+  let { bulletPosition } = gun.getInitialMotionStateOfBullet();
   expect(bulletPosition).toStrictEqual({ x: 100, y: 106 });
 });
 
