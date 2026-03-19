@@ -8,7 +8,6 @@ function setUp(x = 100, y = 100) {
   // reset the static variable that creates a unique ID
   Bullet.bulletIDCounter = 0;
   const bulletPosition = { x, y };
-  const bulletDxDy = { dx: 4, dy: 0 };
   const bulletSpecs = {
     r: 2,
     endurance: 4,
@@ -18,7 +17,6 @@ function setUp(x = 100, y = 100) {
   const bulletVelocity = { speed: 4, direction: 0 };
   const bullet = new Bullet({
     initialPosition: bulletPosition,
-    dxdy: bulletDxDy,
     velocity: bulletVelocity,
     bulletSpecs,
   });
@@ -31,7 +29,6 @@ test("create new Bullets", () => {
   expect(bullet1).toEqual({
     id: "bullet1",
     bulletPower: 1,
-    dxdy: { dx: 4, dy: 0 },
     position: { x: 100, y: 100 },
     velocity: {
       direction: 0,
@@ -39,15 +36,10 @@ test("create new Bullets", () => {
     },
     endurance: 4,
     r: 2,
-    testdxdy: {
-      dx: 4,
-      dy: 0,
-    },
   });
   expect(bullet2).toEqual({
     id: "bullet1",
     bulletPower: 1,
-    dxdy: { dx: 4, dy: 0 },
     velocity: {
       direction: 0,
       speed: 4,
@@ -55,10 +47,6 @@ test("create new Bullets", () => {
     position: { x: 110, y: 100 },
     endurance: 4,
     r: 2,
-    testdxdy: {
-      dx: 4,
-      dy: 0,
-    },
   });
 });
 
