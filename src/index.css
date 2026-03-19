@@ -3,6 +3,11 @@
     src: url(/fonts/Press_Start_2P/PressStart2P-Regular.ttf) format("truetype");
 }
     
+.show-circle-boundary {
+    background-color: blue;
+    border-radius: 50%;
+}
+
 .press-start-2p-regular {
     font-family: "Press Start 2P", system-ui;
     font-weight: 400;
@@ -11,6 +16,10 @@
 
 .rock {
     position:absolute;
+}
+
+.rock svg {
+    display: block;
 }
 
 .rock svg path {
@@ -26,6 +35,20 @@
     margin-top: -6px;
     margin-left: -6px;
     fill: white;
+}
+
+.ship svg {
+    display: block;
+}
+
+.gun {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background-color: red;
+    border-radius: 50%;
+    margin-left: -1px;
+    margin-top: -1px;
 }
 
 .bullet {
