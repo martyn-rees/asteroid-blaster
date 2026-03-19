@@ -16,6 +16,8 @@ export type GunState =
   | "malfunction";
 
 export default class Gun {
+  static gunIDCounter = 0;
+  private id: string;
   private gunReloadTimer: number;
   public state: GunState;
   private muzzleOffset: Position;
@@ -34,6 +36,7 @@ export default class Gun {
     muzzleSpeed: number;
     reloadTime: number;
   }) {
+    this.id = "gun" + Gun.gunIDCounter++;
     this.muzzleOffset = muzzleOffset;
     this.muzzleSpeed = muzzleSpeed;
     this.reloadTime = reloadTime;
@@ -121,8 +124,6 @@ export default class Gun {
     const bulletDxDy = getComponentVelocity(v1, v2);
     // create velocity of bullet fired from moving gun
     const newSpeed = Math.sqrt(bulletDxDy.dx ** 2 + bulletDxDy.dy ** 2);
-    // TODO: write test to check if this is correct
-    //const newDirection = Math.atan2(bulletDxDy.dy, bulletDxDy.dx);
     const newDirection = getDirectionRadians(bulletDxDy.dx, bulletDxDy.dy);
     const bulletVelocity = { speed: newSpeed, direction: newDirection };
 
@@ -133,5 +134,10 @@ export default class Gun {
   reloadGun() {
     this.gunReloadTimer = this.reloadTime;
     this.state = "reloading";
+  }
+
+  render(renderCallback: Function) {
+    const muzzle = this.getMuzzlePosition();
+    renderCallback(this.id, muzzle.x, muzzle.y);
   }
 }

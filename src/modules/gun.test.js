@@ -16,6 +16,7 @@ function setUpGun() {
 test("create new gun", () => {
   const gun = setUpGun();
   expect(gun).toEqual({
+    id: "gun0",
     muzzleOffset: {
       x: 0,
       y: 6,
