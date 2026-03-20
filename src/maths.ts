@@ -1,4 +1,4 @@
-import { Directions, Velocity } from "./modules/types";
+import { Directions, Position, Velocity } from "./modules/types";
 
 function convertDegreestoRadians(degrees: number) {
   return (Math.PI / 180) * degrees;
@@ -6,6 +6,15 @@ function convertDegreestoRadians(degrees: number) {
 
 function convertRadiansToDegrees(radians: number) {
   return +((180 / Math.PI) * radians).toFixed(1);
+}
+
+function getNewPosition(position: Position, velocity: Velocity): Position {
+  const dx = velocity.speed * Math.cos(velocity.direction);
+  const dy = velocity.speed * Math.sin(velocity.direction);
+  return {
+    x: position.x + dx,
+    y: position.y + dy,
+  };
 }
 
 function getComponentVelocity(
@@ -85,6 +94,7 @@ export {
   convertDegreestoRadians,
   convertRadiansToDegrees,
   getComponentVelocity,
+  getNewPosition,
   getDirectionRadians,
   changeRotation,
 };

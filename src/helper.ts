@@ -1,3 +1,5 @@
+import { Position } from "./modules/types";
+
 export const constrainNumber = (
   n: number,
   min: number,
@@ -11,6 +13,19 @@ export const constrainNumber = (
   }
   return constrainedNumber;
 };
+
+// transform functions are used to keep the a position within the playing field.
+// For example, if the position goes off the right edge of the screen it can be transformed to the left edge of the screen and vice versa.
+// This is done by passing in a transform function that takes a position and returns a new position that is within the playing field.
+export function transform(
+  position: Position,
+  transformX?: Function,
+  transformY?: Function,
+): Position {
+  const x = transformX ? transformX(position.x) : position.x;
+  const y = transformY ? transformY(position.y) : position.y;
+  return { x, y };
+}
 
 // alternatrive to warping to other side of screen
 /*bounceOffWalls(screenWidth, screenHeight) {
