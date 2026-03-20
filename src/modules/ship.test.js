@@ -50,7 +50,6 @@ test("create a new ship", () => {
     rotationSpeed: 45,
     rotation: { degrees: 270, radians: 1.5 * Math.PI },
     thrustPower: 0,
-    direction: { degrees: 270, radians: 1.5 * Math.PI },
     velocity: { speed: 0, direction: 1.5 * Math.PI },
     gun: null,
     isTriggerPressed: false,
@@ -93,7 +92,7 @@ test("thrust ship North for 1 frame", () => {
 
   const thrustAction = newActions({ thrust: true });
   ship.updateActions(thrustAction);
-  expect(ship.direction.degrees).toBe(270);
+  expect(ship.velocity.direction).toBe(1.5 * Math.PI);
   ship.update();
   expect(ship).toEqual({
     id: "ship",
@@ -105,17 +104,16 @@ test("thrust ship North for 1 frame", () => {
     rotationSpeed: 45,
     rotation: { degrees: 270, radians: 1.5 * Math.PI },
     thrustPower: 1,
-    direction: { degrees: 270, radians: 1.5 * Math.PI },
     velocity: { speed: 1, direction: 1.5 * Math.PI },
     gun: null,
     isTriggerPressed: false,
   });
 
-  expect(ship.direction.degrees).toBe(270);
+  expect(ship.velocity.direction).toBe(1.5 * Math.PI);
   const motionstate = ship.motionState;
   expect(ship.position.x).toBe(100);
   expect(ship.position.y).toBe(99);
-  expect(ship.direction.degrees).toBe(270);
+  expect(ship.velocity.direction).toBe(1.5 * Math.PI);
   expect(motionstate).toStrictEqual({
     position: { x: 100, y: 99 },
     velocity: {
@@ -146,11 +144,10 @@ test("thrust ship East for 1 frame", () => {
   ship.update();
 
   expect(ship.rotation.degrees).toBe(0);
-  //expect(ship.direction.degrees).toBe(0);
   const motionstate = ship.motionState;
   expect(ship.position.x).toBe(101);
   expect(ship.position.y).toBe(100);
-  expect(ship.direction.degrees).toBe(0);
+  expect(ship.velocity.direction).toBe(0);
   expect(motionstate).toStrictEqual({
     position: { x: 101, y: 100 },
     velocity: {
@@ -173,7 +170,7 @@ test("rotate ship and then thrust", () => {
   ship.render(mockRenderCallback, mockRenderThrustCallback);
   expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 100, 270);
   expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(0);
-  expect(ship.direction.degrees).toBe(270);
+  expect(ship.velocity.direction).toBe(1.5 * Math.PI);
   // rotate ship left
   const rotateLeftAction = newActions({ rotateCounterClockwise: true });
   ship.updateActions(rotateLeftAction);
@@ -191,12 +188,12 @@ test("rotate ship and then thrust", () => {
   ship.render(mockRenderCallback, mockRenderThrustCallback);
   expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 100, 270);
   expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(0);
-  expect(ship.direction.degrees).toBe(270);
+  expect(ship.velocity.direction).toBe(1.5 * Math.PI);
   // thrust ship - for this test it moves 1 pixel up per frame (with reverse y axis so y should be 99)
   const thrustAction = newActions({ thrust: true });
   ship.updateActions(thrustAction);
   ship.update();
-  expect(ship.direction.degrees).toBe(270);
+  expect(ship.velocity.direction).toBe(1.5 * Math.PI);
   ship.render(mockRenderCallback, mockRenderThrustCallback);
   expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 99, 270);
   expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(1);

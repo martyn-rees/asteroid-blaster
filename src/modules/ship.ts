@@ -26,7 +26,6 @@ export default class Ship {
   private rotationSpeed: number;
   public rotation: Directions;
   public thrustPower: number;
-  public direction: Directions;
   public velocity: Velocity;
   public gun: Gun | null;
   public isTriggerPressed: boolean;
@@ -45,7 +44,6 @@ export default class Ship {
     this.rotation = { degrees: 270, radians: 1.5 * Math.PI };
     this.thrustPower = 0;
     // velocity // point North
-    this.direction = { degrees: 270, radians: 1.5 * Math.PI };
     this.velocity = { speed: 0, direction: 1.5 * Math.PI };
     // gun specifications - this can be passed in for different gunpower and position. Need to use array if more than one gun
     this.gun = null;
@@ -100,7 +98,7 @@ export default class Ship {
     const maxSpeed = this.speedMax;
     let driftSpeed: number = this.velocity.speed - this.drag;
     if (driftSpeed < 0) driftSpeed = 0;
-    const driftDirection = this.direction.radians;
+    const driftDirection = this.velocity.direction;
     const thrustDirection = this.rotation.radians;
 
     // update Motion State
@@ -120,7 +118,6 @@ export default class Ship {
     this.velocity = newVelocity;
     const radians = newVelocity.direction;
     const degrees = convertRadiansToDegrees(radians);
-    this.direction = { degrees, radians };
 
     // update gun state
     if (this.gun !== null) {

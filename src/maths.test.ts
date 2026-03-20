@@ -48,32 +48,26 @@ describe("get component velocitiy from 2 velocities", () => {
 describe("get velocity from changes in x and y positions", () => {
   test("angle of direction pointing East", () => {
     const radians: number = getDirectionRadians(1, 0);
-    //expect(angle.degrees).toBe(0);
     expect(radians).toBe(0);
   });
   test("angle of direction pointing North", () => {
     const radians: number = getDirectionRadians(0, -1);
-    //expect(angle.degrees).toBe(270);
     expect(radians).toBe(1.5 * Math.PI);
   });
   test("angle of direction pointing West", () => {
     const radians: number = getDirectionRadians(-1, 0);
-    //expect(angle.degrees).toBe(180);
     expect(radians).toBe(Math.PI);
   });
   test("angle of direction pointing South", () => {
     const radians: number = getDirectionRadians(0, 1);
-    //expect(angle.degrees).toBe(90);
     expect(radians).toBe(Math.PI / 2);
   });
   test("set angle of direction to North when dx,dy is 0", () => {
     const radians: number = getDirectionRadians(0, 0);
-    //expect(angle.degrees).toBe(270);
     expect(radians).toBe(1.5 * Math.PI);
   });
   test("angle of direction 2 parts East 1 part South ", () => {
     const radians: number = getDirectionRadians(2, 1);
-    // expect(angle.degrees).toBe(26.6);
     expect(radians).toBeCloseTo(0.4636);
   });
 });
