@@ -47,8 +47,8 @@ test("create a new ship", () => {
     drag: 0.1,
     thrustMax: 1,
     r: 6,
-    rotationSpeed: 45,
-    rotation: { degrees: 270, radians: 1.5 * Math.PI },
+    rotationSpeed: Math.PI / 4,
+    rotation: 1.5 * Math.PI,
     thrustPower: 0,
     velocity: { speed: 0, direction: 1.5 * Math.PI },
     gun: null,
@@ -101,8 +101,8 @@ test("thrust ship North for 1 frame", () => {
     drag: 0.1,
     thrustMax: 1,
     r: 6,
-    rotationSpeed: 45,
-    rotation: { degrees: 270, radians: 1.5 * Math.PI },
+    rotationSpeed: Math.PI / 4,
+    rotation: 1.5 * Math.PI,
     thrustPower: 1,
     velocity: { speed: 1, direction: 1.5 * Math.PI },
     gun: null,
@@ -135,15 +135,15 @@ test("thrust ship East for 1 frame", () => {
   const rotateRightAction = newActions({ rotateClockwise: true });
   ship.updateActions(rotateRightAction);
   ship.updateActions(rotateRightAction);
-  expect(ship.rotation.degrees).toBe(0);
+  expect(ship.rotation).toBe(0);
   ship.update();
-  expect(ship.rotation.degrees).toBe(0);
+  expect(ship.rotation).toBe(0);
 
   const thrustAction = newActions({ thrust: true });
   ship.updateActions(thrustAction);
   ship.update();
 
-  expect(ship.rotation.degrees).toBe(0);
+  expect(ship.rotation).toBe(0);
   const motionstate = ship.motionState;
   expect(ship.position.x).toBe(101);
   expect(ship.position.y).toBe(100);
@@ -174,9 +174,9 @@ test("rotate ship and then thrust", () => {
   // rotate ship left
   const rotateLeftAction = newActions({ rotateCounterClockwise: true });
   ship.updateActions(rotateLeftAction);
-  expect(ship.rotation.degrees).toBe(225);
+  expect(ship.rotation).toBe(1.25 * Math.PI);
   ship.update();
-  expect(ship.rotation.degrees).toBe(225);
+  expect(ship.rotation).toBe(1.25 * Math.PI);
   ship.render(mockRenderCallback, mockRenderThrustCallback);
   expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 100, 225);
   expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(0);
@@ -233,13 +233,13 @@ test("ship doesn't move beyond its max speed", () => {
 // TODO: this is implementation details so don't really want this test
 test("ships rotation resets after 360 degrees", () => {
   const ship = setUp();
-  expect(ship.rotation.degrees).toBe(270);
+  expect(ship.rotation).toBe(1.5 * Math.PI);
   ship.updateActions(newActions({ rotateClockwise: true }));
   ship.update();
-  expect(ship.rotation.degrees).toBe(315);
+  expect(ship.rotation).toBe(1.75 * Math.PI);
   ship.updateActions(newActions({ rotateClockwise: true }));
   ship.update();
-  expect(ship.rotation.degrees).toBe(0);
+  expect(ship.rotation).toBe(0);
 });
 
 test("ship movement after 2 frames with transform", () => {

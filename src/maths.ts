@@ -1,4 +1,4 @@
-import { Directions, Position, Velocity } from "./modules/types";
+import { Position, Velocity } from "./modules/types";
 
 function convertDegreestoRadians(degrees: number) {
   return (Math.PI / 180) * degrees;
@@ -99,16 +99,15 @@ function getDirectionRadians(dx: number, dy: number): number {
 function changeRotation(
   rotationChange: number,
   currentRotation: number,
-): Directions {
-  const FULLDEGREE = 360;
-  let rotation: Directions = { radians: 0, degrees: 0 };
-  rotation.degrees = currentRotation + rotationChange;
-  if (rotation.degrees < 0) {
-    rotation.degrees += FULLDEGREE;
-  } else if (rotation.degrees >= FULLDEGREE) {
-    rotation.degrees -= FULLDEGREE;
+  format: string = "radians",
+): number {
+  const maxAngle = format === "degrees" ? 360 : 2 * Math.PI;
+  let rotation = currentRotation + rotationChange;
+  if (rotation < 0) {
+    rotation += maxAngle;
+  } else if (rotation >= maxAngle) {
+    rotation -= maxAngle;
   }
-  rotation.radians = convertDegreestoRadians(rotation.degrees);
   return rotation;
 }
 

@@ -1,5 +1,4 @@
 import { describe, expect, test } from "vitest";
-import { Directions } from "./modules/types";
 import {
   changeRotation,
   getComponentVelocity,
@@ -8,22 +7,26 @@ import {
 
 describe("updating rotation", () => {
   test("change rotation from north to west", () => {
-    const newRotation: Directions = changeRotation(-90, 270);
-    expect(newRotation.degrees).toBe(180);
-    expect(newRotation.radians).toBeCloseTo(Math.PI, 4);
+    const newRotation: number = changeRotation(
+      -Math.PI / 2,
+      1.5 * Math.PI,
+      "radians",
+    );
+    //expect(newRotation).toBe(180);
+    expect(newRotation).toBeCloseTo(Math.PI, 4);
   });
   test("change rotation to less than 0", () => {
-    const newRotation: Directions = changeRotation(-90, 50);
-    expect(newRotation.degrees).toBe(320);
+    const newRotation: number = changeRotation(-90, 50, "degrees");
+    expect(newRotation).toBe(320);
   });
   test("change rotation to more than 360", () => {
-    const newRotation: Directions = changeRotation(2, 359);
-    expect(newRotation.degrees).toBe(1);
+    const newRotation: number = changeRotation(2, 359, "degrees");
+    expect(newRotation).toBe(1);
   });
   test("changing rotation to 360 sets rotation to 0", () => {
-    const newRotation: Directions = changeRotation(1, 359);
-    expect(newRotation.degrees).toBe(0);
-    expect(newRotation.radians).toBe(0);
+    const newRotation: number = changeRotation(1, 359, "degrees");
+    expect(newRotation).toBe(0);
+    //expect(radians).toBe(0);
   });
 });
 

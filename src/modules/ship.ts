@@ -1,12 +1,13 @@
 import Gun from "./gun";
 import {
   calculateNewVelocity,
-  convertRadiansToDegrees,
   changeRotation,
   getNewPosition,
+  convertDegreestoRadians,
+  convertRadiansToDegrees,
 } from "../maths";
 import { transform } from "../helper";
-import { Position, Velocity, Directions, MotionState, Circle } from "./types";
+import { Position, Velocity, MotionState, Circle } from "./types";
 
 type ShipSpecs = {
   speedMax: number;
@@ -24,7 +25,7 @@ export default class Ship {
   private thrustMax: number;
   public r: number;
   private rotationSpeed: number;
-  public rotation: Directions;
+  public rotation: number;
   public thrustPower: number;
   public velocity: Velocity;
   public gun: Gun | null;
@@ -39,9 +40,9 @@ export default class Ship {
     this.drag = shipSpecs.drag;
     this.thrustMax = shipSpecs.thrustMax;
     this.r = shipSpecs.radius;
-    this.rotationSpeed = shipSpecs.rotationSpeed;
+    this.rotationSpeed = convertDegreestoRadians(shipSpecs.rotationSpeed);
     // ship state // point North
-    this.rotation = { degrees: 270, radians: 1.5 * Math.PI };
+    this.rotation = 1.5 * Math.PI;
     this.thrustPower = 0;
     // velocity // point North
     this.velocity = { speed: 0, direction: 1.5 * Math.PI };
@@ -58,7 +59,7 @@ export default class Ship {
     return {
       position: this.position,
       velocity: this.velocity,
-      rotation: this.rotation.radians,
+      rotation: this.rotation,
     };
   }
 
@@ -83,13 +84,10 @@ export default class Ship {
   }) {
     this.thrustPower = thrust ? this.thrustMax : 0;
     if (rotateCounterClockwise) {
-      this.rotation = changeRotation(
-        -this.rotationSpeed,
-        this.rotation.degrees,
-      );
+      this.rotation = changeRotation(-this.rotationSpeed, this.rotation);
     }
     if (rotateClockwise) {
-      this.rotation = changeRotation(this.rotationSpeed, this.rotation.degrees);
+      this.rotation = changeRotation(this.rotationSpeed, this.rotation);
     }
     this.isTriggerPressed = shoot;
   }
@@ -99,7 +97,7 @@ export default class Ship {
     let driftSpeed: number = this.velocity.speed - this.drag;
     if (driftSpeed < 0) driftSpeed = 0;
     const driftDirection = this.velocity.direction;
-    const thrustDirection = this.rotation.radians;
+    const thrustDirection = this.rotation;
 
     // update Motion State
     const newVelocity: Velocity = calculateNewVelocity(
@@ -116,27 +114,21 @@ export default class Ship {
       transformYCallback,
     );
     this.velocity = newVelocity;
-    const radians = newVelocity.direction;
-    const degrees = convertRadiansToDegrees(radians);
 
     // update gun state
     if (this.gun !== null) {
       this.gun.motionState = {
         position: this.position,
         velocity: this.velocity,
-        rotation: this.rotation.radians,
+        rotation: this.rotation,
       };
       this.gun.update(this.isTriggerPressed);
     }
   }
 
   render(renderCallback: Function, renderThrustCallback: Function) {
-    renderCallback(
-      this.id,
-      this.position.x,
-      this.position.y,
-      this.rotation.degrees,
-    );
+    const degrees = convertRadiansToDegrees(this.rotation);
+    renderCallback(this.id, this.position.x, this.position.y, degrees);
     renderThrustCallback(this.thrustPower);
   }
 }
