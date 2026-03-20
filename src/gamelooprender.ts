@@ -14,6 +14,8 @@ import {
 import { asteroidsSVG, shipSVG } from "./graphics.js";
 import { GameState } from "./gameState.js";
 
+const debug = { showGunMuzzle: true };
+
 function addNewItems(
   newShips: string[],
   newBullets: string[],
@@ -24,6 +26,11 @@ function addNewItems(
   newShips.forEach((shipId) => {
     const shipEl = createElement(shipId, "ship", null, shipSVG());
     addToScreen(shipEl, screenId);
+    // these lines are for testing - adds the ship's gun muzzle to check it's position is correct
+    if (debug.showGunMuzzle) {
+      const gunEl = createElement("gun0", "gun", null, null);
+      addToScreen(gunEl, screenId);
+    }
   });
 
   newBullets.forEach((bulletId) => {
@@ -78,7 +85,10 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
 
   // UPDATE ITEMS
   ship!.render(updateElement, renderThrust); // this calls render method in ship class which calls renderShip above whch calls render
-
+  // these lines are for testing - updates the ship's gun muzzle to check it's position is correct
+  if (debug.showGunMuzzle) {
+    ship!.gun!.render(updateElement);
+  }
   for (var rockId in rocks) {
     rocks[rockId].render(updateElement); // this calls render method in rock class which calls render above
   }
