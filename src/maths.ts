@@ -17,6 +17,30 @@ function getNewPosition(position: Position, velocity: Velocity): Position {
   };
 }
 
+// calculate new position of a point attached to another object
+// position and rotation are for main object
+// offset is the position of the attached point relative to the main object when the main object is at rotation 0
+// TODO: refactor to use getNewPosition
+export function getNewPositionWithOffset(
+  position: Position,
+  rotation: number,
+  offset: Position,
+): Position {
+  const dx = offset.x;
+  const dy = offset.y;
+  const offsetLength = Math.sqrt(dx * dx + dy * dy);
+  const offsetAngle = getDirectionRadians(dx, dy);
+
+  const offsetVector = {
+    x: offsetLength * Math.cos(offsetAngle + rotation),
+    y: offsetLength * Math.sin(offsetAngle + rotation),
+  };
+
+  const x = parseFloat((position.x + offsetVector.x).toFixed(1));
+  const y = parseFloat((position.y + offsetVector.y).toFixed(1));
+  return { x, y };
+}
+
 function getComponentVelocity(
   v1: Velocity,
   v2: Velocity,
