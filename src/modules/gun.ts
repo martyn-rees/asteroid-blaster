@@ -1,9 +1,4 @@
-// reverse y-axis (scren coords) compared to y axis (maths coords)
-// sin(angle) and tan(angle) reverse sign
-// cos(angle) remains unchanged
-// angles increase clockwise (reverse y-axis), increase counter-clockwise (positive y-axis)
-
-// gun specs of gun that can be attached to ship
+// using left-handed cartesian coords, y-axis is inverted to match canvas coords, rotation 0 points to the right (East) and increases clockwise
 
 import { getComponentVelocity, getDirectionRadians } from "../maths";
 import { Position, Velocity } from "./types";
@@ -99,14 +94,23 @@ export default class Gun {
     }
   }
 
-  // TODO: calculate gun position when off the x axis
   private getMuzzlePosition(): Position {
-    const gunlength = this.muzzleOffset.y;
+    const dx = this.muzzleOffset.x;
+    const dy = this.muzzleOffset.y;
+    const gunLength = Math.sqrt(dx * dx + dy * dy);
+    const muzzleAngle = getDirectionRadians(dx, dy);
+
     const x = parseFloat(
-      (this.position.x + gunlength * Math.cos(this.rotation)).toFixed(1),
+      (
+        this.position.x +
+        gunLength * Math.cos(muzzleAngle + this.rotation)
+      ).toFixed(1),
     );
     const y = parseFloat(
-      (this.position.y + gunlength * Math.sin(this.rotation)).toFixed(1),
+      (
+        this.position.y +
+        gunLength * Math.sin(muzzleAngle + this.rotation)
+      ).toFixed(1),
     );
     return { x, y };
   }

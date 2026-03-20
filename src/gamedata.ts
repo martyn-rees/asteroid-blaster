@@ -5,6 +5,7 @@ export const bulletSpecs = {
   endurance: 90,
   power: 1,
 };
+
 export const shipSpecs = {
   speedMax: 4.0,
   drag: 0.005,
@@ -12,11 +13,14 @@ export const shipSpecs = {
   radius: 6,
   rotationSpeed: 2,
 };
+
+// using offset to position gun muzzle on ship when it is facing East (ship rotation 0)
 export const gunSpec = {
-  muzzleOffset: { x: 0, y: 6 },
+  muzzleOffset: { x: 6, y: 0 },
   muzzleSpeed: 6,
   reloadTime: 12,
 };
+
 type Range = { min: number; max: number };
 
 type RockSpec = {
@@ -26,6 +30,7 @@ type RockSpec = {
   speed: Range;
   rotationRate: Range;
 };
+
 type RockType = {
   [key: string]: RockSpec;
 };
@@ -53,6 +58,7 @@ export const rockType: RockType = {
     rotationRate: { min: 2, max: 3 },
   },
 };
+
 export const keyBindings = {
   rotateLeft: "ArrowLeft",
   rotateRight: "ArrowRight",

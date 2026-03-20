@@ -5,7 +5,7 @@ import Gun from "./gun";
 
 function setUpGun() {
   const gunSpec = {
-    muzzleOffset: { x: 0, y: 6 },
+    muzzleOffset: { x: 6, y: 0 },
     muzzleSpeed: 4,
     reloadTime: 3,
   };
@@ -18,8 +18,8 @@ test("create new gun", () => {
   expect(gun).toEqual({
     id: "gun0",
     muzzleOffset: {
-      x: 0,
-      y: 6,
+      x: 6,
+      y: 0,
     },
     gunReloadTimer: 0,
     position: {
