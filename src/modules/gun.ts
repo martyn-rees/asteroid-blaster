@@ -1,6 +1,10 @@
 // using left-handed cartesian coords, y-axis is inverted to match canvas coords, rotation 0 points to the right (East) and increases clockwise
 
-import { getComponentVelocity, getDirectionRadians } from "../maths";
+import {
+  getComponentVelocity,
+  getDirectionRadians,
+  getNewPositionWithOffset,
+} from "../maths";
 import { Position, Velocity } from "./types";
 
 export type GunState =
@@ -95,24 +99,12 @@ export default class Gun {
   }
 
   private getMuzzlePosition(): Position {
-    const dx = this.muzzleOffset.x;
-    const dy = this.muzzleOffset.y;
-    const gunLength = Math.sqrt(dx * dx + dy * dy);
-    const muzzleAngle = getDirectionRadians(dx, dy);
-
-    const x = parseFloat(
-      (
-        this.position.x +
-        gunLength * Math.cos(muzzleAngle + this.rotation)
-      ).toFixed(1),
+    const muzzlePosition: Position = getNewPositionWithOffset(
+      this.position,
+      this.rotation,
+      this.muzzleOffset,
     );
-    const y = parseFloat(
-      (
-        this.position.y +
-        gunLength * Math.sin(muzzleAngle + this.rotation)
-      ).toFixed(1),
-    );
-    return { x, y };
+    return muzzlePosition;
   }
 
   public getInitialMotionStateOfBullet(): {
