@@ -3,7 +3,9 @@ import {
   calculateNewVelocity,
   convertRadiansToDegrees,
   changeRotation,
+  getNewPosition,
 } from "../maths";
+import { transform } from "../helper";
 import { Position, Velocity, Directions, MotionState, Circle } from "./types";
 
 type ShipSpecs = {
@@ -25,7 +27,7 @@ export default class Ship {
   public rotation: Directions;
   public thrustPower: number;
   public direction: Directions;
-  public shipSpeed: number;
+  public velocity: Velocity;
   public gun: Gun | null;
   public isTriggerPressed: boolean;
 
@@ -44,7 +46,7 @@ export default class Ship {
     this.thrustPower = 0;
     // velocity // point North
     this.direction = { degrees: 270, radians: 1.5 * Math.PI };
-    this.shipSpeed = 0;
+    this.velocity = { speed: 0, direction: 1.5 * Math.PI };
     // gun specifications - this can be passed in for different gunpower and position. Need to use array if more than one gun
     this.gun = null;
     this.isTriggerPressed = false;
@@ -57,10 +59,7 @@ export default class Ship {
   get motionState(): MotionState {
     return {
       position: this.position,
-      velocity: {
-        speed: this.shipSpeed,
-        direction: this.direction.radians,
-      },
+      velocity: this.velocity,
       rotation: this.rotation.radians,
     };
   }
@@ -99,7 +98,7 @@ export default class Ship {
 
   update(transformXCallback?: Function, transformYCallback?: Function) {
     const maxSpeed = this.speedMax;
-    let driftSpeed: number = this.shipSpeed - this.drag;
+    let driftSpeed: number = this.velocity.speed - this.drag;
     if (driftSpeed < 0) driftSpeed = 0;
     const driftDirection = this.direction.radians;
     const thrustDirection = this.rotation.radians;
@@ -110,23 +109,24 @@ export default class Ship {
       { speed: this.thrustPower, direction: thrustDirection },
       maxSpeed,
     );
-
+    const newPosition = getNewPosition(this.position, newVelocity);
+    // use transforms to update position of rock on game screen
+    // update x,y,velocity and direction of rotation
+    this.position = transform(
+      newPosition,
+      transformXCallback,
+      transformYCallback,
+    );
+    this.velocity = newVelocity;
     const radians = newVelocity.direction;
     const degrees = convertRadiansToDegrees(radians);
-    const newX = this.position.x + newVelocity.speed * Math.cos(radians);
-    const newY = this.position.y + newVelocity.speed * Math.sin(radians);
-    // use transforms to update position of rock on game screen
-    // update x,y,shipSpeed and direction
-    this.position.x = transformXCallback ? transformXCallback(newX) : newX;
-    this.position.y = transformYCallback ? transformYCallback(newY) : newY;
-    this.shipSpeed = newVelocity.speed;
     this.direction = { degrees, radians };
 
     // update gun state
     if (this.gun !== null) {
       this.gun.motionState = {
         position: this.position,
-        velocity: { speed: this.shipSpeed, direction: this.direction.radians },
+        velocity: this.velocity,
         rotation: this.rotation.radians,
       };
       this.gun.update(this.isTriggerPressed);

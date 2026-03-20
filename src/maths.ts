@@ -66,7 +66,6 @@ function calculateNewVelocity(
   maxSpeed: number,
 ): Velocity {
   let { dx, dy } = getComponentVelocity(v1, v2);
-  // shipSpeed
   let speed = Math.sqrt(dx * dx + dy * dy);
   if (speed > maxSpeed) {
     speed = maxSpeed;

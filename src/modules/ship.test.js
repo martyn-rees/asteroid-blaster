@@ -51,7 +51,7 @@ test("create a new ship", () => {
     rotation: { degrees: 270, radians: 1.5 * Math.PI },
     thrustPower: 0,
     direction: { degrees: 270, radians: 1.5 * Math.PI },
-    shipSpeed: 0,
+    velocity: { speed: 0, direction: 1.5 * Math.PI },
     gun: null,
     isTriggerPressed: false,
   });
@@ -106,7 +106,7 @@ test("thrust ship North for 1 frame", () => {
     rotation: { degrees: 270, radians: 1.5 * Math.PI },
     thrustPower: 1,
     direction: { degrees: 270, radians: 1.5 * Math.PI },
-    shipSpeed: 1,
+    velocity: { speed: 1, direction: 1.5 * Math.PI },
     gun: null,
     isTriggerPressed: false,
   });
@@ -205,32 +205,32 @@ test("rotate ship and then thrust", () => {
 test("ship doesn't move beyond its max speed", () => {
   const ship = setUp();
   // render ship before any actions
-  expect(ship.shipSpeed).toBe(0);
+  expect(ship.velocity.speed).toBe(0);
   // thrust ship - speed should be 1
   ship.updateActions(newActions({ thrust: true }));
   ship.update();
-  expect(ship.shipSpeed).toBe(1);
+  expect(ship.velocity.speed).toBe(1);
   // thrust ship - speed should be 2
   ship.updateActions(newActions({ thrust: true }));
   ship.update();
-  expect(ship.shipSpeed).toBe(1.9);
+  expect(ship.velocity.speed).toBe(1.9);
   // thrust ship - speed should be 3
   ship.updateActions(newActions({ thrust: true }));
   ship.update();
-  expect(ship.shipSpeed).toBe(2.8);
+  expect(ship.velocity.speed).toBe(2.8);
   // thrust ship - speed should be 4
   ship.updateActions(newActions({ thrust: true }));
   ship.update();
   // TODO: this was 3.6999999999999997 instead of 3.7
-  expect(ship.shipSpeed).toBe(3.7);
+  expect(ship.velocity.speed).toBe(3.7);
   // thrust ship - speed should not exceed maxSpeed (4 for this test)
   ship.updateActions(newActions({ thrust: true }));
   ship.update();
-  expect(ship.shipSpeed).toBe(4);
+  expect(ship.velocity.speed).toBe(4);
   // thrust ship - speed should still be 4 (max speed)
   ship.updateActions(newActions({ thrust: true }));
   ship.update();
-  expect(ship.shipSpeed).toBe(4);
+  expect(ship.velocity.speed).toBe(4);
 });
 
 // TODO: this is implementation details so don't really want this test
