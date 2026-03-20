@@ -1,27 +1,25 @@
-import { expect, test, vi } from "vitest";
+import { beforeEach, expect, test, vi } from "vitest";
 import Bullet from "./bullet";
 
 // left hand cartesian coords reverse y-asix
 // directions: east 0, south Math.PI/2, west Math.PI, north 1.5 * Math.PI
 
 function setUp(x = 100, y = 100) {
-  // reset the static variable that creates a unique ID
-  Bullet.bulletIDCounter = 0;
-  const bulletPosition = { x, y };
-  const bulletSpecs = {
-    r: 2,
-    endurance: 4,
-    power: 1,
-  };
-  // bellet velocity direction 0 is East at speed 4 pixels per frame
-  const bulletVelocity = { speed: 4, direction: 0 };
-  const bullet = new Bullet({
-    initialPosition: bulletPosition,
-    velocity: bulletVelocity,
-    bulletSpecs,
+  return new Bullet({
+    initialPosition: { x, y },
+    velocity: { speed: 4, direction: 0 },
+    bulletSpecs: {
+      r: 2,
+      endurance: 4,
+      power: 1,
+    },
   });
-  return bullet;
 }
+
+beforeEach(() => {
+  // reset the static variable that creates a unique ID before each test
+  Bullet.bulletIDCounter = 0;
+});
 
 test("create new Bullets", () => {
   const bullet1 = setUp();
@@ -38,7 +36,7 @@ test("create new Bullets", () => {
     r: 2,
   });
   expect(bullet2).toEqual({
-    id: "bullet1",
+    id: "bullet2",
     bulletPower: 1,
     velocity: {
       direction: 0,
