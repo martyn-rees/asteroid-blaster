@@ -32,7 +32,8 @@ describe("get component velocitiy from 2 velocities", () => {
     const v1 = { speed: 1, direction: 1.5 * Math.PI };
     const v2 = { speed: 0.5, direction: Math.PI / 2 };
     const { dx, dy } = getComponentVelocity(v1, v2);
-    expect(dx).toBe(0);
+    // this failed because of issue with javascript maths where dx was -0 instead of 0 so using toBecloseTo to 7 decimal places
+    expect(dx).toBeCloseTo(0, 7);
     expect(dy).toBe(-0.5);
   });
   test("component velocity while heading SouthEast", () => {

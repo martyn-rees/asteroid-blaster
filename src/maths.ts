@@ -23,15 +23,6 @@ function getComponentVelocity(
   let dx = +(v1x + v2x).toFixed(3);
   let dy = +(v1y + v2y).toFixed(3);
 
-  // fix issue with javascript maths
-  // NB: if direction is North (degrees:270, radians: 1.5 * Math.PI) then velocity can be close to -0.000000000001 instead of 0
-  // which returns a component value of -0 instead of 0
-  if (dx == -0) {
-    dx = 0;
-  }
-  if (dy === -0) {
-    dy = 0;
-  }
   return { dx, dy };
 }
 
