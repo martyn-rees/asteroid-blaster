@@ -81,8 +81,8 @@ export function getRockData(size: string): {
   let r = getRandomNumber(rockProps.radius.min, rockProps.radius.max);
   // choose a random direction but avoid angles within 15 degrees to vertical or horizontal
   let direction = getRandomNumber(15, 75);
-  let quadrant = 1 + Math.floor(Math.random() * 4);
-  direction = direction * quadrant;
+  let quadrant = 90 * Math.floor(Math.random() * 4);
+  direction = direction + quadrant;
   let rotationRate = getRandomNumber(
     rockProps.rotationRate.min,
     rockProps.rotationRate.max,
