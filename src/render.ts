@@ -63,14 +63,20 @@ export function createRockElement({
   id,
   r,
   SVGList,
+  size,
 }: {
   id: string;
   r: number;
   SVGList: string[];
+  size: string;
 }): HTMLElement {
   let rockStyle = `height:${2 * r}px; width:${2 * r}px; margin-left:-${r}px; margin-top:-${r}px;`;
+  let rockClass = "rock";
+  if (size === "large" || size === "medium") {
+    rockClass = " rock glow";
+  }
   const asteroidSVG = getAsteroidGraphic(SVGList);
-  const el = createElement(id, "rock", rockStyle, asteroidSVG);
+  const el = createElement(id, rockClass, rockStyle, asteroidSVG);
   return el;
 }
 
@@ -83,8 +89,8 @@ export function playSound(soundDescription: string) {
   let soundurl;
   if (soundDescription == "shoot") {
     soundurl = "./sounds/shoot.wav";
-  } else if (soundDescription == "explosion") {
-    soundurl = "./sounds/explosion.wav";
+  } else if (soundDescription == "rock-explosion") {
+    soundurl = "./sounds/rock-explosion.mp3";
   } else {
     console.error(`sound description ${soundDescription} not recognised`);
     return;

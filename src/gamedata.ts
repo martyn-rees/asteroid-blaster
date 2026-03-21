@@ -10,13 +10,13 @@ export const shipSpecs = {
   speedMax: 4.0,
   drag: 0.005,
   thrustMax: 0.1,
-  radius: 6,
+  radius: 10,
   rotationSpeed: 2,
 };
 
 // using offset to position gun muzzle on ship when it is facing East (ship rotation 0)
 export const gunSpec = {
-  muzzleOffset: { x: 6, y: 0 },
+  muzzleOffset: { x: 10, y: 0 },
   muzzleSpeed: 6,
   reloadTime: 12,
 };

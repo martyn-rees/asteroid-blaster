@@ -46,12 +46,13 @@ function addNewItems(
       id: rockId,
       r: rock.r,
       SVGList: asteroidsSVG,
+      size: rock.size,
     });
     addToScreen(el, screenId);
   });
 }
 
-/* RENDER CODEE */
+/* RENDER CODE */
 // disply game elements, ship, rocks and bullets
 // TODO - keep a copy of rocks and bullets from previous frame and compare to current list to decide which elements to add, update and remove
 // can then remove oldBullets, oldRocks and newBullets
@@ -80,7 +81,7 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
   // remove dead rocks
   oldRocks.forEach((rockId) => {
     removeFromScreen(rockId);
-    playSound("explosion");
+    playSound("rock-explosion");
   });
 
   // UPDATE ITEMS
