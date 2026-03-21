@@ -1,91 +1,20 @@
-import Rock from "./modules/rock.ts";
-import Ship from "./modules/ship.ts";
+import { addNewShip } from "./index-ship.ts";
 import Gun from "./modules/gun.ts";
 import Bullet from "./modules/bullet.ts";
 import GameScreen from "./modules/gamescreen.ts";
 import { addToScreen, removeFromScreen } from "./render.ts";
 import { constrainNumber, testCollision } from "./helper.ts";
-import {
-  bulletSpecs,
-  shipSpecs,
-  gunSpec,
-  getRockData,
-  getRockValue,
-} from "./gamedata.js";
+import { bulletSpecs, shipSpecs, gunSpec, getRockValue } from "./gamedata.js";
 import { createButton } from "./ui/button.ts";
 import { gameLoopRender } from "./gamelooprender.ts";
 import { GameState, gameState, changeGameState } from "./gameState.ts";
-import { Position } from "./modules/types.ts";
+import {
+  createRocksForNewLevel as addNewRocksForNewLevel,
+  explodeRock,
+} from "./index-rock.ts";
 var animationId: number;
 
 let gameScreen = new GameScreen("gameScreen", 800, 400);
-
-// ----  Rock code ----
-
-// this function does several things - creates a rock with random properties, adds it to the rock list, creates a game element for the rock and adds it to the game screen
-function initRock(size: string, pos: Position) {
-  const { velocity, r, rotationRate } = getRockData(size);
-  const rock = new Rock({
-    initialPosition: pos,
-    initialVelocity: velocity,
-    size,
-    r,
-    rotationRate,
-  });
-  changeGameState({ action: "add rock", gameElement: rock });
-}
-
-const getRandom = (n: number): number => Math.floor(Math.random() * (n + 1));
-
-function getEdgePosition(edge: string): { x: number; y: number } {
-  const { screenWidth, screenHeight } = gameScreen.screenSize;
-  switch (edge) {
-    case "top":
-      return { x: getRandom(screenWidth), y: 0 };
-    case "right":
-      return { x: screenWidth, y: getRandom(screenHeight) };
-    case "bottom":
-      return { x: getRandom(screenWidth), y: screenHeight };
-    case "left":
-      return { x: 0, y: getRandom(screenHeight) };
-  }
-  return { x: getRandom(screenWidth), y: 0 };
-}
-
-// TODO: needs gamescreen to get random edge start position
-function createRocksForNewLevel({ rockAmount }: { rockAmount: number }) {
-  for (let i = 0; i < rockAmount; i++) {
-    const borders: string[] = ["top", "right", "bottom", "left"];
-    const edge = borders[i % 4];
-    const posXY = getEdgePosition(edge);
-    initRock("large", posXY);
-  }
-}
-
-function explodeRock(rock: Rock) {
-  const explodedRockLocation = rock.rockPosition;
-  const rockSize = rock.size;
-  // explode rock in to smaller rocks
-  if (rockSize == "large") {
-    initRock("medium", explodedRockLocation);
-    initRock("medium", explodedRockLocation);
-  } else if (rockSize == "medium") {
-    initRock("small", explodedRockLocation);
-    initRock("small", explodedRockLocation);
-    initRock("small", explodedRockLocation);
-  }
-  changeGameState({ action: "delete rock", gameElement: rock });
-}
-// end of Rock code
-
-// ---- Ship code ----
-function initShip(pos: { x: number; y: number }): Ship {
-  const ship = new Ship(pos, "ship", shipSpecs);
-  const gun = new Gun(gunSpec);
-  ship.attachGun(gun);
-  return ship;
-}
-// end of Ship code
 
 // GAME loop code
 function step(timestamp: number) {
@@ -262,12 +191,17 @@ function exitPlayGameScreen() {
 function enterGameScreen() {
   enterPlayGameScreen();
   changeGameState({ action: "score", gameElement: 0 });
-  // create ship and add controls
-  const pos = gameScreen.screenCentre;
-  const ship: Ship = initShip(pos);
-  changeGameState({ action: "add ship", gameElement: ship });
 
-  setTimeout(() => createRocksForNewLevel({ rockAmount: 8 }), 1000);
+  addNewShip(gameScreen.screenCentre);
+
+  setTimeout(
+    () =>
+      addNewRocksForNewLevel({
+        rockAmount: 8,
+        screenSize: gameScreen.screenSize,
+      }),
+    1000,
+  );
 
   cancelAnimationFrame(animationId);
   animationId = requestAnimationFrame(step);
