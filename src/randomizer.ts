@@ -1,27 +1,52 @@
+import { RockSpec } from "./gamedata";
+
 // functions that reply on random numbers
 // the result of these functions can not be determined in user tests so they are packages up in to this file
 
-const getRandom = (n: number): number => Math.floor(Math.random() * (n + 1));
+const getRandomInt = (n: number): number => Math.floor(Math.random() * (n + 1));
 
-export function getRandomEdgePosition(
+function getRandomNumberInRange(min: number, max: number): number {
+  return min + Math.random() * (max - min);
+}
+
+function getRandomEdgePosition(
   edge: string,
   screenSize: { screenWidth: number; screenHeight: number },
 ): { x: number; y: number } {
   switch (edge) {
     case "top":
-      return { x: getRandom(screenSize.screenWidth), y: 0 };
+      return { x: getRandomInt(screenSize.screenWidth), y: 0 };
     case "right":
       return {
         x: screenSize.screenWidth,
-        y: getRandom(screenSize.screenHeight),
+        y: getRandomInt(screenSize.screenHeight),
       };
     case "bottom":
       return {
-        x: getRandom(screenSize.screenWidth),
+        x: getRandomInt(screenSize.screenWidth),
         y: screenSize.screenHeight,
       };
     case "left":
-      return { x: 0, y: getRandom(screenSize.screenHeight) };
+      return { x: 0, y: getRandomInt(screenSize.screenHeight) };
   }
-  return { x: getRandom(screenSize.screenWidth), y: 0 };
+  return { x: getRandomInt(screenSize.screenWidth), y: 0 };
 }
+
+function getRandomRockProps(rockProps: RockSpec) {
+  let speed = getRandomNumberInRange(rockProps.speed.min, rockProps.speed.max);
+  let r = getRandomNumberInRange(rockProps.radius.min, rockProps.radius.max);
+  // choose a random direction but avoid angles within 15 degrees to vertical or horizontal
+  let direction = getRandomNumberInRange(15, 75);
+  let quadrant = 90 * Math.floor(Math.random() * 4);
+  direction = direction + quadrant;
+  let rotationRate = getRandomNumberInRange(
+    rockProps.rotationRate.min,
+    rockProps.rotationRate.max,
+  );
+  rotationRate = Math.random() > 0.5 ? rotationRate : -rotationRate;
+  let velocity = { speed, direction };
+
+  return { velocity, r, rotationRate };
+}
+
+export { getRandomEdgePosition, getRandomRockProps };

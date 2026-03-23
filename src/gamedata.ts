@@ -1,4 +1,5 @@
 import { Velocity } from "./modules/types";
+import { getRandomRockProps } from "./randomizer";
 
 export const bulletSpecs = {
   r: 2,
@@ -23,7 +24,7 @@ export const gunSpec = {
 
 type Range = { min: number; max: number };
 
-type RockSpec = {
+export type RockSpec = {
   description: string;
   value: number;
   radius: Range;
@@ -66,29 +67,14 @@ export const keyBindings = {
   shoot: "KeyS",
 };
 
-/* get random valus for new asteroids */
-function getRandomNumber(min: number, max: number): number {
-  return min + Math.random() * (max - min);
-}
-
 export function getRockData(size: string): {
   velocity: Velocity;
   r: number;
   rotationRate: number;
 } {
   let rockProps: RockSpec = rockType[size];
-  let speed = getRandomNumber(rockProps.speed.min, rockProps.speed.max);
-  let r = getRandomNumber(rockProps.radius.min, rockProps.radius.max);
-  // choose a random direction but avoid angles within 15 degrees to vertical or horizontal
-  let direction = getRandomNumber(15, 75);
-  let quadrant = 90 * Math.floor(Math.random() * 4);
-  direction = direction + quadrant;
-  let rotationRate = getRandomNumber(
-    rockProps.rotationRate.min,
-    rockProps.rotationRate.max,
-  );
-  rotationRate = Math.random() > 0.5 ? rotationRate : -rotationRate;
-  let velocity = { speed, direction };
+  let { velocity, r, rotationRate } = getRandomRockProps(rockProps);
+
   return { velocity, r, rotationRate };
 }
 /* end of random values for new asteroids */
