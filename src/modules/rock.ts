@@ -5,6 +5,7 @@ import { Circle, Position, Velocity } from "./types";
 
 export default class Rock {
   static rockIDCounter = 0;
+  public index: number;
   public id: string;
   public size: string;
   public r: number;
@@ -27,7 +28,8 @@ export default class Rock {
     rotationRate: number;
   }) {
     // constant values for life of this rock
-    this.id = "rock" + Rock.rockIDCounter++;
+    this.index = Rock.rockIDCounter++;
+    this.id = "rock" + this.index;
     this.size = size;
     this.r = r;
     this.rotationRate = rotationRate;

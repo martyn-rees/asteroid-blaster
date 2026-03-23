@@ -2,6 +2,7 @@ import Rock from "./modules/rock.ts";
 import { changeGameState } from "./gameState";
 import { Position } from "./modules/types";
 import { getRockData } from "./gamedata";
+import { getRandomEdgePosition } from "./randomizer.ts";
 
 function addRock(size: string, pos: Position) {
   const { velocity, r, rotationRate } = getRockData(size);
@@ -15,32 +16,7 @@ function addRock(size: string, pos: Position) {
   changeGameState({ action: "add rock", gameElement: rock });
 }
 
-const getRandom = (n: number): number => Math.floor(Math.random() * (n + 1));
-
-function getEdgePosition(
-  edge: string,
-  screenSize: { screenWidth: number; screenHeight: number },
-): { x: number; y: number } {
-  switch (edge) {
-    case "top":
-      return { x: getRandom(screenSize.screenWidth), y: 0 };
-    case "right":
-      return {
-        x: screenSize.screenWidth,
-        y: getRandom(screenSize.screenHeight),
-      };
-    case "bottom":
-      return {
-        x: getRandom(screenSize.screenWidth),
-        y: screenSize.screenHeight,
-      };
-    case "left":
-      return { x: 0, y: getRandom(screenSize.screenHeight) };
-  }
-  return { x: getRandom(screenSize.screenWidth), y: 0 };
-}
-
-export function createRocksForNewLevel({
+export function addNewRocksForNewLevel({
   rockAmount,
   screenSize,
 }: {
@@ -50,7 +26,7 @@ export function createRocksForNewLevel({
   for (let i = 0; i < rockAmount; i++) {
     const borders: string[] = ["top", "right", "bottom", "left"];
     const edge = borders[i % 4];
-    const posXY = getEdgePosition(edge, screenSize);
+    const posXY = getRandomEdgePosition(edge, screenSize);
     addRock("large", posXY);
   }
 }

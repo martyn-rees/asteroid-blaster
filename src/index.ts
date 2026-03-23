@@ -4,14 +4,11 @@ import Bullet from "./modules/bullet.ts";
 import GameScreen from "./modules/gamescreen.ts";
 import { addToScreen, removeFromScreen } from "./render.ts";
 import { constrainNumber, testCollision } from "./helper.ts";
-import { bulletSpecs, shipSpecs, gunSpec, getRockValue } from "./gamedata.js";
+import { bulletSpecs, getRockValue } from "./gamedata.js";
 import { createButton } from "./ui/button.ts";
 import { gameLoopRender } from "./gamelooprender.ts";
 import { GameState, gameState, changeGameState } from "./gameState.ts";
-import {
-  createRocksForNewLevel as addNewRocksForNewLevel,
-  explodeRock,
-} from "./index-rock.ts";
+import { addNewRocksForNewLevel, explodeRock } from "./index-rock.ts";
 var animationId: number;
 
 let gameScreen = new GameScreen("gameScreen", 800, 400);

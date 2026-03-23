@@ -19,6 +19,7 @@ test("create new rock", () => {
   const rock1 = setUp();
   expect(rock1).toEqual({
     id: "rock0",
+    index: 0,
     size: "large",
     r: 70,
     rotationRate: 1.5,

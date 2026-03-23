@@ -42,10 +42,11 @@ function addNewItems(
   // add new rocks to screen and then reset newRocks list to []
   newRocks.forEach((rockId) => {
     const rock = rocks[rockId];
+    const graphicIndex = rock.index % asteroidsSVG.length;
     const el = createRockElement({
       id: rockId,
       r: rock.r,
-      SVGList: asteroidsSVG,
+      asteroidImage: asteroidsSVG[graphicIndex],
       size: rock.size,
     });
     addToScreen(el, screenId);

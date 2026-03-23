@@ -54,29 +54,21 @@ export function createElement(
   return elContainer;
 }
 
-const getAsteroidGraphic = (SVGList: string[]): string => {
-  const n = Math.floor(Math.random() * SVGList.length);
-  return SVGList[n];
-};
-
 export function createRockElement({
   id,
   r,
-  SVGList,
+  asteroidImage,
   size,
 }: {
   id: string;
   r: number;
-  SVGList: string[];
+  asteroidImage: string;
   size: string;
 }): HTMLElement {
   let rockStyle = `height:${2 * r}px; width:${2 * r}px; margin-left:-${r}px; margin-top:-${r}px;`;
-  let rockClass = "rock";
-  if (size === "large" || size === "medium") {
-    rockClass = " rock glow";
-  }
-  const asteroidSVG = getAsteroidGraphic(SVGList);
-  const el = createElement(id, rockClass, rockStyle, asteroidSVG);
+  const rockClass = size === "small" ? "rock" : "rock glow";
+
+  const el = createElement(id, rockClass, rockStyle, asteroidImage);
   return el;
 }
 
