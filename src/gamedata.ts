@@ -1,6 +1,3 @@
-import { Velocity } from "./modules/types";
-import { getRandomRockProps } from "./randomizer";
-
 export const bulletSpecs = {
   r: 2,
   endurance: 90,
@@ -66,19 +63,3 @@ export const keyBindings = {
   thrust: "ArrowUp",
   shoot: "KeyS",
 };
-
-export function getRockData(size: string): {
-  velocity: Velocity;
-  r: number;
-  rotationRate: number;
-} {
-  let rockProps: RockSpec = rockType[size];
-  let { velocity, r, rotationRate } = getRandomRockProps(rockProps);
-
-  return { velocity, r, rotationRate };
-}
-/* end of random values for new asteroids */
-
-export function getRockValue(size: string): number {
-  return rockType[size].value;
-}

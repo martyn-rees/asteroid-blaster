@@ -4,7 +4,7 @@ import Bullet from "./modules/bullet.ts";
 import GameScreen from "./modules/gamescreen.ts";
 import { addToScreen, removeFromScreen } from "./render.ts";
 import { constrainNumber, testCollision } from "./helper.ts";
-import { bulletSpecs, getRockValue } from "./gamedata.js";
+import { bulletSpecs, rockType } from "./gamedata.js";
 import { createButton } from "./ui/button.ts";
 import { gameLoopRender } from "./gamelooprender.ts";
 import { GameState, gameState, changeGameState } from "./gameState.ts";
@@ -95,7 +95,8 @@ function gameLoopUpdate() {
     }
     // if collision with bullet or ship then remove rock, add score and add smaller rocks if needed
     if (hasRockCollided) {
-      const valueOfRock = getRockValue(gameState.rocks[rockId].size);
+      const rockSize = thisRock.size;
+      const valueOfRock = rockType[rockSize].value;
       changeGameState({ action: "score", gameElement: valueOfRock });
       explodeRock(gameState.rocks[rockId]);
       gameState.oldRocks.push(rockId);
