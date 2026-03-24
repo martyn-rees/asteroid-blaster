@@ -1,6 +1,6 @@
 // reversed y axis (screen coords) so going up decreses in value
 // angeles: north: 0, east: PI/2, south: PI,
-import { expect, test } from "vitest";
+import { beforeEach, expect, test, vi } from "vitest";
 import Gun from "./gun";
 
 function setUpGun() {
@@ -12,6 +12,11 @@ function setUpGun() {
   const gun = new Gun(gunSpec);
   return gun;
 }
+
+beforeEach(() => {
+  // reset the static variable that creates a unique ID before each test
+  Gun.gunIDCounter = 0;
+});
 
 test("create new gun", () => {
   const gun = setUpGun();
@@ -35,25 +40,6 @@ test("create new gun", () => {
       speed: 0,
     },
   });
-});
-
-test("set motion state", () => {
-  const gun = setUpGun();
-
-  gun.motionState = {
-    position: { x: 100, y: 100 },
-    velocity: {
-      speed: 0,
-      direction: 0,
-    },
-    rotation: 0,
-  };
-  expect(gun.position).toStrictEqual({ x: 100, y: 100 });
-  expect(gun.velocity).toStrictEqual({
-    speed: 0,
-    direction: 0,
-  });
-  expect(gun.rotation).toBe(0);
 });
 
 test("gun and muzzle position when pointing North", () => {
@@ -135,4 +121,21 @@ test("when gun is fired it is not reloaded until reload time has passed", () => 
   // when updates = reload time then gun is loaded again
   gun.update();
   expect(gun.state).toBe("loaded");
+});
+
+test("rendering function get called correctly", () => {
+  const mockRenderCallback = vi.fn();
+  const gun = setUpGun();
+  gun.render(mockRenderCallback);
+  expect(mockRenderCallback).toHaveBeenLastCalledWith("gun0", 6, 0);
+  // when attached to an object such as a ship then the motionstate of the gun would be set by the ship
+  // ship is stationary, position 100,100 and pointing north.
+  gun.motionState = {
+    position: { x: 100, y: 100 },
+    velocity: { speed: 0, direction: 1.5 * Math.PI },
+    rotation: 1.5 * Math.PI,
+  };
+  gun.render(mockRenderCallback);
+  // the gun is offset at (x:6, y:0) when rotated East. This test has the ship now rotated North so should expect the gun muzzle to be at (x:100, y:94)
+  expect(mockRenderCallback).toHaveBeenLastCalledWith("gun0", 100, 94);
 });

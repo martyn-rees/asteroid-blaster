@@ -72,18 +72,6 @@ export default class Gun {
     rotation && this.updateGunRotation(rotation);
   }
 
-  get motionStateGun(): {
-    position: Position;
-    velocity: Velocity;
-    rotation: number;
-  } {
-    return {
-      position: this.position,
-      velocity: this.velocity,
-      rotation: this.rotation,
-    };
-  }
-
   // updates gun state not position.
   update(shoot: boolean) {
     if (shoot && this.state === "loaded") {

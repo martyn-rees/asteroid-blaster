@@ -86,8 +86,6 @@ test("attach a gun to ship and fire it", () => {
 });
 
 test("thrust ship North for 1 frame", () => {
-  const mockRenderCallback = vi.fn();
-  const mockRenderThrustCallback = vi.fn();
   const ship = setUp();
 
   const thrustAction = newActions({ thrust: true });
@@ -122,14 +120,9 @@ test("thrust ship North for 1 frame", () => {
     },
     rotation: 1.5 * Math.PI,
   });
-  ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 99, 270);
-  expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(1);
 });
 
 test("thrust ship East for 1 frame", () => {
-  const mockRenderCallback = vi.fn();
-  const mockRenderThrustCallback = vi.fn();
   const ship = setUp();
 
   const rotateRightAction = newActions({ rotateClockwise: true });
@@ -156,20 +149,10 @@ test("thrust ship East for 1 frame", () => {
     },
     rotation: 0,
   });
-  ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 101, 100, 0);
-  expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(1);
 });
 
 test("rotate ship and then thrust", () => {
   const ship = setUp();
-
-  const mockRenderCallback = vi.fn();
-  const mockRenderThrustCallback = vi.fn();
-  // render ship before any actions
-  ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 100, 270);
-  expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(0);
   expect(ship.velocity.direction).toBe(1.5 * Math.PI);
   // rotate ship left
   const rotateLeftAction = newActions({ rotateCounterClockwise: true });
@@ -177,31 +160,21 @@ test("rotate ship and then thrust", () => {
   expect(ship.rotation).toBe(1.25 * Math.PI);
   ship.update();
   expect(ship.rotation).toBe(1.25 * Math.PI);
-  ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 100, 225);
-  expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(0);
 
   // rotate ship right
   const rotateRightAction = newActions({ rotateClockwise: true });
   ship.updateActions(rotateRightAction);
   ship.update();
-  ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 100, 270);
-  expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(0);
   expect(ship.velocity.direction).toBe(1.5 * Math.PI);
   // thrust ship - for this test it moves 1 pixel up per frame (with reverse y axis so y should be 99)
   const thrustAction = newActions({ thrust: true });
   ship.updateActions(thrustAction);
   ship.update();
   expect(ship.velocity.direction).toBe(1.5 * Math.PI);
-  ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 99, 270);
-  expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(1);
 });
 
 test("ship doesn't move beyond its max speed", () => {
   const ship = setUp();
-  // render ship before any actions
   expect(ship.velocity.speed).toBe(0);
   // thrust ship - speed should be 1
   ship.updateActions(newActions({ thrust: true }));
@@ -255,4 +228,27 @@ test("ship movement after 2 frames with transform", () => {
   ship.update(transformCallback, transformCallback);
   expect(ship.position.x).toBe(10);
   expect(ship.position.y).toBe(10);
+});
+
+test("rendering function get called correctly", () => {
+  const mockRenderCallback = vi.fn();
+  const mockRenderThrustCallback = vi.fn();
+  const ship = setUp();
+  // no actions so ship should point North with no thrust
+  ship.render(mockRenderCallback, mockRenderThrustCallback);
+  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 100, 270);
+  expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(0);
+  // thurst and rotate northeastt (for this test rotation speed is 45 degrees)
+  // at speed 1, distance moved is 0.707 north and 0.707 east
+  const shipActions = newActions({ thrust: true, rotateClockwise: true });
+  ship.updateActions(shipActions);
+  ship.update();
+  ship.render(mockRenderCallback, mockRenderThrustCallback);
+  expect(mockRenderCallback).toHaveBeenLastCalledWith(
+    "ship",
+    100.707,
+    99.293,
+    315,
+  );
+  expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(1);
 });
