@@ -1,4 +1,5 @@
-import { Rocks } from "../state/gameState.js";
+import { Bullets, Rocks } from "../state/gameState.js";
+import Ship from "../modules/ship.js";
 
 import {
   addToScreen,
@@ -39,7 +40,6 @@ function addNewItems(
     playSound("shoot");
   });
 
-  // add new rocks to screen and then reset newRocks list to []
   newRocks.forEach((rockId) => {
     const rock = rocks[rockId];
     const graphicIndex = rock.index % asteroidsSVG.length;
@@ -51,6 +51,34 @@ function addNewItems(
     });
     addToScreen(el, screenId);
   });
+}
+
+function removeOldItems(oldRocks: string[], oldBullets: string[]) {
+  // remove dead bullets
+  oldBullets.forEach((bulletId) => {
+    removeFromScreen(bulletId);
+  });
+
+  // remove dead rocks
+  oldRocks.forEach((rockId) => {
+    removeFromScreen(rockId);
+    playSound("rock-explosion");
+  });
+}
+
+function updateItems(ship: Ship, rocks: Rocks, bullets: Bullets) {
+  ship!.render(updateElement, renderThrust); // this calls render method in ship class which calls renderShip above whch calls render
+  // these lines are for testing - updates the ship's gun muzzle to check it's position is correct
+  if (debug.showGunMuzzle) {
+    ship!.gun!.render(updateElement);
+  }
+  for (var rockId in rocks) {
+    rocks[rockId].render(updateElement); // this calls render method in rock class which calls render above
+  }
+
+  for (var bulletId in bullets) {
+    bullets[bulletId].render(updateElement);
+  }
 }
 
 /* RENDER CODE */
@@ -74,30 +102,10 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
   addNewItems(newShips, newBullets, newRocks, screenId, rocks);
 
   // REMOVE OLD ITEMS
-  // remove dead bullets
-  oldBullets.forEach((bulletId) => {
-    removeFromScreen(bulletId);
-  });
-
-  // remove dead rocks
-  oldRocks.forEach((rockId) => {
-    removeFromScreen(rockId);
-    playSound("rock-explosion");
-  });
+  removeOldItems(oldRocks, oldBullets);
 
   // UPDATE ITEMS
-  ship!.render(updateElement, renderThrust); // this calls render method in ship class which calls renderShip above whch calls render
-  // these lines are for testing - updates the ship's gun muzzle to check it's position is correct
-  if (debug.showGunMuzzle) {
-    ship!.gun!.render(updateElement);
-  }
-  for (var rockId in rocks) {
-    rocks[rockId].render(updateElement); // this calls render method in rock class which calls render above
-  }
-
-  for (var bulletId in bullets) {
-    bullets[bulletId].render(updateElement);
-  }
+  updateItems(ship!, rocks, bullets);
 
   displayScore(score);
 }
