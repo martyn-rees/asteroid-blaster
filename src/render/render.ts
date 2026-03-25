@@ -73,8 +73,16 @@ export function createRockElement({
 }
 
 export function removeFromScreen(elId: string) {
-  let elNode: HTMLElement = document.getElementById(elId)!;
-  elNode.parentNode!.removeChild(elNode);
+  let elNode: HTMLElement | null = document.getElementById(elId);
+  if (elNode) {
+    if (elNode.parentNode) {
+      elNode.parentNode.removeChild(elNode);
+    } else {
+      console.error("Error: No parent node for element with id:", elId);
+    }
+  } else {
+    console.error("Error: can't find element with id:", elId);
+  }
 }
 
 export function playSound(soundDescription: string) {
