@@ -1,4 +1,4 @@
-import { Position } from "./modules/types";
+import { Circle, Position } from "./modules/types";
 
 export const constrainNumber = (
   n: number,
@@ -43,7 +43,10 @@ export function transform(
 
 // position: {x,y} - the position of the object that has gone off the screen
 // boundingBox: {w,h} - the width and height of the game screen
-/*export const translateToOppositeSideIfOutside = (position, boundingBox) => {
+export const translateToOppositeSideIfOutside = (
+  position: Position,
+  boundingBox: { w: number; h: number },
+) => {
   let newPosition = { x: position.x, y: position.y };
   if (newPosition.x < 0) {
     newPosition.x = boundingBox.w + newPosition.x;
@@ -56,23 +59,17 @@ export function transform(
     newPosition.y = newPosition.y - boundingBox.h;
   }
   return newPosition;
-};*/
+};
 
 // p1 and p2 are objects with x and y properties
-const distanceBetweenPoints = (
-  p1: { x: number; y: number },
-  p2: { x: number; y: number },
-): number => {
+const distanceBetweenPoints = (p1: Circle, p2: Circle): number => {
   let dx = p1.x - p2.x;
   let dy = p1.y - p2.y;
   return Math.sqrt(dx * dx + dy * dy);
 };
 
 // c1 and c2 are objects with x, y and r properties
-export const testCollision = (
-  c1: { x: number; y: number; r: number },
-  c2: { x: number; y: number; r: number },
-): boolean => {
+export const testCollision = (c1: Circle, c2: Circle): boolean => {
   let minDistance = c1.r + c2.r;
   return distanceBetweenPoints(c1, c2) < minDistance ? true : false;
 };
