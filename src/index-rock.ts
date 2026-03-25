@@ -1,7 +1,10 @@
 import Rock from "./modules/rock.ts";
-import { changeGameState } from "./gameState";
+import { changeGameState } from "./state/gameState.ts";
 import { Position } from "./modules/types";
-import { getRandomEdgePosition, getRandomRockProps } from "./randomizer.ts";
+import {
+  getRandomEdgePosition,
+  getRandomRockProps,
+} from "./utils/randomizer.ts";
 import { rockType } from "./gamedata.ts";
 
 function addRock(size: string, pos: Position) {

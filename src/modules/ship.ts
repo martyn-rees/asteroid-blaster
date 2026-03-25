@@ -5,8 +5,8 @@ import {
   getNewPosition,
   convertDegreestoRadians,
   convertRadiansToDegrees,
-} from "../maths";
-import { transform } from "../helper";
+} from "../utils/maths";
+import { transform } from "../utils/helper";
 import { Position, Velocity, MotionState, Circle } from "./types";
 
 type ShipSpecs = {

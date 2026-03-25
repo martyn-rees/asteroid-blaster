@@ -1,4 +1,4 @@
-import { Circle, Position } from "./modules/types";
+import { Circle, Position } from "../modules/types";
 
 export const constrainNumber = (
   n: number,

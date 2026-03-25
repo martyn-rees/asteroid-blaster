@@ -1,4 +1,4 @@
-import { Position, Velocity } from "./modules/types";
+import { Position, Velocity } from "../modules/types";
 
 function convertDegreestoRadians(degrees: number) {
   return (Math.PI / 180) * degrees;

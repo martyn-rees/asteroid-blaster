@@ -2,12 +2,12 @@ import { addNewShip } from "./index-ship.ts";
 import Gun from "./modules/gun.ts";
 import Bullet from "./modules/bullet.ts";
 import GameScreen from "./modules/gamescreen.ts";
-import { addToScreen, removeFromScreen } from "./render.ts";
-import { constrainNumber, testCollision } from "./helper.ts";
+import { addToScreen, removeFromScreen } from "./render/render.ts";
+import { constrainNumber, testCollision } from "./utils/helper.ts";
 import { bulletSpecs, rockType } from "./gamedata.js";
 import { createButton } from "./ui/button.ts";
-import { gameLoopRender } from "./gamelooprender.ts";
-import { GameState, gameState, changeGameState } from "./gameState.ts";
+import { gameLoopRender } from "./render/gamelooprender.ts";
+import { GameState, gameState, changeGameState } from "./state/gameState.ts";
 import { addNewRocksForNewLevel, explodeRock } from "./index-rock.ts";
 var animationId: number;
 

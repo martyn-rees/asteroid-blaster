@@ -1,4 +1,4 @@
-import { convertDegreestoRadians } from "../maths";
+import { convertDegreestoRadians } from "../utils/maths";
 // use left-hand cartesian coords (standard screen coords with +ve y axis pointing down)
 // rotation angles: 0 - east, 90 - south, 180 - west, 270 - north
 import { Circle, Position, Velocity } from "./types";

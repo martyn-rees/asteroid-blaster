@@ -1,4 +1,4 @@
-import { RockSpec } from "./gamedata";
+import { RockSpec } from "../gamedata";
 
 // functions that reply on random numbers
 // the result of these functions can not be determined in user tests so they are packages up in to this file

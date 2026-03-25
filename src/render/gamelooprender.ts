@@ -1,4 +1,4 @@
-import { Rocks } from "./gameState.js";
+import { Rocks } from "../state/gameState.js";
 
 import {
   addToScreen,
@@ -11,8 +11,8 @@ import {
   displayScore,
 } from "./render.js";
 
-import { asteroidsSVG, shipSVG } from "./graphics.js";
-import { GameState } from "./gameState.js";
+import { asteroidsSVG, shipSVG } from "../graphics.js";
+import { GameState } from "../state/gameState.js";
 
 const debug = { showGunMuzzle: true };
 

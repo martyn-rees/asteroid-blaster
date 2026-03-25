@@ -4,7 +4,7 @@ import {
   getComponentVelocity,
   getDirectionRadians,
   getNewPositionWithOffset,
-} from "../maths";
+} from "../utils/maths";
 import { Position, Velocity } from "./types";
 
 export type GunState =

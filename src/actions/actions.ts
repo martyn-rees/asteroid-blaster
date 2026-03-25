@@ -1,4 +1,4 @@
-import { keyBindings } from "./gamedata.js";
+import { keyBindings } from "../gamedata.js";
 
 type ShipActions = {
   thrust: boolean;
