@@ -125,10 +125,4 @@ export default class Ship {
       this.gun.update(this.isTriggerPressed);
     }
   }
-
-  render(renderCallback: Function, renderThrustCallback: Function) {
-    const degrees = convertRadiansToDegrees(this.rotation);
-    renderCallback(this.id, this.position.x, this.position.y, degrees);
-    renderThrustCallback(this.thrustPower);
-  }
 }

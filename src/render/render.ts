@@ -1,11 +1,11 @@
 // change position and rotation to element already on screen
 // TODO maybe provide additonalCLass property which could be used for examples such as ships thrust
 // could be Display.update
-export const updateElement = (
+export const redrawOnScreen = (
   id: string,
   x: number,
   y: number,
-  rotation: number,
+  rotation?: number,
 ) => {
   let el: HTMLElement = document.getElementById(id)!;
   el.style.left = x + "px";

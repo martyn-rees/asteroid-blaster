@@ -10,8 +10,8 @@ export default class Rock {
   public size: string;
   public r: number;
   public rotationRate: number;
-  private velocity: Velocity;
-  private position: Position;
+  public velocity: Velocity;
+  public position: Position;
   public rotation: number;
 
   constructor({
@@ -85,9 +85,5 @@ export default class Rock {
     this.position.y = transformYCallback
       ? transformYCallback(newPosition.y)
       : newPosition.y;
-  }
-
-  render(renderCallback: Function) {
-    renderCallback(this.id, this.position.x, this.position.y, this.rotation);
   }
 }

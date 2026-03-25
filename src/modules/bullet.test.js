@@ -1,4 +1,4 @@
-import { beforeEach, expect, test, vi } from "vitest";
+import { beforeEach, expect, test } from "vitest";
 import Bullet from "./bullet";
 
 // left hand cartesian coords reverse y-asix
@@ -88,13 +88,4 @@ test("life expectancy of bullet", () => {
   bullet.update();
   expect(bullet.endurance).toBe(-1);
   expect(bullet.bulletPower).toBe(0);
-});
-
-test("render calls callback function with id and position", () => {
-  const mockRenderCallback = vi.fn();
-  const bullet = setUp();
-  bullet.render(mockRenderCallback);
-  //expect renderCallback to be called with id,x,y parameters
-  expect(mockRenderCallback).toHaveBeenCalledTimes(1);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("bullet1", 100, 100);
 });

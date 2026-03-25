@@ -1,4 +1,4 @@
-import { expect, test, vi } from "vitest";
+import { expect, test } from "vitest";
 import Rock from "./rock";
 
 function setUp(direction = 0) {
@@ -76,20 +76,4 @@ test("rock movement after 2 frames with transform", () => {
   rock.update();
   rock.update(transformCallback, transformCallback);
   expect(rock.rockPosition).toStrictEqual({ x: 10, y: 10 });
-});
-
-test("render calls callback function with id, position and rotation", () => {
-  const mockRenderCallback = vi.fn();
-  const rock = setUp();
-  expect(rock.rockPosition).toStrictEqual({ x: 100, y: 100 });
-  //expect renderCallback to be called with id,x,y parameters
-  rock.render(mockRenderCallback);
-  expect(mockRenderCallback).toHaveBeenCalledTimes(1);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("rock0", 100, 100, 0);
-  // after a frame update the x,y position and rotation parameters have been updated
-  rock.update();
-  expect(rock.rockPosition).toStrictEqual({ x: 101, y: 100 });
-  rock.render(mockRenderCallback);
-  expect(mockRenderCallback).toHaveBeenCalledTimes(2);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("rock0", 101, 100, 1.5);
 });

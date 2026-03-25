@@ -61,8 +61,4 @@ export default class Bullet {
       this.bulletPower = 0;
     }
   }
-
-  render(renderCallback: Function) {
-    renderCallback(this.id, this.position.x, this.position.y);
-  }
 }

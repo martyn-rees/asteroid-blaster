@@ -1,11 +1,14 @@
 import { Bullets, Rocks } from "../state/gameState.js";
 import Ship from "../modules/ship.js";
+import Rock from "../modules/rock.js";
+import Gun from "../modules/gun.js";
+import { convertRadiansToDegrees } from "../utils/maths.js";
 
 import {
   addToScreen,
   removeFromScreen,
   createElement,
-  updateElement,
+  redrawOnScreen,
   renderThrust,
   playSound,
   createRockElement,
@@ -67,17 +70,25 @@ function removeOldItems(oldRocks: string[], oldBullets: string[]) {
 }
 
 function updateItems(ship: Ship, rocks: Rocks, bullets: Bullets) {
-  ship!.render(updateElement, renderThrust); // this calls render method in ship class which calls renderShip above whch calls render
+  // redraw ship
+  const degrees = convertRadiansToDegrees(ship.rotation);
+  redrawOnScreen(ship.id, ship.position.x, ship.position.y, degrees);
+  renderThrust(ship.thrustPower);
+
   // these lines are for testing - updates the ship's gun muzzle to check it's position is correct
   if (debug.showGunMuzzle) {
-    ship!.gun!.render(updateElement);
+    const gun: Gun = ship!.gun!;
+    redrawOnScreen(gun.id, gun.muzzlePosition.x, gun.muzzlePosition.y);
   }
+  // redraw rocks
   for (var rockId in rocks) {
-    rocks[rockId].render(updateElement); // this calls render method in rock class which calls render above
+    const rock: Rock = rocks[rockId];
+    redrawOnScreen(rockId, rock.position.x, rock.position.y, rock.rotation);
   }
-
+  // redraw bullets
   for (var bulletId in bullets) {
-    bullets[bulletId].render(updateElement);
+    const bullet = bullets[bulletId];
+    redrawOnScreen(bulletId, bullet.position.x, bullet.position.y);
   }
 }
 

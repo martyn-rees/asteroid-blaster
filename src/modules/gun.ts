@@ -16,7 +16,7 @@ export type GunState =
 
 export default class Gun {
   static gunIDCounter = 0;
-  private id: string;
+  public id: string;
   private gunReloadTimer: number;
   public state: GunState;
   private muzzleOffset: Position;
@@ -86,7 +86,7 @@ export default class Gun {
     }
   }
 
-  private getMuzzlePosition(): Position {
+  get muzzlePosition(): Position {
     const muzzlePosition: Position = getNewPositionWithOffset(
       this.position,
       this.rotation,
@@ -99,7 +99,7 @@ export default class Gun {
     bulletPosition: Position;
     bulletVelocity: Velocity;
   } {
-    const bulletPosition: Position = this.getMuzzlePosition();
+    const bulletPosition: Position = this.muzzlePosition;
     const v1 = {
       speed: this.velocity.speed,
       direction: this.velocity.direction,
@@ -118,10 +118,5 @@ export default class Gun {
   reloadGun() {
     this.gunReloadTimer = this.reloadTime;
     this.state = "reloading";
-  }
-
-  render(renderCallback: Function) {
-    const muzzle = this.getMuzzlePosition();
-    renderCallback(this.id, muzzle.x, muzzle.y);
   }
 }

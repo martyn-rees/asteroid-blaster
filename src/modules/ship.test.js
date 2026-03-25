@@ -229,26 +229,3 @@ test("ship movement after 2 frames with transform", () => {
   expect(ship.position.x).toBe(10);
   expect(ship.position.y).toBe(10);
 });
-
-test("rendering function get called correctly", () => {
-  const mockRenderCallback = vi.fn();
-  const mockRenderThrustCallback = vi.fn();
-  const ship = setUp();
-  // no actions so ship should point North with no thrust
-  ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("ship", 100, 100, 270);
-  expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(0);
-  // thurst and rotate northeastt (for this test rotation speed is 45 degrees)
-  // at speed 1, distance moved is 0.707 north and 0.707 east
-  const shipActions = newActions({ thrust: true, rotateClockwise: true });
-  ship.updateActions(shipActions);
-  ship.update();
-  ship.render(mockRenderCallback, mockRenderThrustCallback);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith(
-    "ship",
-    100.707,
-    99.293,
-    315,
-  );
-  expect(mockRenderThrustCallback).toHaveBeenLastCalledWith(1);
-});
