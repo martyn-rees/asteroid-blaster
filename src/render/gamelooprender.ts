@@ -138,6 +138,8 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
     newShips,
     score,
   } = gameState;
+  // if in render debug mode to test if update and render are de-coupled
+  // this line can force this rendering to be skipped for a designated number of frames
   if (debug_skipRenderForThisFrame()) return false;
 
   // ADD NEW ITEMS
