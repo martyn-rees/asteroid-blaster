@@ -3,6 +3,8 @@ import {
   changeRotation,
   getComponentVelocity,
   getDirectionRadians,
+  convertRadiansToDegrees,
+  convertDegreestoRadians,
 } from "./maths";
 
 describe("updating rotation", () => {
@@ -72,5 +74,18 @@ describe("get velocity from changes in x and y positions", () => {
   test("angle of direction 2 parts East 1 part South ", () => {
     const radians: number = getDirectionRadians(2, 1);
     expect(radians).toBeCloseTo(0.4636);
+  });
+});
+
+describe("test angle conversion", () => {
+  test("degrees to radians", () => {
+    expect(convertDegreestoRadians(0)).toBe(0);
+    expect(convertDegreestoRadians(180)).toBe(Math.PI);
+  });
+  test("radians to degrees", () => {
+    expect(convertRadiansToDegrees(0)).toBe(0);
+    expect(convertRadiansToDegrees(Math.PI)).toBe(180);
+    expect(convertRadiansToDegrees(Math.PI * 1.21)).toBe(217.8);
+    expect(convertRadiansToDegrees(2 * Math.PI)).toBe(360);
   });
 });
