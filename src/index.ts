@@ -1,15 +1,12 @@
 import { addNewShip } from "./index-ship.ts";
-import Gun from "./modules/gun.ts";
-import { Rocks, Bullets } from "./state/gameState.ts";
-import Bullet from "./modules/bullet.ts";
 import GameScreen from "./modules/gamescreen.ts";
 import { addToScreen, removeFromScreen } from "./render/render.ts";
-import { constrainNumber, testCollision } from "./utils/helper.ts";
-import { bulletSpecs, rockType } from "./gamedata.js";
 import { createButton } from "./ui/button.ts";
 import { gameLoopRender } from "./render/gamelooprender.ts";
-import { GameState, gameState, changeGameState } from "./state/gameState.ts";
-import { addNewRocksForNewLevel, explodeRock } from "./index-rock.ts";
+import { changeGameState } from "./state/gameState.ts";
+import { addNewRocksForNewLevel } from "./index-rock.ts";
+import { gameLoopUpdate } from "./update/gameloopupdate.ts";
+
 var animationId: number;
 
 let gameScreen = new GameScreen("gameScreen", 800, 400);
@@ -19,103 +16,6 @@ function step(timestamp: number) {
   gameLoop();
 }
 
-function updateMotionStates(gameState: GameState) {
-  const { ship, bullets, rocks } = gameState;
-  // use constrainNumber as a callback in update method of ship, rock and bullet classes instead of passing in gameScreen dimensions
-  const warpX = (x: number) => constrainNumber(x, 0, gameScreen.width);
-  const warpY = (y: number) => constrainNumber(y, 0, gameScreen.height);
-
-  // update ship position based on motion state
-  ship!.update(warpX, warpY);
-
-  // update position of bullet based on motion state
-  for (var bulletId in bullets) {
-    bullets[bulletId].update(warpX, warpY);
-  }
-
-  // update position of rock based on motion state
-  for (var rock in rocks) {
-    const thisRock = rocks[rock];
-    thisRock.update(warpX, warpY);
-  }
-}
-
-function gameLoopUpdate() {
-  changeGameState({ action: "ship actions" });
-  updateMotionStates(gameState);
-  // - add new bullets - if ACTION.shoot
-  const shipGun: Gun | null = gameState.ship!.gun;
-  if (shipGun && shipGun.state === "firing") {
-    // get position of gun attached to ship as the starting position of new bullet
-    const { bulletPosition, bulletVelocity } =
-      shipGun.getInitialMotionStateOfBullet();
-    const bullet = new Bullet({
-      initialPosition: bulletPosition,
-      velocity: bulletVelocity,
-      bulletSpecs,
-    });
-    changeGameState({ action: "add bullet", gameElement: bullet });
-  }
-
-  // - remove dead bullets - if power <= 0
-  // this could be moved to collision function where it loops over bullets to save looping over bullets twice but for now its kept separate for clarity
-  // this also changes gameState.bullets as action: "delete bullet" removes any dead bullets from gameState.bullets so this should return the new array
-  const currentBullets: Bullets = { ...gameState.bullets };
-  for (var bulletId in currentBullets) {
-    const thisBullet = currentBullets[bulletId];
-    if (thisBullet.bulletPower == 0) {
-      changeGameState({ action: "delete bullet", gameElement: thisBullet });
-    }
-  }
-
-  // currentRocks and currentBullets are array copies so not using the gameState arrays directly as the gameState arrays get updated inside the loop
-  // GOTCHA: when i tried the same technique using another array copy of { ...gameState.bullets } I'd get an error as each rock looped over the full
-  // array of bullets even when a bullet should have been removed after hitting a rock
-  // so a bullet could be recorded as hitting several rocks. It's ID would be added to oldBullets twice causing an error when removing that bullet
-  // the element would try to be deleted twice from the renderer
-  const currentRocks: Rocks = { ...gameState.rocks };
-  // test each rock for collision with bullets and ship
-  for (var rockId in currentRocks) {
-    let hasRockCollided: boolean = false;
-    const thisRock = currentRocks[rockId];
-    // test rock against each bullet until collision is found - if collision then remove bullet and record a collision has happened and break out of bullet loop
-    // BUG: it's possible that a bullet can hit 2 rocks if using currentBullets above. The alternative is to use gameState.bullets directly but this array also
-    // gets amended if a bullet hits a rock
-    for (var bulletId in gameState.bullets) {
-      const thisBullet = gameState.bullets[bulletId];
-      hasRockCollided = testCollision(
-        thisRock.boundary(),
-        thisBullet.boundary(),
-      );
-      if (hasRockCollided) {
-        changeGameState({ action: "delete bullet", gameElement: thisBullet });
-        break;
-      }
-    }
-    // if the rock has not collided with a bullet then check if it has collided with the ship
-    if (!hasRockCollided) {
-      hasRockCollided = testCollision(
-        thisRock.boundary(),
-        gameState.ship!.boundary(),
-      );
-      if (hasRockCollided) {
-        changeGameState({ action: "delete ship" });
-        // add ship collision code
-        // explodeShip(); or reduceShields() - or use one of the automaticshields that gives invincibility for a few seconds
-      }
-    }
-    // if collision with bullet or ship then remove rock, add score and add smaller rocks if needed
-    if (hasRockCollided) {
-      const rockSize = thisRock.size;
-      const valueOfRock = rockType[rockSize].value;
-      changeGameState({ action: "score", gameElement: valueOfRock });
-      explodeRock(currentRocks[rockId]);
-    }
-  }
-
-  return { gameState };
-}
-
 // rendering
 // add gamelements (id, pos, rotation) to rendering list
 // map through rendering list. Add ID to previous list
@@ -123,7 +23,7 @@ function gameLoopUpdate() {
 // if ID is in previous list then update element position and rotation
 // if ID is not in current list but is in previous list then remove element
 function gameLoop() {
-  const { gameState } = gameLoopUpdate();
+  const { gameState } = gameLoopUpdate(gameScreen);
   // DOM rendering
   gameLoopRender(gameState, gameScreen.id);
 
