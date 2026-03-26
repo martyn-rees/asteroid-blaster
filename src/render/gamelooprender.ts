@@ -1,4 +1,4 @@
-import { Bullets, Rocks } from "../state/gameState.js";
+import { Bullets, Rocks, changeGameState } from "../state/gameState.js";
 import Ship from "../modules/ship.js";
 import Rock from "../modules/rock.js";
 import Gun from "../modules/gun.js";
@@ -18,7 +18,27 @@ import {
 import { asteroidsSVG, shipSVG } from "../graphics.js";
 import { GameState } from "../state/gameState.js";
 
-const debug = { showGunMuzzle: true };
+// can set the debug mode on by setting the debug object
+// set show gun muzzle to display the poition of a ships gun to check it's in the correct position
+// set renderDelay to true to make the render loop run slower than the update loop.
+// so setting a longer render delay can quickly show any problems
+const debug = { showGunMuzzle: false, renderDelay: false };
+const DEBUG_RENDER_DELAY = 5;
+let debug_render_countdown = DEBUG_RENDER_DELAY;
+
+function debug_skipRenderForThisFrame(): boolean {
+  // code to delay rendering for number of frames specified by DEBUG_RENDER_DELAY
+  // use this for testing if rendering truly is separated from update to game model
+  if (debug.renderDelay === true) {
+    debug_render_countdown--;
+    if (debug_render_countdown <= 0) {
+      debug_render_countdown = DEBUG_RENDER_DELAY;
+    } else {
+      return true;
+    }
+  }
+  return false;
+}
 
 function addNewItems(
   newShips: string[],
@@ -26,6 +46,7 @@ function addNewItems(
   newRocks: string[],
   screenId: string,
   rocks: Rocks,
+  bullets: Bullets,
 ) {
   newShips.forEach((shipId) => {
     const shipEl = createElement(shipId, "ship", null, shipSVG());
@@ -38,21 +59,30 @@ function addNewItems(
   });
 
   newBullets.forEach((bulletId) => {
-    const el = createElement(bulletId, "bullet", null, null);
-    addToScreen(el, screenId);
-    playSound("shoot");
+    const bullet = bullets[bulletId];
+    if (bullet) {
+      const el = createElement(bulletId, "bullet", null, null);
+      addToScreen(el, screenId);
+      playSound("shoot");
+    } else {
+      console.error("bulletId doesn't exist in bullets", bulletId);
+    }
   });
 
   newRocks.forEach((rockId) => {
     const rock = rocks[rockId];
-    const graphicIndex = rock.index % asteroidsSVG.length;
-    const el = createRockElement({
-      id: rockId,
-      r: rock.r,
-      asteroidImage: asteroidsSVG[graphicIndex],
-      size: rock.size,
-    });
-    addToScreen(el, screenId);
+    if (rock) {
+      const graphicIndex = rock.index % asteroidsSVG.length;
+      const el = createRockElement({
+        id: rockId,
+        r: rock.r,
+        asteroidImage: asteroidsSVG[graphicIndex],
+        size: rock.size,
+      });
+      addToScreen(el, screenId);
+    } else {
+      console.error("rockId doesn't exist in rocks", rockId);
+    }
   });
 }
 
@@ -108,9 +138,10 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
     newShips,
     score,
   } = gameState;
+  if (debug_skipRenderForThisFrame()) return false;
 
   // ADD NEW ITEMS
-  addNewItems(newShips, newBullets, newRocks, screenId, rocks);
+  addNewItems(newShips, newBullets, newRocks, screenId, rocks, bullets);
 
   // REMOVE OLD ITEMS
   removeOldItems(oldRocks, oldBullets);
@@ -119,4 +150,7 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
   updateItems(ship!, rocks, bullets);
 
   displayScore(score);
+
+  changeGameState({ action: "reset lists", gameElement: "" });
+  return true;
 }

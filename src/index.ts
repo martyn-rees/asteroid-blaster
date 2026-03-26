@@ -1,5 +1,6 @@
 import { addNewShip } from "./index-ship.ts";
 import Gun from "./modules/gun.ts";
+import { Rocks, Bullets } from "./state/gameState.ts";
 import Bullet from "./modules/bullet.ts";
 import GameScreen from "./modules/gamescreen.ts";
 import { addToScreen, removeFromScreen } from "./render/render.ts";
@@ -58,18 +59,28 @@ function gameLoopUpdate() {
 
   // - remove dead bullets - if power <= 0
   // this could be moved to collision function where it loops over bullets to save looping over bullets twice but for now its kept separate for clarity
-  for (var bulletId in gameState.bullets) {
-    const thisBullet = gameState.bullets[bulletId];
+  // this also changes gameState.bullets as action: "delete bullet" removes any dead bullets from gameState.bullets so this should return the new array
+  const currentBullets: Bullets = { ...gameState.bullets };
+  for (var bulletId in currentBullets) {
+    const thisBullet = currentBullets[bulletId];
     if (thisBullet.bulletPower == 0) {
       changeGameState({ action: "delete bullet", gameElement: thisBullet });
     }
   }
 
+  // currentRocks and currentBullets are array copies so not using the gameState arrays directly as the gameState arrays get updated inside the loop
+  // GOTCHA: when i tried the same technique using another array copy of { ...gameState.bullets } I'd get an error as each rock looped over the full
+  // array of bullets even when a bullet should have been removed after hitting a rock
+  // so a bullet could be recorded as hitting several rocks. It's ID would be added to oldBullets twice causing an error when removing that bullet
+  // the element would try to be deleted twice from the renderer
+  const currentRocks: Rocks = { ...gameState.rocks };
   // test each rock for collision with bullets and ship
-  for (var rockId in gameState.rocks) {
+  for (var rockId in currentRocks) {
     let hasRockCollided: boolean = false;
-    const thisRock = gameState.rocks[rockId];
+    const thisRock = currentRocks[rockId];
     // test rock against each bullet until collision is found - if collision then remove bullet and record a collision has happened and break out of bullet loop
+    // BUG: it's possible that a bullet can hit 2 rocks if using currentBullets above. The alternative is to use gameState.bullets directly but this array also
+    // gets amended if a bullet hits a rock
     for (var bulletId in gameState.bullets) {
       const thisBullet = gameState.bullets[bulletId];
       hasRockCollided = testCollision(
@@ -98,8 +109,7 @@ function gameLoopUpdate() {
       const rockSize = thisRock.size;
       const valueOfRock = rockType[rockSize].value;
       changeGameState({ action: "score", gameElement: valueOfRock });
-      explodeRock(gameState.rocks[rockId]);
-      gameState.oldRocks.push(rockId);
+      explodeRock(currentRocks[rockId]);
     }
   }
 
@@ -116,7 +126,7 @@ function gameLoop() {
   const { gameState } = gameLoopUpdate();
   // DOM rendering
   gameLoopRender(gameState, gameScreen.id);
-  changeGameState({ action: "reset lists", gameElement: "" });
+
   animationId = window.requestAnimationFrame(step);
 }
 
