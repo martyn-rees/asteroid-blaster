@@ -1,31 +1,63 @@
+:root {
+  --ship-radius: 10px;
+}
+
 @font-face {
     font-family: "Press Start 2P";
     src: url(/fonts/Press_Start_2P/PressStart2P-Regular.ttf) format("truetype");
 }
     
+.show-circle-boundary {
+    background-color: blue;
+    border-radius: 50%;
+}
+
 .press-start-2p-regular {
     font-family: "Press Start 2P", system-ui;
     font-weight: 400;
     font-style: normal;
 }
 
+.glow {
+    filter: drop-shadow(0px 0px 16px white);
+}
+
 .rock {
     position:absolute;
+}
+
+.rock svg {
+    display: block;
 }
 
 .rock svg path {
     vector-effect: non-scaling-stroke;
     stroke-width: 1px;
     stroke: white;
+        
 }
 
 .ship {
     position:absolute;
-    width: 12px;
-    height: 12px;
-    margin-top: -6px;
-    margin-left: -6px;
+    width: calc(2 * var(--ship-radius));
+    height: calc(2 * var(--ship-radius));
+    margin-top: calc(-1 * var(--ship-radius));
+    margin-left: calc(-1 * var(--ship-radius));
     fill: white;
+}
+
+.ship svg {
+    display: block;
+}
+
+.gun {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background-color: red;
+    border-radius: 50%;
+    margin-left: -1px;
+    margin-top: -1px;
 }
 
 .bullet {

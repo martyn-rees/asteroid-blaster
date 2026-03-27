@@ -1,31 +1,34 @@
-import { Velocity } from "./modules/types";
-
 export const bulletSpecs = {
   r: 2,
   endurance: 90,
   power: 1,
 };
+
 export const shipSpecs = {
   speedMax: 4.0,
   drag: 0.005,
   thrustMax: 0.1,
-  radius: 6,
+  radius: 10,
   rotationSpeed: 2,
 };
+
+// using offset to position gun muzzle on ship when it is facing East (ship rotation 0)
 export const gunSpec = {
-  barrelOffset: { x: 0, y: 6 },
+  muzzleOffset: { x: 10, y: 0 },
   muzzleSpeed: 6,
   reloadTime: 12,
 };
+
 type Range = { min: number; max: number };
 
-type RockSpec = {
+export type RockSpec = {
   description: string;
   value: number;
   radius: Range;
   speed: Range;
   rotationRate: Range;
 };
+
 type RockType = {
   [key: string]: RockSpec;
 };
@@ -53,40 +56,10 @@ export const rockType: RockType = {
     rotationRate: { min: 2, max: 3 },
   },
 };
+
 export const keyBindings = {
   rotateLeft: "ArrowLeft",
   rotateRight: "ArrowRight",
   thrust: "ArrowUp",
   shoot: "KeyS",
 };
-
-/* get random valus for new asteroids */
-function getRandomNumber(min: number, max: number): number {
-  return min + Math.random() * (max - min);
-}
-
-export function getRockData(size: string): {
-  velocity: Velocity;
-  r: number;
-  rotationRate: number;
-} {
-  let rockProps: RockSpec = rockType[size];
-  let speed = getRandomNumber(rockProps.speed.min, rockProps.speed.max);
-  let r = getRandomNumber(rockProps.radius.min, rockProps.radius.max);
-  // choose a random direction but avoid angles within 15 degrees to vertical or horizontal
-  let direction = getRandomNumber(15, 75);
-  let quadrant = 1 + Math.floor(Math.random() * 4);
-  direction = direction * quadrant;
-  let rotationRate = getRandomNumber(
-    rockProps.rotationRate.min,
-    rockProps.rotationRate.max,
-  );
-  rotationRate = Math.random() > 0.5 ? rotationRate : -rotationRate;
-  let velocity = { speed, direction };
-  return { velocity, r, rotationRate };
-}
-/* end of random values for new asteroids */
-
-export function getRockValue(size: string): number {
-  return rockType[size].value;
-}

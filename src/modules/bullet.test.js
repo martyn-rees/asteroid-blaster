@@ -1,25 +1,25 @@
-import { expect, test, vi } from "vitest";
+import { beforeEach, expect, test } from "vitest";
 import Bullet from "./bullet";
 
+// left hand cartesian coords reverse y-asix
+// directions: east 0, south Math.PI/2, west Math.PI, north 1.5 * Math.PI
+
 function setUp(x = 100, y = 100) {
-  // reset the static variable that creates a unique ID
-  Bullet.bulletIDCounter = 0;
-  const bulletPosition = { x, y };
-  const bulletDxDy = { dx: 4, dy: 1 };
-  const bulletSpecs = {
-    r: 2,
-    endurance: 4,
-    power: 1,
-  };
-  const bulletVelocity = { speed: 4, direction: 0 };
-  const bullet = new Bullet({
-    initialPosition: bulletPosition,
-    dxdy: bulletDxDy,
-    velocity: bulletVelocity,
-    bulletSpecs,
+  return new Bullet({
+    initialPosition: { x, y },
+    velocity: { speed: 4, direction: 0 },
+    bulletSpecs: {
+      r: 2,
+      endurance: 4,
+      power: 1,
+    },
   });
-  return bullet;
 }
+
+beforeEach(() => {
+  // reset the static variable that creates a unique ID before each test
+  Bullet.bulletIDCounter = 0;
+});
 
 test("create new Bullets", () => {
   const bullet1 = setUp();
@@ -27,7 +27,6 @@ test("create new Bullets", () => {
   expect(bullet1).toEqual({
     id: "bullet1",
     bulletPower: 1,
-    dxdy: { dx: 4, dy: 1 },
     position: { x: 100, y: 100 },
     velocity: {
       direction: 0,
@@ -35,15 +34,10 @@ test("create new Bullets", () => {
     },
     endurance: 4,
     r: 2,
-    testdxdy: {
-      dx: 0,
-      dy: 4,
-    },
   });
   expect(bullet2).toEqual({
-    id: "bullet1",
+    id: "bullet2",
     bulletPower: 1,
-    dxdy: { dx: 4, dy: 1 },
     velocity: {
       direction: 0,
       speed: 4,
@@ -51,10 +45,6 @@ test("create new Bullets", () => {
     position: { x: 110, y: 100 },
     endurance: 4,
     r: 2,
-    testdxdy: {
-      dx: 0,
-      dy: 4,
-    },
   });
 });
 
@@ -63,15 +53,13 @@ test("boundary of bullet", () => {
   expect(bullet.boundary()).toStrictEqual({ x: 100, y: 100, r: 2 });
 });
 
-// NB: that y axis is reversed for computer screens with 0,0 being top left instead of bottom left
-// maybe I should change calculations so that -dy moves up and +dy moves down
 test("bullet movement after 2 frames", () => {
   const bullet = setUp();
-  // bullet moves dx=4 every frame so should move 8 pixels after 2 frames
+  // bullet moves 4 pixels east every frame so should move 8 pixels after 2 frames
   bullet.update();
   bullet.update();
   expect(bullet.position.x).toBe(108);
-  expect(bullet.position.y).toBe(98);
+  expect(bullet.position.y).toBe(100);
 });
 
 test("bullet movement after 2 frames with transform", () => {
@@ -79,7 +67,6 @@ test("bullet movement after 2 frames with transform", () => {
     return 10;
   };
   const bullet = setUp();
-  // bullet moves dx=4 every frame so should move 8 pixels after 2 frames
   bullet.update();
   bullet.update(transformCallback, transformCallback);
   expect(bullet.position.x).toBe(10);
@@ -101,13 +88,4 @@ test("life expectancy of bullet", () => {
   bullet.update();
   expect(bullet.endurance).toBe(-1);
   expect(bullet.bulletPower).toBe(0);
-});
-
-test("render calls callback function with id and position", () => {
-  const mockRenderCallback = vi.fn();
-  const bullet = setUp();
-  bullet.render(mockRenderCallback);
-  //expect renderCallback to be called with id,x,y parameters
-  expect(mockRenderCallback).toHaveBeenCalledTimes(1);
-  expect(mockRenderCallback).toHaveBeenLastCalledWith("bullet1", 100, 100);
 });

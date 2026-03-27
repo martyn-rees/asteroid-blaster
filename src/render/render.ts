@@ -1,11 +1,11 @@
 // change position and rotation to element already on screen
 // TODO maybe provide additonalCLass property which could be used for examples such as ships thrust
 // could be Display.update
-export const updateElement = (
+export const redrawOnScreen = (
   id: string,
   x: number,
   y: number,
-  rotation: number,
+  rotation?: number,
 ) => {
   let el: HTMLElement = document.getElementById(id)!;
   el.style.left = x + "px";
@@ -54,37 +54,43 @@ export function createElement(
   return elContainer;
 }
 
-const getAsteroidGraphic = (SVGList: string[]): string => {
-  const n = Math.floor(Math.random() * SVGList.length);
-  return SVGList[n];
-};
-
 export function createRockElement({
   id,
   r,
-  SVGList,
+  asteroidImage,
+  size,
 }: {
   id: string;
   r: number;
-  SVGList: string[];
+  asteroidImage: string;
+  size: string;
 }): HTMLElement {
   let rockStyle = `height:${2 * r}px; width:${2 * r}px; margin-left:-${r}px; margin-top:-${r}px;`;
-  const asteroidSVG = getAsteroidGraphic(SVGList);
-  const el = createElement(id, "rock", rockStyle, asteroidSVG);
+  const rockClass = size === "small" ? "rock" : "rock glow";
+
+  const el = createElement(id, rockClass, rockStyle, asteroidImage);
   return el;
 }
 
 export function removeFromScreen(elId: string) {
-  let elNode: HTMLElement = document.getElementById(elId)!;
-  elNode.parentNode!.removeChild(elNode);
+  let elNode: HTMLElement | null = document.getElementById(elId);
+  if (elNode) {
+    if (elNode.parentNode) {
+      elNode.parentNode.removeChild(elNode);
+    } else {
+      console.error("Error: No parent node for element with id:", elId);
+    }
+  } else {
+    console.error("Error: can't find element with id:", elId);
+  }
 }
 
 export function playSound(soundDescription: string) {
   let soundurl;
   if (soundDescription == "shoot") {
     soundurl = "./sounds/shoot.wav";
-  } else if (soundDescription == "explosion") {
-    soundurl = "./sounds/explosion.wav";
+  } else if (soundDescription == "rock-explosion") {
+    soundurl = "./sounds/rock-explosion.mp3";
   } else {
     console.error(`sound description ${soundDescription} not recognised`);
     return;

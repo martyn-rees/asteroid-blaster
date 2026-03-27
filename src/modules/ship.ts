@@ -1,7 +1,13 @@
 import Gun from "./gun";
-import { Position, Velocity, Directions, MotionState, Circle } from "./types";
-
-const FULLDEGREE = 360;
+import {
+  calculateNewVelocity,
+  changeRotation,
+  getNewPosition,
+  convertDegreestoRadians,
+  convertRadiansToDegrees,
+} from "../utils/maths";
+import { transform } from "../utils/helper";
+import { Position, Velocity, MotionState, Circle } from "./types";
 
 type ShipSpecs = {
   speedMax: number;
@@ -19,10 +25,9 @@ export default class Ship {
   private thrustMax: number;
   public r: number;
   private rotationSpeed: number;
-  public rotation: Directions;
+  public rotation: number;
   public thrustPower: number;
-  public direction: Directions;
-  public shipSpeed: number;
+  public velocity: Velocity;
   public gun: Gun | null;
   public isTriggerPressed: boolean;
 
@@ -35,13 +40,12 @@ export default class Ship {
     this.drag = shipSpecs.drag;
     this.thrustMax = shipSpecs.thrustMax;
     this.r = shipSpecs.radius;
-    this.rotationSpeed = shipSpecs.rotationSpeed;
-    // ship state
-    this.rotation = { degrees: 0, radians: 0 };
+    this.rotationSpeed = convertDegreestoRadians(shipSpecs.rotationSpeed);
+    // ship state // point North
+    this.rotation = 1.5 * Math.PI;
     this.thrustPower = 0;
-    // velocity
-    this.direction = { degrees: 0, radians: 0 };
-    this.shipSpeed = 0;
+    // velocity // point North
+    this.velocity = { speed: 0, direction: 1.5 * Math.PI };
     // gun specifications - this can be passed in for different gunpower and position. Need to use array if more than one gun
     this.gun = null;
     this.isTriggerPressed = false;
@@ -51,14 +55,11 @@ export default class Ship {
     this.gun = gun;
   }
 
-  getShipMotionState(): MotionState {
+  get motionState(): MotionState {
     return {
       position: this.position,
-      velocity: {
-        speed: this.shipSpeed,
-        direction: this.direction.radians,
-      },
-      rotation: this.rotation.radians,
+      velocity: this.velocity,
+      rotation: this.rotation,
     };
   }
 
@@ -68,46 +69,6 @@ export default class Ship {
       y: this.position.y,
       r: this.r,
     };
-  }
-
-  convertDegreestoRadians(degrees: number) {
-    return 0.0174533 * degrees;
-  }
-  convertRadiansToDegrees(radians: number) {
-    return 57.2958 * radians;
-  }
-  // calculate new speed and direction
-  calculateNewVelocity() {
-    const driftSpeed =
-      this.shipSpeed > this.drag ? this.shipSpeed - this.drag : 0;
-    const driftX = driftSpeed * Math.sin(this.direction.radians);
-    const driftY = driftSpeed * Math.cos(this.direction.radians);
-
-    const thrustX = this.thrustPower * Math.sin(this.rotation.radians);
-    const thrustY = this.thrustPower * Math.cos(this.rotation.radians);
-
-    let dx = driftX + thrustX;
-    let dy = driftY + thrustY;
-
-    // shipSpeed
-    this.shipSpeed = Math.sqrt(dx * dx + dy * dy);
-    if (this.shipSpeed > this.speedMax) {
-      this.shipSpeed = this.speedMax;
-    }
-
-    if (dy == 0) {
-      dy = -0.001;
-    }
-    this.direction.radians = Math.atan(dx / dy);
-    this.direction.degrees = this.convertRadiansToDegrees(
-      this.direction.radians,
-    );
-
-    if (dy < 0) {
-      // Add PI radians or 180 degrees
-      this.direction.degrees += 180;
-      this.direction.radians += Math.PI;
-    }
   }
 
   updateActions({
@@ -123,53 +84,45 @@ export default class Ship {
   }) {
     this.thrustPower = thrust ? this.thrustMax : 0;
     if (rotateCounterClockwise) {
-      this.changeShipRotation(-this.rotationSpeed);
+      this.rotation = changeRotation(-this.rotationSpeed, this.rotation);
     }
     if (rotateClockwise) {
-      this.changeShipRotation(this.rotationSpeed);
+      this.rotation = changeRotation(this.rotationSpeed, this.rotation);
     }
     this.isTriggerPressed = shoot;
   }
 
   update(transformXCallback?: Function, transformYCallback?: Function) {
+    const maxSpeed = this.speedMax;
+    let driftSpeed: number = this.velocity.speed - this.drag;
+    if (driftSpeed < 0) driftSpeed = 0;
+    const driftDirection = this.velocity.direction;
+    const thrustDirection = this.rotation;
+
     // update Motion State
-    this.calculateNewVelocity();
-    const newX =
-      this.position.x + this.shipSpeed * Math.sin(this.direction.radians);
-    const newY =
-      this.position.y - this.shipSpeed * Math.cos(this.direction.radians);
+    const newVelocity: Velocity = calculateNewVelocity(
+      { speed: driftSpeed, direction: driftDirection },
+      { speed: this.thrustPower, direction: thrustDirection },
+      maxSpeed,
+    );
+    const newPosition = getNewPosition(this.position, newVelocity);
     // use transforms to update position of rock on game screen
-    this.position.x = transformXCallback ? transformXCallback(newX) : newX;
-    this.position.y = transformYCallback ? transformYCallback(newY) : newY;
+    // update x,y,velocity and direction of rotation
+    this.position = transform(
+      newPosition,
+      transformXCallback,
+      transformYCallback,
+    );
+    this.velocity = newVelocity;
 
     // update gun state
     if (this.gun !== null) {
-      this.gun.updateMotionState({
+      this.gun.motionState = {
         position: this.position,
-        velocity: { speed: this.shipSpeed, direction: this.direction.radians },
-        rotation: this.rotation.radians,
-      });
+        velocity: this.velocity,
+        rotation: this.rotation,
+      };
       this.gun.update(this.isTriggerPressed);
     }
-  }
-
-  changeShipRotation(dRot: number) {
-    this.rotation.degrees += dRot;
-    if (this.rotation.degrees < 0) {
-      this.rotation.degrees += FULLDEGREE;
-    } else if (this.rotation.degrees >= FULLDEGREE) {
-      this.rotation.degrees -= FULLDEGREE;
-    }
-    this.rotation.radians = this.convertDegreestoRadians(this.rotation.degrees);
-  }
-
-  render(renderCallback: Function, renderThrustCallback: Function) {
-    renderCallback(
-      this.id,
-      this.position.x,
-      this.position.y,
-      this.rotation.degrees,
-    );
-    renderThrustCallback(this.thrustPower);
   }
 }
