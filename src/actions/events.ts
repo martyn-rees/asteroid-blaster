@@ -55,7 +55,6 @@ function onEnter(screen: string) {
     case "start":
       changeGameState({ action: "state", gameElement: "start" });
       addStartButton();
-      changeGameState({ action: "state", gameElement: "start" });
       break;
     case "playing":
       changeGameState({ action: "state", gameElement: "playing" });
