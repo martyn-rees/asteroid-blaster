@@ -1,11 +1,7 @@
 import Rock from "../modules/rock.js";
 import Ship from "../modules/ship.js";
 import Bullet from "../modules/bullet.js";
-import {
-  getShipActions,
-  addShipControlEvents,
-  removeShipControlEvents,
-} from "../actions/actions.js";
+import { getShipActions, removeShipControlEvents } from "../actions/actions.js";
 
 export interface Rocks {
   [index: string]: Rock;
@@ -17,6 +13,7 @@ export interface Bullets {
 
 export type GameState = {
   state: string;
+  previousState: string;
   score: number;
   ship: Ship | undefined;
   newShips: string[];
@@ -32,7 +29,8 @@ export type GameState = {
 };
 
 export let gameState: GameState = {
-  state: "start",
+  state: "",
+  previousState: "",
   score: 0,
   ship: undefined,
   rocks: {},
@@ -54,6 +52,11 @@ type gameStateChanger = {
 
 export function changeGameState({ action, gameElement }: gameStateChanger) {
   switch (action) {
+    case "state":
+      const state = gameElement as string;
+      gameState.previousState = gameState.state;
+      gameState.state = state;
+      break;
     case "ship actions":
       const shipActions = getShipActions();
       gameState.ship!.updateActions(shipActions);
@@ -62,7 +65,6 @@ export function changeGameState({ action, gameElement }: gameStateChanger) {
       const ship = gameElement as Ship;
       gameState.ship = ship;
       gameState.newShips.push(ship.id);
-      addShipControlEvents();
       break;
     case "delete ship":
       //const oldShip = gameElement as Ship;
