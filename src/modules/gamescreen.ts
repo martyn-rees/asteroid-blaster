@@ -9,10 +9,12 @@ export default class GameScreen {
     this.height = h;
 
     // Keep size in sync with the DOM element on initial load and on resize
-    this.setGameScreenSize();
-    window.addEventListener("resize", () => {
+    if (globalThis.document) {
       this.setGameScreenSize();
-    });
+      window.addEventListener("resize", () => {
+        this.setGameScreenSize();
+      });
+    }
   }
 
   set screenSize({ w, h }: { w: number; h: number }) {
