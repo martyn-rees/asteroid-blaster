@@ -47,26 +47,9 @@ function gameLoop() {
   gameLoopRender(gameState, gameScreen.id);
 }
 
-// TODO: uses GameScreen instance
 function init() {
-  window.addEventListener("resize", function (event) {
-    setGameScreenSize(gameScreen);
-  });
-  setGameScreenSize(gameScreen);
   changeGameState({ action: "state", payload: "start" });
   requestAnimationFrame(step);
 }
-/* end of set up game */
 
 init();
-
-// events code
-// TODO: get game screen size and set dimesniosn of GameScreen instance
-export function setGameScreenSize(screen: GameScreen) {
-  let screenNode: HTMLElement = document.getElementById(screen.id)!;
-  screen.screenSize = {
-    w: screenNode.offsetWidth,
-    h: screenNode.offsetHeight,
-  };
-}
-// end of events code

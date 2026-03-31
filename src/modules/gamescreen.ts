@@ -7,6 +7,12 @@ export default class GameScreen {
     this.id = id;
     this.width = w;
     this.height = h;
+
+    // Keep size in sync with the DOM element on initial load and on resize
+    this.setGameScreenSize();
+    window.addEventListener("resize", () => {
+      this.setGameScreenSize();
+    });
   }
 
   set screenSize({ w, h }: { w: number; h: number }) {
@@ -20,5 +26,15 @@ export default class GameScreen {
 
   get screenCentre(): { x: number; y: number } {
     return { x: this.width / 2, y: this.height / 2 };
+  }
+
+  setGameScreenSize() {
+    let screenNode: HTMLElement | null = document.getElementById(this.id);
+    if (screenNode) {
+      this.screenSize = {
+        w: screenNode.offsetWidth,
+        h: screenNode.offsetHeight,
+      };
+    }
   }
 }
