@@ -9,5 +9,5 @@ export function addNewShip(pos: { x: number; y: number }) {
   const gun = new Gun(gunSpec);
   ship.attachGun(gun);
   addShipControlEvents();
-  changeGameState({ action: "add ship", gameElement: ship });
+  changeGameState({ action: "add ship", payload: ship });
 }

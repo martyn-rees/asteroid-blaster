@@ -47,7 +47,7 @@ export function gameLoopUpdate(gameScreen: GameScreen) {
       velocity: bulletVelocity,
       bulletSpecs,
     });
-    changeGameState({ action: "add bullet", gameElement: bullet });
+    changeGameState({ action: "add bullet", payload: bullet });
   }
 
   // - remove dead bullets - if power <= 0
@@ -57,7 +57,7 @@ export function gameLoopUpdate(gameScreen: GameScreen) {
   for (var bulletId in currentBullets) {
     const thisBullet = currentBullets[bulletId];
     if (thisBullet.bulletPower == 0) {
-      changeGameState({ action: "delete bullet", gameElement: thisBullet });
+      changeGameState({ action: "delete bullet", payload: thisBullet });
     }
   }
 
@@ -81,7 +81,7 @@ export function gameLoopUpdate(gameScreen: GameScreen) {
         thisBullet.boundary(),
       );
       if (hasRockCollided) {
-        changeGameState({ action: "delete bullet", gameElement: thisBullet });
+        changeGameState({ action: "delete bullet", payload: thisBullet });
         break;
       }
     }
@@ -101,7 +101,7 @@ export function gameLoopUpdate(gameScreen: GameScreen) {
     if (hasRockCollided) {
       const rockSize = thisRock.size;
       const valueOfRock = rockType[rockSize].value;
-      changeGameState({ action: "score", gameElement: valueOfRock });
+      changeGameState({ action: "score", payload: valueOfRock });
       explodeRock(currentRocks[rockId]);
     }
   }

@@ -160,6 +160,6 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
 
   displayScore(score);
 
-  changeGameState({ action: "reset lists", gameElement: "" });
+  changeGameState({ action: "reset lists", payload: "" });
   return true;
 }

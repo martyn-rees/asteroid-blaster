@@ -16,7 +16,7 @@ function addRock(size: string, pos: Position) {
     r,
     rotationRate,
   });
-  changeGameState({ action: "add rock", gameElement: rock });
+  changeGameState({ action: "add rock", payload: rock });
 }
 
 export function addNewRocksForNewLevel({
@@ -46,5 +46,5 @@ export function explodeRock(rock: Rock) {
     addRock("small", explodedRockLocation);
     addRock("small", explodedRockLocation);
   }
-  changeGameState({ action: "delete rock", gameElement: rock });
+  changeGameState({ action: "delete rock", payload: rock });
 }

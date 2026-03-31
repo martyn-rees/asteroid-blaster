@@ -47,13 +47,13 @@ export let gameState: GameState = {
 
 type gameStateChanger = {
   action: string;
-  gameElement?: Rock | Ship | Bullet | number | string;
+  payload?: Rock | Ship | Bullet | number | string;
 };
 
-export function changeGameState({ action, gameElement }: gameStateChanger) {
+export function changeGameState({ action, payload }: gameStateChanger) {
   switch (action) {
     case "state":
-      const state = gameElement as string;
+      const state = payload as string;
       gameState.previousState = gameState.state;
       gameState.state = state;
       break;
@@ -62,23 +62,23 @@ export function changeGameState({ action, gameElement }: gameStateChanger) {
       gameState.ship!.updateActions(shipActions);
       break;
     case "add ship":
-      const ship = gameElement as Ship;
+      const ship = payload as Ship;
       gameState.ship = ship;
       gameState.newShips.push(ship.id);
       break;
     case "delete ship":
-      //const oldShip = gameElement as Ship;
+      //const oldShip = payload as Ship;
       //gameState.oldShips.push(oldShip.id);
       //gameState.ship = undefined;
       removeShipControlEvents();
       break;
     case "add rock":
-      const rock = gameElement as Rock;
+      const rock = payload as Rock;
       gameState.rocks[rock.id] = rock;
       gameState.newRocks.push(rock.id);
       break;
     case "delete rock":
-      const oldRock = gameElement as Rock;
+      const oldRock = payload as Rock;
       // BUGFIX: if renderloop is running slower than updateLoop then there's a possibility that a rock can be created and destroyed between a render
       // element ID would be in both newRocks and oldRocks and the Rock instance[elId] would have been deleted leading to 2 bugs
       // if oldRock.id is also in newRocks then remove from newRocks and add to oldAndNewRocksInSameRenderLoop instead of oldRocks
@@ -93,12 +93,12 @@ export function changeGameState({ action, gameElement }: gameStateChanger) {
       delete gameState.rocks[oldRock.id];
       break;
     case "add bullet":
-      const newBullet = gameElement as Bullet;
+      const newBullet = payload as Bullet;
       gameState.bullets[newBullet.id] = newBullet;
       gameState.newBullets.push(newBullet.id);
       break;
     case "delete bullet":
-      const oldBullet = gameElement as Bullet;
+      const oldBullet = payload as Bullet;
 
       // BUGFIX: if renderloop is running slower than updateLoop then there's a possibility that a bullet can be created and destroyed between a render
       // this is the same bugfix as used for deleting rocks
@@ -112,7 +112,7 @@ export function changeGameState({ action, gameElement }: gameStateChanger) {
       delete gameState.bullets[oldBullet.id];
       break;
     case "score":
-      const value = gameElement as number;
+      const value = payload as number;
       gameState.score += value;
       break;
     case "reset lists":

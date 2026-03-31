@@ -11,7 +11,7 @@ function addStartButton() {
     label: "start",
     id: "startButton",
     className: "start-button",
-    onClick: () => changeGameState({ action: "state", gameElement: "playing" }),
+    onClick: () => changeGameState({ action: "state", payload: "playing" }),
   });
   addToScreen(startButton, gameScreen.id);
 }
@@ -21,7 +21,7 @@ function addPauseButton() {
     label: "pause",
     id: "pauseButton",
     className: "pause-button",
-    onClick: () => changeGameState({ action: "state", gameElement: "paused" }),
+    onClick: () => changeGameState({ action: "state", payload: "paused" }),
   });
   addToScreen(pauseButton, gameScreen.id);
 }
@@ -31,14 +31,14 @@ function addResumeButton() {
     label: "resume",
     id: "resumeButton",
     className: "pause-button",
-    onClick: () => changeGameState({ action: "state", gameElement: "playing" }),
+    onClick: () => changeGameState({ action: "state", payload: "playing" }),
   });
   addToScreen(resumeButton, gameScreen.id);
 }
 
 // add ship and then add rocks after a set time and set score to 0
 function setUpLevel() {
-  changeGameState({ action: "score", gameElement: 0 });
+  changeGameState({ action: "score", payload: 0 });
   addNewShip(gameScreen.screenCentre);
   setTimeout(
     () =>
@@ -53,15 +53,15 @@ function setUpLevel() {
 function onEnter(screen: string) {
   switch (screen) {
     case "start":
-      changeGameState({ action: "state", gameElement: "start" });
+      changeGameState({ action: "state", payload: "start" });
       addStartButton();
       break;
     case "playing":
-      changeGameState({ action: "state", gameElement: "playing" });
+      changeGameState({ action: "state", payload: "playing" });
       addPauseButton();
       break;
     case "pause":
-      changeGameState({ action: "state", gameElement: "paused" });
+      changeGameState({ action: "state", payload: "paused" });
       removeFromScreen("pauseButton");
       addResumeButton();
       break;

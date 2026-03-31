@@ -53,7 +53,7 @@ function init() {
     setGameScreenSize(gameScreen);
   });
   setGameScreenSize(gameScreen);
-  changeGameState({ action: "state", gameElement: "start" });
+  changeGameState({ action: "state", payload: "start" });
   requestAnimationFrame(step);
 }
 /* end of set up game */
