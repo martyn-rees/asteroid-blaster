@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import Container from "./gamescreen";
+import Container from "./container";
 
 test("set up gamescreen, resize it and get screen centre", () => {
   const screen1 = new Container("gameScreen1", 400, 300);
