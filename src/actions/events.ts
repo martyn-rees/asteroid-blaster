@@ -39,12 +39,12 @@ function addResumeButton() {
 // add ship and then add rocks after a set time and set score to 0
 function setUpLevel() {
   changeGameState({ action: "score", payload: 0 });
-  addNewShip(gameScreen.screenCentre);
+  addNewShip(gameScreen.centre);
   setTimeout(
     () =>
       addNewRocksForNewLevel({
         rockAmount: 8,
-        screenSize: gameScreen.screenSize,
+        screenSize: gameScreen.dimensions,
       }),
     1000,
   );
@@ -68,6 +68,7 @@ function onEnter(screen: string) {
   }
 }
 
+// buttons onClick events are automatically removed so do not need to clean up attachedEvent
 function onExit(screen: string) {
   switch (screen) {
     case "start":

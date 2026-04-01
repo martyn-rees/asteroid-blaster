@@ -1,4 +1,4 @@
-export default class GameScreen {
+export default class Container {
   public id: string;
   public width: number;
   public height: number;
@@ -8,6 +8,7 @@ export default class GameScreen {
     this.width = w;
     this.height = h;
 
+    // TODO: use resizeObservorAPI on this element instead of window resize
     // Keep size in sync with the DOM element on initial load and on resize
     if (globalThis.document) {
       this.setGameScreenSize();
@@ -17,23 +18,23 @@ export default class GameScreen {
     }
   }
 
-  set screenSize({ w, h }: { w: number; h: number }) {
+  set dimensions({ w, h }: { w: number; h: number }) {
     this.width = w;
     this.height = h;
   }
 
-  get screenSize(): { screenWidth: number; screenHeight: number } {
+  get dimensions(): { screenWidth: number; screenHeight: number } {
     return { screenWidth: this.width, screenHeight: this.height };
   }
 
-  get screenCentre(): { x: number; y: number } {
+  get centre(): { x: number; y: number } {
     return { x: this.width / 2, y: this.height / 2 };
   }
 
   setGameScreenSize() {
     let screenNode: HTMLElement | null = document.getElementById(this.id);
     if (screenNode) {
-      this.screenSize = {
+      this.dimensions = {
         w: screenNode.offsetWidth,
         h: screenNode.offsetHeight,
       };

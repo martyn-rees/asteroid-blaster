@@ -1,14 +1,14 @@
 import { expect, test } from "vitest";
-import GameScreen from "./gamescreen";
+import Container from "./gamescreen";
 
 test("set up gamescreen, resize it and get screen centre", () => {
-  const screen1 = new GameScreen("gameScreen1", 400, 300);
-  const screenCentre = screen1.screenCentre;
+  const screen1 = new Container("gameScreen1", 400, 300);
+  const screenCentre = screen1.centre;
   expect(screenCentre).toStrictEqual({ x: 200, y: 150 });
-  screen1.screenSize = { w: 300, h: 200 };
-  expect(screen1.screenSize).toStrictEqual({
+  screen1.dimensions = { w: 300, h: 200 };
+  expect(screen1.dimensions).toStrictEqual({
     screenWidth: 300,
     screenHeight: 200,
   });
-  expect(screen1.screenCentre).toStrictEqual({ x: 150, y: 100 });
+  expect(screen1.centre).toStrictEqual({ x: 150, y: 100 });
 });

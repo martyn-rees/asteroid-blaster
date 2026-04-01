@@ -1,10 +1,10 @@
-import GameScreen from "./modules/gamescreen.ts";
+import Container from "./modules/gamescreen.ts";
 import { changeGameState, gameState } from "./state/gameState.ts";
 import { gameLoopUpdate } from "./update/gameloopupdate.ts";
 import { gameLoopRender } from "./render/gamelooprender.ts";
 import { onEnter, onExit, setUpLevel } from "./actions/events.ts";
 
-export let gameScreen = new GameScreen("gameScreen", 800, 400);
+export let gameScreen = new Container("gameScreen", 800, 400);
 
 // GAME loop code
 function step(timestamp: number) {
