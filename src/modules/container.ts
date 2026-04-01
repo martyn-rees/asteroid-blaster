@@ -11,9 +11,9 @@ export default class Container {
     // TODO: use resizeObservorAPI on this element instead of window resize
     // Keep size in sync with the DOM element on initial load and on resize
     if (globalThis.document) {
-      this.setGameScreenSize();
+      this.setDimensionsFromElement();
       window.addEventListener("resize", () => {
-        this.setGameScreenSize();
+        this.setDimensionsFromElement();
       });
     }
   }
@@ -31,7 +31,7 @@ export default class Container {
     return { x: this.width / 2, y: this.height / 2 };
   }
 
-  setGameScreenSize() {
+  setDimensionsFromElement() {
     let screenNode: HTMLElement | null = document.getElementById(this.id);
     if (screenNode) {
       this.dimensions = {
