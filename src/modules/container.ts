@@ -13,7 +13,7 @@ export default class Container {
     if (globalThis.document) {
       const element: HTMLElement | null = document.getElementById(this.id);
       if (element) {
-        this.setDimensionsFromElement(element);
+        this.matchElementSize(element);
         this.setupResizeObserver(element);
       }
     }
@@ -40,13 +40,14 @@ export default class Container {
   }
 
   private setupResizeObserver(element: HTMLElement) {
-    this.resizeObserver = new ResizeObserver(() => {
-      this.setDimensionsFromElement(element);
-    });
+    this.removeResizeObserver();
+    this.resizeObserver = new ResizeObserver(() =>
+      this.matchElementSize(element),
+    );
     this.resizeObserver.observe(element);
   }
 
-  private setDimensionsFromElement(element: HTMLElement) {
+  private matchElementSize(element: HTMLElement) {
     this.dimensions = {
       w: element.offsetWidth,
       h: element.offsetHeight,
