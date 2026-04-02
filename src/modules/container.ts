@@ -2,19 +2,20 @@ export default class Container {
   public id: string;
   public width: number;
   public height: number;
+  private resizeObserver: ResizeObserver | null = null;
 
   constructor(id: string, w: number, h: number) {
     this.id = id;
     this.width = w;
     this.height = h;
 
-    // TODO: use resizeObservorAPI on this element instead of window resize
-    // Keep size in sync with the DOM element on initial load and on resize
+    // Keep size in sync with the DOM element on initial load and on resize using ResizeObserver
     if (globalThis.document) {
-      this.setDimensionsFromElement();
-      window.addEventListener("resize", () => {
-        this.setDimensionsFromElement();
-      });
+      const element: HTMLElement | null = document.getElementById(this.id);
+      if (element) {
+        this.setDimensionsFromElement(element);
+        this.setupResizeObserver(element);
+      }
     }
   }
 
@@ -31,13 +32,24 @@ export default class Container {
     return { x: this.width / 2, y: this.height / 2 };
   }
 
-  setDimensionsFromElement() {
-    let screenNode: HTMLElement | null = document.getElementById(this.id);
-    if (screenNode) {
-      this.dimensions = {
-        w: screenNode.offsetWidth,
-        h: screenNode.offsetHeight,
-      };
+  removeResizeObserver() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
     }
+  }
+
+  private setupResizeObserver(element: HTMLElement) {
+    this.resizeObserver = new ResizeObserver(() => {
+      this.setDimensionsFromElement(element);
+    });
+    this.resizeObserver.observe(element);
+  }
+
+  private setDimensionsFromElement(element: HTMLElement) {
+    this.dimensions = {
+      w: element.offsetWidth,
+      h: element.offsetHeight,
+    };
   }
 }
