@@ -25,6 +25,9 @@ import {
 import { asteroidsSVG, shipSVG } from "../graphics.js";
 import { GameState } from "../state/gameState.js";
 
+let previousRockIds: Set<string> = new Set();
+let previousBulletIds: Set<string> = new Set();
+
 // can set the debug mode on by setting the debug object
 // set show gun muzzle to display the poition of a ships gun to check it's in the correct position
 // set renderDelay to true to make the render loop run slower than the update loop.
@@ -49,8 +52,8 @@ function debug_skipRenderForThisFrame(): boolean {
 
 function addNewItems(
   newShips: string[],
-  newBullets: string[],
-  newRocks: string[],
+  newBulletIds: Set<string>,
+  newRockIds: Set<string>,
   screenId: string,
   rocks: Rocks,
   bullets: Bullets,
@@ -65,7 +68,7 @@ function addNewItems(
     }
   });
 
-  newBullets.forEach((bulletId) => {
+  newBulletIds.forEach((bulletId: string) => {
     const bullet = bullets[bulletId];
     if (bullet) {
       const el = createElement(bulletId, "bullet", null, null);
@@ -76,7 +79,7 @@ function addNewItems(
     }
   });
 
-  newRocks.forEach((rockId) => {
+  newRockIds.forEach((rockId: string) => {
     const rock = rocks[rockId];
     if (rock) {
       const graphicIndex = rock.index % asteroidsSVG.length;
@@ -93,14 +96,12 @@ function addNewItems(
   });
 }
 
-function removeOldItems(oldRocks: string[], oldBullets: string[]) {
-  // remove dead bullets
-  oldBullets.forEach((bulletId) => {
+function removeOldItems(oldRockIds: Set<string>, oldBulletIds: Set<string>) {
+  oldBulletIds.forEach((bulletId: string) => {
     removeFromScreen(bulletId);
   });
 
-  // remove dead rocks
-  oldRocks.forEach((rockId) => {
+  oldRockIds.forEach((rockId: string) => {
     removeFromScreen(rockId);
     playSound("rock-explosion");
   });
@@ -130,36 +131,43 @@ function updateItems(ship: Ship, rocks: Rocks, bullets: Bullets) {
 }
 
 /* RENDER CODE */
-// disply game elements, ship, rocks and bullets
-// TODO - keep a copy of rocks and bullets from previous frame and compare to current list to decide which elements to add, update and remove
-// can then remove oldBullets, oldRocks and newBullets
+// display game elements, ship, rocks and bullets
 export function gameLoopRender(gameState: GameState, screenId: string) {
-  const {
-    bullets,
-    newBullets,
-    oldBullets,
-    rocks,
-    newRocks,
-    oldRocks,
-    ship,
-    newShips,
-    score,
-  } = gameState;
+  const { bullets, rocks, ship, newShips, score } = gameState;
+
   // if in render debug mode to test if update and render are de-coupled
   // this line can force this rendering to be skipped for a designated number of frames
   if (debug_skipRenderForThisFrame()) return false;
 
+  const currentRockIds = new Set(Object.keys(rocks));
+  const newRockIds = new Set(
+    [...currentRockIds].filter((id) => !previousRockIds.has(id)),
+  );
+  const oldRockIds = new Set(
+    [...previousRockIds].filter((id) => !currentRockIds.has(id)),
+  );
+
+  const currentBulletIds = new Set(Object.keys(bullets));
+  const newBulletIds = new Set(
+    [...currentBulletIds].filter((id) => !previousBulletIds.has(id)),
+  );
+  const oldBulletIds = new Set(
+    [...previousBulletIds].filter((id) => !currentBulletIds.has(id)),
+  );
+
   // ADD NEW ITEMS
-  addNewItems(newShips, newBullets, newRocks, screenId, rocks, bullets);
+  addNewItems(newShips, newBulletIds, newRockIds, screenId, rocks, bullets);
 
   // REMOVE OLD ITEMS
-  removeOldItems(oldRocks, oldBullets);
+  removeOldItems(oldRockIds, oldBulletIds);
 
   // UPDATE ITEMS
   updateItems(ship!, rocks, bullets);
 
   displayScore(score);
 
+  previousRockIds = currentRockIds;
+  previousBulletIds = currentBulletIds;
   changeGameState({ action: "reset lists", payload: "" });
   return true;
 }
