@@ -10,9 +10,9 @@ import Bullet from "../modules/bullet";
 import { bulletSpecs, rockType } from "../gamedata";
 import { constrainNumber, testCollision } from "../utils/helper";
 import { explodeRock } from "../index-rock";
-import GameScreen from "../modules/gamescreen";
+import Container from "../modules/container";
 
-function updateMotionStates(gameState: GameState, gameScreen: GameScreen) {
+function updateMotionStates(gameState: GameState, gameScreen: Container) {
   const { ship, bullets, rocks } = gameState;
   // use constrainNumber as a callback in update method of ship, rock and bullet classes instead of passing in gameScreen dimensions
   const warpX = (x: number) => constrainNumber(x, 0, gameScreen.width);
@@ -33,7 +33,7 @@ function updateMotionStates(gameState: GameState, gameScreen: GameScreen) {
   }
 }
 
-export function gameLoopUpdate(gameScreen: GameScreen) {
+export function gameLoopUpdate(gameScreen: Container) {
   changeGameState({ action: "ship actions" });
   updateMotionStates(gameState, gameScreen);
   // - add new bullets - if ACTION.shoot
@@ -47,7 +47,7 @@ export function gameLoopUpdate(gameScreen: GameScreen) {
       velocity: bulletVelocity,
       bulletSpecs,
     });
-    changeGameState({ action: "add bullet", gameElement: bullet });
+    changeGameState({ action: "add bullet", payload: bullet });
   }
 
   // - remove dead bullets - if power <= 0
@@ -57,7 +57,7 @@ export function gameLoopUpdate(gameScreen: GameScreen) {
   for (var bulletId in currentBullets) {
     const thisBullet = currentBullets[bulletId];
     if (thisBullet.bulletPower == 0) {
-      changeGameState({ action: "delete bullet", gameElement: thisBullet });
+      changeGameState({ action: "delete bullet", payload: thisBullet });
     }
   }
 
@@ -81,7 +81,7 @@ export function gameLoopUpdate(gameScreen: GameScreen) {
         thisBullet.boundary(),
       );
       if (hasRockCollided) {
-        changeGameState({ action: "delete bullet", gameElement: thisBullet });
+        changeGameState({ action: "delete bullet", payload: thisBullet });
         break;
       }
     }
@@ -101,7 +101,7 @@ export function gameLoopUpdate(gameScreen: GameScreen) {
     if (hasRockCollided) {
       const rockSize = thisRock.size;
       const valueOfRock = rockType[rockSize].value;
-      changeGameState({ action: "score", gameElement: valueOfRock });
+      changeGameState({ action: "score", payload: valueOfRock });
       explodeRock(currentRocks[rockId]);
     }
   }

@@ -1,3 +1,10 @@
+// rendering
+// add gamelements (id, pos, rotation) to rendering list
+// map through rendering list. Add ID to previous list
+// if ID is not in previous list then create element
+// if ID is in previous list then update element position and rotation
+// if ID is not in current list but is in previous list then remove element
+//
 import { Bullets, Rocks, changeGameState } from "../state/gameState.js";
 import Ship from "../modules/ship.js";
 import Rock from "../modules/rock.js";
@@ -153,6 +160,6 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
 
   displayScore(score);
 
-  changeGameState({ action: "reset lists", gameElement: "" });
+  changeGameState({ action: "reset lists", payload: "" });
   return true;
 }
