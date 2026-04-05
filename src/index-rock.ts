@@ -1,6 +1,6 @@
-import Rock from "./modules/rock.ts";
+import Rock from "./entities/rock.ts";
 import { changeGameState } from "./state/gameState.ts";
-import { Position } from "./modules/types";
+import { Position } from "./entities/types.ts";
 import {
   getRandomEdgePosition,
   getRandomRockProps,

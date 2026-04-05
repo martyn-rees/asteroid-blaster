@@ -1,4 +1,4 @@
-import Container from "./modules/container.ts";
+import Container from "./entities/container.ts";
 import { changeGameState, gameState } from "./state/gameState.ts";
 import { gameLoopUpdate } from "./update/gameloopupdate.ts";
 import { gameLoopRender } from "./render/gamelooprender.ts";

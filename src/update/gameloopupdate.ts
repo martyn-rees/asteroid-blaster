@@ -5,13 +5,13 @@ import {
   Rocks,
   Bullets,
 } from "../state/gameState";
-import Gun from "../modules/gun";
-import Bullet from "../modules/bullet";
+import Gun from "../entities/gun";
+import Bullet from "../entities/bullet";
 import { bulletSpecs, rockType } from "../assets/gamedata";
 import { constrainNumber, testCollision } from "../utils/helper";
 import { explodeRock } from "../index-rock";
 import { getShipActions } from "../actions/actions";
-import Container from "../modules/container";
+import Container from "../entities/container";
 
 function updateMotionStates(gameState: GameState, gameScreen: Container) {
   const { ship, bullets, rocks } = gameState;
