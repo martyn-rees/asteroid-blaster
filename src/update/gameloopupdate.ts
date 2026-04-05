@@ -11,9 +11,9 @@ import { bulletSpecs, rockType } from "../assets/gamedata";
 import { constrainNumber, testCollision } from "../utils/helper";
 import { explodeRock } from "../entities/rock-factory";
 import { getShipActions } from "../input/ship-actions";
-import Container from "../entities/container";
+import Viewport from "../entities/viewport";
 
-function updateMotionStates(gameState: GameState, gameScreen: Container) {
+function updateMotionStates(gameState: GameState, gameScreen: Viewport) {
   const { ship, bullets, rocks } = gameState;
   // use constrainNumber as a callback in update method of ship, rock and bullet classes instead of passing in gameScreen dimensions
   const warpX = (x: number) => constrainNumber(x, 0, gameScreen.width);
@@ -34,7 +34,7 @@ function updateMotionStates(gameState: GameState, gameScreen: Container) {
   }
 }
 
-export function gameLoopUpdate(gameScreen: Container) {
+export function gameLoopUpdate(gameScreen: Viewport) {
   changeGameState({ action: "ship actions", payload: getShipActions() });
   updateMotionStates(gameState, gameScreen);
   // - add new bullets - if ACTION.shoot

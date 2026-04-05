@@ -1,4 +1,4 @@
-export default class Container {
+export default class Viewport {
   public id: string;
   public width: number;
   public height: number;
