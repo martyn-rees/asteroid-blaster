@@ -29,24 +29,31 @@ export let gameState: GameState = {
   bullets: {},
 };
 
-type gameStateChanger = {
-  action: string;
-  payload?: Rock | Ship | Bullet | ShipActions | number | string;
-};
+// Discriminated union ensures each action carries the correct payload type with no casts.
+type GameStateAction =
+  | { action: "state"; payload: string }
+  | { action: "ship actions"; payload: ShipActions }
+  | { action: "add ship"; payload: Ship }
+  | { action: "delete ship" }
+  | { action: "add rock"; payload: Rock }
+  | { action: "delete rock"; payload: Rock }
+  | { action: "add bullet"; payload: Bullet }
+  | { action: "delete bullet"; payload: Bullet }
+  | { action: "score"; payload: number };
 
-export function changeGameState({ action, payload }: gameStateChanger) {
-  switch (action) {
+// Do not destructure to ({ action, payload }) — it severs the link between them
+// and breaks type narrowing, requiring manual casts in each case.
+export function changeGameState(change: GameStateAction) {
+  switch (change.action) {
     case "state":
-      const state = payload as string;
       gameState.previousState = gameState.state;
-      gameState.state = state;
+      gameState.state = change.payload;
       break;
     case "ship actions":
-      gameState.ship!.updateActions(payload as ShipActions);
+      gameState.ship!.updateActions(change.payload);
       break;
     case "add ship":
-      const ship = payload as Ship;
-      gameState.ship = ship;
+      gameState.ship = change.payload;
       break;
     case "delete ship":
       //const oldShip = payload as Ship;
@@ -54,24 +61,19 @@ export function changeGameState({ action, payload }: gameStateChanger) {
       removeShipControlEvents();
       break;
     case "add rock":
-      const rock = payload as Rock;
-      gameState.rocks[rock.id] = rock;
+      gameState.rocks[change.payload.id] = change.payload;
       break;
     case "delete rock":
-      const oldRock = payload as Rock;
-      delete gameState.rocks[oldRock.id];
+      delete gameState.rocks[change.payload.id];
       break;
     case "add bullet":
-      const newBullet = payload as Bullet;
-      gameState.bullets[newBullet.id] = newBullet;
+      gameState.bullets[change.payload.id] = change.payload;
       break;
     case "delete bullet":
-      const oldBullet = payload as Bullet;
-      delete gameState.bullets[oldBullet.id];
+      delete gameState.bullets[change.payload.id];
       break;
     case "score":
-      const value = payload as number;
-      gameState.score += value;
+      gameState.score += change.payload;
       break;
   }
 }
