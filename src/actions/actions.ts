@@ -1,6 +1,6 @@
 import { keyBindings } from "../gamedata.js";
 
-type ShipActions = {
+export type ShipActions = {
   thrust: boolean;
   rotateCounterClockwise: boolean;
   rotateClockwise: boolean;
