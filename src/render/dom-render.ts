@@ -42,16 +42,16 @@ export function createElement(
   style: string | null,
   graphicSVG: string | null,
 ): HTMLElement {
-  let elContainer = document.createElement("div");
-  elContainer.setAttribute("id", id);
-  elContainer.setAttribute("class", className);
+  let divElement = document.createElement("div");
+  divElement.setAttribute("id", id);
+  divElement.setAttribute("class", className);
   if (style) {
-    elContainer.setAttribute("style", style);
+    divElement.setAttribute("style", style);
   }
   if (graphicSVG) {
-    elContainer.innerHTML = graphicSVG;
+    divElement.innerHTML = graphicSVG;
   }
-  return elContainer;
+  return divElement;
 }
 
 export function createRockElement({
