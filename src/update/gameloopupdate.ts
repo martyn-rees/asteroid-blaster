@@ -7,7 +7,7 @@ import {
 } from "../state/gameState";
 import Gun from "../modules/gun";
 import Bullet from "../modules/bullet";
-import { bulletSpecs, rockType } from "../gamedata";
+import { bulletSpecs, rockType } from "../assets/gamedata";
 import { constrainNumber, testCollision } from "../utils/helper";
 import { explodeRock } from "../index-rock";
 import { getShipActions } from "../actions/actions";

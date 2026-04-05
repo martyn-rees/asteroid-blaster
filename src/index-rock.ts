@@ -5,7 +5,7 @@ import {
   getRandomEdgePosition,
   getRandomRockProps,
 } from "./utils/randomizer.ts";
-import { rockType } from "./gamedata.ts";
+import { rockType } from "./assets/gamedata.ts";
 
 function addRock(size: string, pos: Position) {
   const { velocity, r, rotationRate } = getRandomRockProps(rockType[size]);

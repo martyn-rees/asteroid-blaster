@@ -21,7 +21,7 @@ import {
   displayScore,
 } from "./render.js";
 
-import { asteroidsSVG, shipSVG } from "../graphics.js";
+import { asteroidsSVG, shipSVG } from "../assets/graphics.js";
 import { GameState } from "../state/gameState.js";
 
 function diffSets(current: Set<string>, previous: Set<string>) {
