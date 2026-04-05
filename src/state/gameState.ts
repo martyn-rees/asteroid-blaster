@@ -1,7 +1,7 @@
 import Rock from "../modules/rock.js";
 import Ship from "../modules/ship.js";
 import Bullet from "../modules/bullet.js";
-import { getShipActions, removeShipControlEvents } from "../actions/actions.js";
+import { removeShipControlEvents, ShipActions } from "../actions/actions.js";
 
 export interface Rocks {
   [index: string]: Rock;
@@ -31,7 +31,7 @@ export let gameState: GameState = {
 
 type gameStateChanger = {
   action: string;
-  payload?: Rock | Ship | Bullet | number | string;
+  payload?: Rock | Ship | Bullet | ShipActions | number | string;
 };
 
 export function changeGameState({ action, payload }: gameStateChanger) {
@@ -42,8 +42,7 @@ export function changeGameState({ action, payload }: gameStateChanger) {
       gameState.state = state;
       break;
     case "ship actions":
-      const shipActions = getShipActions();
-      gameState.ship!.updateActions(shipActions);
+      gameState.ship!.updateActions(payload as ShipActions);
       break;
     case "add ship":
       const ship = payload as Ship;

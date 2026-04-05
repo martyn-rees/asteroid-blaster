@@ -10,6 +10,7 @@ import Bullet from "../modules/bullet";
 import { bulletSpecs, rockType } from "../gamedata";
 import { constrainNumber, testCollision } from "../utils/helper";
 import { explodeRock } from "../index-rock";
+import { getShipActions } from "../actions/actions";
 import Container from "../modules/container";
 
 function updateMotionStates(gameState: GameState, gameScreen: Container) {
@@ -34,7 +35,7 @@ function updateMotionStates(gameState: GameState, gameScreen: Container) {
 }
 
 export function gameLoopUpdate(gameScreen: Container) {
-  changeGameState({ action: "ship actions" });
+  changeGameState({ action: "ship actions", payload: getShipActions() });
   updateMotionStates(gameState, gameScreen);
   // - add new bullets - if ACTION.shoot
   const shipGun: Gun | null = gameState.ship!.gun;
