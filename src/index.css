@@ -114,13 +114,44 @@
     transform: rotate(-26deg);
 }
 
-.start-button {
+.start-screen {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 12px 114px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    color: white;
+}
+
+.start-screen__instructions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font-size: 12px;
+}
+
+.start-screen__instruction-row {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+
+.start-screen__key {
+    display: inline-block;
+    min-width: 48px;
+    text-align: center;
+    padding: 4px 8px;
+    border: 1px solid white;
+    border-radius: 4px;
+}
+
+.start-screen__button {
+    padding: 12px 48px;
     font-size: 16px;
+    font-family: "Press Start 2P", system-ui;
     cursor: pointer;
     border-radius: 24px;
     border: 2px white solid;
@@ -128,7 +159,7 @@
     color: white;
 }
 
-.start-button:hover {
+.start-screen__button:hover {
     background: white;
     color: black;
 }

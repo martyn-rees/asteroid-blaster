@@ -3,6 +3,7 @@ import { createButton } from "../ui/button";
 import { addToScreen, removeFromScreen } from "../render/dom-render";
 import { addNewShip } from "../entities/ship-factory";
 import { addNewRocksForNewLevel } from "../entities/rock-factory";
+import { createStartScreen } from "../ui/startscreen";
 import { gameScreen } from "../index";
 
 let cursorHideTimer: ReturnType<typeof setTimeout> | null = null;
@@ -36,16 +37,6 @@ function showCursor() {
   }
 }
 
-/* ADD BUTTONS AND BUTTON HANDLERS */
-function addStartButton() {
-  const startButton = createButton({
-    label: "start",
-    id: "startButton",
-    className: "start-button",
-    onClick: () => changeGameState({ action: "state", payload: "playing" }),
-  });
-  addToScreen(startButton, gameScreen.id);
-}
 
 function addPauseButton() {
   const pauseButton = createButton({
@@ -85,7 +76,7 @@ function onEnter(screen: string) {
   switch (screen) {
     case "start":
       changeGameState({ action: "state", payload: "start" });
-      addStartButton();
+      addToScreen(createStartScreen(() => changeGameState({ action: "state", payload: "playing" })), gameScreen.id);
       break;
     case "playing":
       changeGameState({ action: "state", payload: "playing" });
@@ -104,7 +95,7 @@ function onEnter(screen: string) {
 function onExit(screen: string) {
   switch (screen) {
     case "start":
-      removeFromScreen("startButton");
+      removeFromScreen("startScreen");
       break;
     case "pause":
       removeFromScreen("resumeButton");
