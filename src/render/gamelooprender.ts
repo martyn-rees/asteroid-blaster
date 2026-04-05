@@ -24,6 +24,13 @@ import {
 import { asteroidsSVG, shipSVG } from "../graphics.js";
 import { GameState } from "../state/gameState.js";
 
+function diffSets(current: Set<string>, previous: Set<string>) {
+  return {
+    added: new Set([...current].filter((id) => !previous.has(id))),
+    removed: new Set([...previous].filter((id) => !current.has(id))),
+  };
+}
+
 let previousRender = {
   shipIds: new Set<string>(),
   rockIds: new Set<string>(),
@@ -150,28 +157,13 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
   if (debug_skipRenderForThisFrame()) return false;
 
   const currentShipIds = new Set(ship ? [ship.id] : []);
-  const newShipIds = new Set(
-    [...currentShipIds].filter((id) => !previousRender.shipIds.has(id)),
-  );
-  const oldShipIds = new Set(
-    [...previousRender.shipIds].filter((id) => !currentShipIds.has(id)),
-  );
+  const { added: newShipIds, removed: oldShipIds } = diffSets(currentShipIds, previousRender.shipIds);
 
   const currentRockIds = new Set(Object.keys(rocks));
-  const newRockIds = new Set(
-    [...currentRockIds].filter((id) => !previousRender.rockIds.has(id)),
-  );
-  const oldRockIds = new Set(
-    [...previousRender.rockIds].filter((id) => !currentRockIds.has(id)),
-  );
+  const { added: newRockIds, removed: oldRockIds } = diffSets(currentRockIds, previousRender.rockIds);
 
   const currentBulletIds = new Set(Object.keys(bullets));
-  const newBulletIds = new Set(
-    [...currentBulletIds].filter((id) => !previousRender.bulletIds.has(id)),
-  );
-  const oldBulletIds = new Set(
-    [...previousRender.bulletIds].filter((id) => !currentBulletIds.has(id)),
-  );
+  const { added: newBulletIds, removed: oldBulletIds } = diffSets(currentBulletIds, previousRender.bulletIds);
 
   // ADD NEW ITEMS
   addNewItems(newShipIds, newBulletIds, newRockIds, screenId, rocks, bullets);
