@@ -1,8 +1,8 @@
 import { expect, test } from "vitest";
-import Container from "./container";
+import Viewport from "./viewport";
 
 test("set up gamescreen, resize it and get screen centre", () => {
-  const screen1 = new Container("gameScreen1", 400, 300);
+  const screen1 = new Viewport("gameScreen1", 400, 300);
   const screenCentre = screen1.centre;
   expect(screenCentre).toStrictEqual({ x: 200, y: 150 });
   screen1.dimensions = { w: 300, h: 200 };

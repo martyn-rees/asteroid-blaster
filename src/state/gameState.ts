@@ -1,7 +1,7 @@
-import Rock from "../modules/rock.js";
-import Ship from "../modules/ship.js";
-import Bullet from "../modules/bullet.js";
-import { removeShipControlEvents, ShipActions } from "../actions/actions.js";
+import Rock from "../entities/rock.js";
+import Ship from "../entities/ship.js";
+import Bullet from "../entities/bullet.js";
+import { removeShipControlEvents, ShipActions } from "../input/ship-actions.js";
 
 export interface Rocks {
   [index: string]: Rock;

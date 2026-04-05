@@ -1,4 +1,4 @@
-import { keyBindings } from "../gamedata.js";
+import { keyBindings } from "../assets/gamedata.js";
 
 export type ShipActions = {
   thrust: boolean;

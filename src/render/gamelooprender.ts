@@ -5,9 +5,9 @@
 // if ID is in previous list then update element position and rotation
 // if ID is not in current list but is in previous list then remove element
 import { Bullets, Rocks } from "../state/gameState.js";
-import Ship from "../modules/ship.js";
-import Rock from "../modules/rock.js";
-import Gun from "../modules/gun.js";
+import Ship from "../entities/ship.js";
+import Rock from "../entities/rock.js";
+import Gun from "../entities/gun.js";
 import { convertRadiansToDegrees } from "../utils/maths.js";
 
 import {
@@ -19,9 +19,9 @@ import {
   playSound,
   createRockElement,
   displayScore,
-} from "./render.js";
+} from "./dom-render.js";
 
-import { asteroidsSVG, shipSVG } from "../graphics.js";
+import { asteroidsSVG, shipSVG } from "../assets/graphics.js";
 import { GameState } from "../state/gameState.js";
 
 function diffSets(current: Set<string>, previous: Set<string>) {
@@ -157,13 +157,22 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
   if (debug_skipRenderForThisFrame()) return false;
 
   const currentShipIds = new Set(ship ? [ship.id] : []);
-  const { added: newShipIds, removed: oldShipIds } = diffSets(currentShipIds, previousRender.shipIds);
+  const { added: newShipIds, removed: oldShipIds } = diffSets(
+    currentShipIds,
+    previousRender.shipIds,
+  );
 
   const currentRockIds = new Set(Object.keys(rocks));
-  const { added: newRockIds, removed: oldRockIds } = diffSets(currentRockIds, previousRender.rockIds);
+  const { added: newRockIds, removed: oldRockIds } = diffSets(
+    currentRockIds,
+    previousRender.rockIds,
+  );
 
   const currentBulletIds = new Set(Object.keys(bullets));
-  const { added: newBulletIds, removed: oldBulletIds } = diffSets(currentBulletIds, previousRender.bulletIds);
+  const { added: newBulletIds, removed: oldBulletIds } = diffSets(
+    currentBulletIds,
+    previousRender.bulletIds,
+  );
 
   // ADD NEW ITEMS
   addNewItems(newShipIds, newBulletIds, newRockIds, screenId, rocks, bullets);
