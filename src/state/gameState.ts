@@ -16,8 +16,6 @@ export type GameState = {
   previousState: string;
   score: number;
   ship: Ship | undefined;
-  newShips: string[];
-  oldShips: string[];
   rocks: Rocks;
   bullets: Bullets;
 };
@@ -28,8 +26,6 @@ export let gameState: GameState = {
   score: 0,
   ship: undefined,
   rocks: {},
-  newShips: [],
-  oldShips: [],
   bullets: {},
 };
 
@@ -52,11 +48,9 @@ export function changeGameState({ action, payload }: gameStateChanger) {
     case "add ship":
       const ship = payload as Ship;
       gameState.ship = ship;
-      gameState.newShips.push(ship.id);
       break;
     case "delete ship":
       //const oldShip = payload as Ship;
-      //gameState.oldShips.push(oldShip.id);
       //gameState.ship = undefined;
       removeShipControlEvents();
       break;
@@ -79,10 +73,6 @@ export function changeGameState({ action, payload }: gameStateChanger) {
     case "score":
       const value = payload as number;
       gameState.score += value;
-      break;
-    case "reset lists":
-      gameState.oldShips = [];
-      gameState.newShips = [];
       break;
   }
 }
