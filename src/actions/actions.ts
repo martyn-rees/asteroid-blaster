@@ -25,16 +25,16 @@ function resetShipActions() {
 
 function shipControlKeyEvent(ev: KeyboardEvent, isKeyDown: boolean) {
   var key = ev.code;
-  if (key == keyBindings.rotateLeft) {
+  if (key === keyBindings.rotateLeft) {
     shipActions.rotateCounterClockwise = isKeyDown;
   }
-  if (key == keyBindings.rotateRight) {
+  if (key === keyBindings.rotateRight) {
     shipActions.rotateClockwise = isKeyDown;
   }
-  if (key == keyBindings.thrust) {
+  if (key === keyBindings.thrust) {
     shipActions.thrust = isKeyDown;
   }
-  if (key == keyBindings.shoot) {
+  if (key === keyBindings.shoot) {
     shipActions.shoot = isKeyDown;
   }
 }

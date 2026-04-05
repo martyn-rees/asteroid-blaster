@@ -87,7 +87,7 @@ export function removeFromScreen(elId: string) {
 
 export function playSound(soundDescription: string) {
   let soundurl;
-  if (soundDescription == "shoot") {
+  if (soundDescription === "shoot") {
     soundurl = "./sounds/shoot.wav";
   } else if (soundDescription == "rock-explosion") {
     soundurl = "./sounds/rock-explosion.mp3";

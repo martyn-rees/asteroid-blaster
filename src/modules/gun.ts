@@ -78,7 +78,7 @@ export default class Gun {
       this.state = "firing";
     }
 
-    if (this.state == "reloading") {
+    if (this.state === "reloading") {
       this.gunReloadTimer--;
       if (this.gunReloadTimer <= 0) {
         this.state = "loaded";

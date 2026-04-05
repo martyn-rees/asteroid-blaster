@@ -57,16 +57,12 @@ export function gameLoopUpdate(gameScreen: Container) {
   const currentBullets: Bullets = { ...gameState.bullets };
   for (var bulletId in currentBullets) {
     const thisBullet = currentBullets[bulletId];
-    if (thisBullet.bulletPower == 0) {
+    if (thisBullet.bulletPower === 0) {
       changeGameState({ action: "delete bullet", payload: thisBullet });
     }
   }
 
   // currentRocks and currentBullets are array copies so not using the gameState arrays directly as the gameState arrays get updated inside the loop
-  // GOTCHA: when i tried the same technique using another array copy of { ...gameState.bullets } I'd get an error as each rock looped over the full
-  // array of bullets even when a bullet should have been removed after hitting a rock
-  // so a bullet could be recorded as hitting several rocks. It's ID would be added to oldBullets twice causing an error when removing that bullet
-  // the element would try to be deleted twice from the renderer
   const currentRocks: Rocks = { ...gameState.rocks };
   // test each rock for collision with bullets and ship
   for (var rockId in currentRocks) {
