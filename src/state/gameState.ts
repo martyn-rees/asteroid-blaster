@@ -56,8 +56,8 @@ export function changeGameState(change: GameStateAction) {
       gameState.ship = change.payload;
       break;
     case "delete ship":
-      //const oldShip = payload as Ship;
-      //gameState.ship = undefined;
+      // TODO: will need to remove ship when game ends. maybe add an explosion animation before removing the ship?
+      // gameState.ship = undefined;
       removeShipControlEvents();
       break;
     case "add rock":
