@@ -19,7 +19,7 @@ import {
   playSound,
   createRockElement,
   displayScore,
-} from "./render.js";
+} from "./dom-render.js";
 
 import { asteroidsSVG, shipSVG } from "../assets/graphics.js";
 import { GameState } from "../state/gameState.js";

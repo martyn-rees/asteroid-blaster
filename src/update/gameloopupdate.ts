@@ -9,8 +9,8 @@ import Gun from "../entities/gun";
 import Bullet from "../entities/bullet";
 import { bulletSpecs, rockType } from "../assets/gamedata";
 import { constrainNumber, testCollision } from "../utils/helper";
-import { explodeRock } from "../index-rock";
-import { getShipActions } from "../actions/actions";
+import { explodeRock } from "../entities/rock-factory";
+import { getShipActions } from "../actions/ship-actions";
 import Container from "../entities/container";
 
 function updateMotionStates(gameState: GameState, gameScreen: Container) {

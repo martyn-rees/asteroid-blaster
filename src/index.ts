@@ -2,7 +2,7 @@ import Container from "./entities/container.ts";
 import { changeGameState, gameState } from "./state/gameState.ts";
 import { gameLoopUpdate } from "./update/gameloopupdate.ts";
 import { gameLoopRender } from "./render/gamelooprender.ts";
-import { onEnter, onExit, setUpLevel } from "./actions/events.ts";
+import { onEnter, onExit, setUpLevel } from "./events/events.ts";
 
 export let gameScreen = new Container("gameScreen", 800, 400);
 

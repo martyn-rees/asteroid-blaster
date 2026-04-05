@@ -1,8 +1,8 @@
 import { changeGameState } from "../state/gameState";
 import { createButton } from "../ui/button";
-import { addToScreen, removeFromScreen } from "../render/render";
-import { addNewShip } from "../index-ship";
-import { addNewRocksForNewLevel } from "../index-rock";
+import { addToScreen, removeFromScreen } from "../render/dom-render";
+import { addNewShip } from "../entities/ship-factory";
+import { addNewRocksForNewLevel } from "../entities/rock-factory";
 import { gameScreen } from "../index";
 
 /* ADD BUTTONS AND BUTTON HANDLERS */
