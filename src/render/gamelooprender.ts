@@ -4,8 +4,7 @@
 // if ID is not in previous list then create element
 // if ID is in previous list then update element position and rotation
 // if ID is not in current list but is in previous list then remove element
-//
-import { Bullets, Rocks, changeGameState } from "../state/gameState.js";
+import { Bullets, Rocks } from "../state/gameState.js";
 import Ship from "../modules/ship.js";
 import Rock from "../modules/rock.js";
 import Gun from "../modules/gun.js";
@@ -25,9 +24,11 @@ import {
 import { asteroidsSVG, shipSVG } from "../graphics.js";
 import { GameState } from "../state/gameState.js";
 
-let previousShipIds: Set<string> = new Set();
-let previousRockIds: Set<string> = new Set();
-let previousBulletIds: Set<string> = new Set();
+let previousRender = {
+  shipIds: new Set<string>(),
+  rockIds: new Set<string>(),
+  bulletIds: new Set<string>(),
+};
 
 // can set the debug mode on by setting the debug object
 // set show gun muzzle to display the poition of a ships gun to check it's in the correct position
@@ -150,26 +151,26 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
 
   const currentShipIds = new Set(ship ? [ship.id] : []);
   const newShipIds = new Set(
-    [...currentShipIds].filter((id) => !previousShipIds.has(id)),
+    [...currentShipIds].filter((id) => !previousRender.shipIds.has(id)),
   );
   const oldShipIds = new Set(
-    [...previousShipIds].filter((id) => !currentShipIds.has(id)),
+    [...previousRender.shipIds].filter((id) => !currentShipIds.has(id)),
   );
 
   const currentRockIds = new Set(Object.keys(rocks));
   const newRockIds = new Set(
-    [...currentRockIds].filter((id) => !previousRockIds.has(id)),
+    [...currentRockIds].filter((id) => !previousRender.rockIds.has(id)),
   );
   const oldRockIds = new Set(
-    [...previousRockIds].filter((id) => !currentRockIds.has(id)),
+    [...previousRender.rockIds].filter((id) => !currentRockIds.has(id)),
   );
 
   const currentBulletIds = new Set(Object.keys(bullets));
   const newBulletIds = new Set(
-    [...currentBulletIds].filter((id) => !previousBulletIds.has(id)),
+    [...currentBulletIds].filter((id) => !previousRender.bulletIds.has(id)),
   );
   const oldBulletIds = new Set(
-    [...previousBulletIds].filter((id) => !currentBulletIds.has(id)),
+    [...previousRender.bulletIds].filter((id) => !currentBulletIds.has(id)),
   );
 
   // ADD NEW ITEMS
@@ -183,8 +184,10 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
 
   displayScore(score);
 
-  previousShipIds = currentShipIds;
-  previousRockIds = currentRockIds;
-  previousBulletIds = currentBulletIds;
+  previousRender = {
+    shipIds: currentShipIds,
+    rockIds: currentRockIds,
+    bulletIds: currentBulletIds,
+  };
   return true;
 }
