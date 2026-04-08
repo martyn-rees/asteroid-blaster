@@ -156,11 +156,28 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
   // this line can force this rendering to be skipped for a designated number of frames
   if (debug_skipRenderForThisFrame()) return false;
 
-  const currentShipIds = new Set(ship ? [ship.id] : []);
+  // ship is only in currentShipIds when active — going non-active removes it from the DOM
+  const currentShipIds = new Set(ship && ship.state === "active" ? [ship.id] : []);
   const { added: newShipIds, removed: oldShipIds } = diffSets(
     currentShipIds,
     previousRender.shipIds,
   );
+
+  // ship just transitioned to exploding this frame — add explosion element
+  if (ship && ship.state === "exploding" && previousRender.shipIds.has(ship.id)) {
+    const el = document.createElement("div");
+    el.setAttribute("id", "shipExplosion");
+    el.setAttribute("class", "ship-explosion");
+    el.style.left = `${ship.position.x}px`;
+    el.style.top = `${ship.position.y}px`;
+    document.getElementById(screenId)?.appendChild(el);
+  }
+
+  // remove explosion element once ship reaches destroyed
+  if (ship && ship.state === "destroyed") {
+    const el = document.getElementById("shipExplosion");
+    el?.parentNode?.removeChild(el);
+  }
 
   const currentRockIds = new Set(Object.keys(rocks));
   const { added: newRockIds, removed: oldRockIds } = diffSets(
@@ -181,7 +198,7 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
   removeOldItems(oldShipIds, oldRockIds, oldBulletIds);
 
   // UPDATE ITEMS
-  if (ship) updateItems(ship, rocks, bullets);
+  if (ship && ship.state === "active") updateItems(ship, rocks, bullets);
 
   displayScore(score);
 

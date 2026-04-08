@@ -4,10 +4,13 @@ import {
   changeRotation,
   getNewPosition,
   convertDegreestoRadians,
-  convertRadiansToDegrees,
 } from "../utils/maths";
 import { transform } from "../utils/helper";
 import { Position, Velocity, MotionState, Circle } from "./types";
+
+export type ShipState = "active" | "exploding" | "destroyed";
+
+const EXPLOSION_DURATION = 90; // frames (~1.5s at 60fps)
 
 type ShipSpecs = {
   speedMax: number;
@@ -19,6 +22,7 @@ type ShipSpecs = {
 
 export default class Ship {
   public id: string;
+  public state: ShipState;
   public position: Position;
   private speedMax: number;
   private drag: number;
@@ -30,9 +34,11 @@ export default class Ship {
   public velocity: Velocity;
   public gun: Gun | null;
   public isTriggerPressed: boolean;
+  private explosionTimer: number;
 
   constructor(pos: Position, id: string, shipSpecs: ShipSpecs) {
     this.id = id;
+    this.state = "active";
     // position
     this.position = pos;
     // ship specifications - this can be passed in for different ships
@@ -49,6 +55,12 @@ export default class Ship {
     // gun specifications - this can be passed in for different gunpower and position. Need to use array if more than one gun
     this.gun = null;
     this.isTriggerPressed = false;
+    this.explosionTimer = 0;
+  }
+
+  explode() {
+    this.state = "exploding";
+    this.explosionTimer = EXPLOSION_DURATION;
   }
 
   attachGun(gun: Gun) {
@@ -93,6 +105,13 @@ export default class Ship {
   }
 
   update(transformXCallback?: Function, transformYCallback?: Function) {
+    if (this.state === "exploding") {
+      this.explosionTimer--;
+      if (this.explosionTimer <= 0) this.state = "destroyed";
+      return;
+    }
+    if (this.state === "destroyed") return;
+
     const maxSpeed = this.speedMax;
     let driftSpeed: number = this.velocity.speed - this.drag;
     if (driftSpeed < 0) driftSpeed = 0;

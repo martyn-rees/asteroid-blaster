@@ -2,7 +2,6 @@ import Rock from "../entities/rock.js";
 import Ship from "../entities/ship.js";
 import Bullet from "../entities/bullet.js";
 import { removeShipControlEvents, ShipActions } from "../input/ship-actions.js";
-import { MotionState } from "../entities/types.js";
 
 export interface Rocks {
   [index: string]: Rock;
@@ -17,7 +16,6 @@ export type GameState = {
   previousState: string;
   score: number;
   ship: Ship | undefined;
-  explodedShipMotionState: MotionState | undefined;
   rocks: Rocks;
   bullets: Bullets;
 };
@@ -27,7 +25,6 @@ export let gameState: GameState = {
   previousState: "",
   score: 0,
   ship: undefined,
-  explodedShipMotionState: undefined,
   rocks: {},
   bullets: {},
 };
@@ -42,7 +39,8 @@ type GameStateAction =
   | { action: "delete rock"; payload: Rock }
   | { action: "add bullet"; payload: Bullet }
   | { action: "delete bullet"; payload: Bullet }
-  | { action: "score"; payload: number };
+  | { action: "score"; payload: number }
+  | { action: "reset game" };
 
 // Do not destructure to ({ action, payload }) — it severs the link between them
 // and breaks type narrowing, requiring manual casts in each case.
@@ -59,8 +57,7 @@ export function changeGameState(change: GameStateAction) {
       gameState.ship = change.payload;
       break;
     case "delete ship":
-      gameState.explodedShipMotionState = gameState.ship?.motionState;
-      //gameState.ship = undefined;
+      gameState.ship?.explode();
       removeShipControlEvents();
       break;
     case "add rock":
@@ -77,6 +74,12 @@ export function changeGameState(change: GameStateAction) {
       break;
     case "score":
       gameState.score += change.payload;
+      break;
+    case "reset game":
+      gameState.ship = undefined;
+      gameState.rocks = {};
+      gameState.bullets = {};
+      gameState.score = 0;
       break;
   }
 }

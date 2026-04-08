@@ -12,7 +12,6 @@ import { constrainNumber, testCollision } from "../utils/helper";
 import { explodeRock } from "../entities/rock-factory";
 import { getShipActions } from "../input/ship-actions";
 import Viewport from "../entities/viewport";
-
 function updateMotionStates(gameState: GameState, gameScreen: Viewport) {
   const { ship, bullets, rocks } = gameState;
   // use constrainNumber as a callback in update method of ship, rock and bullet classes instead of passing in gameScreen dimensions
@@ -35,11 +34,20 @@ function updateMotionStates(gameState: GameState, gameScreen: Viewport) {
 }
 
 export function gameLoopUpdate(gameScreen: Viewport) {
-  changeGameState({ action: "ship actions", payload: getShipActions() });
+  const ship = gameState.ship!;
+  if (ship.state === "active") {
+    changeGameState({ action: "ship actions", payload: getShipActions() });
+  }
   updateMotionStates(gameState, gameScreen);
+
+  if (ship.state === "destroyed") {
+    changeGameState({ action: "state", payload: "gameover" });
+    return { gameState };
+  }
+
   // - add new bullets - if ACTION.shoot
-  const shipGun: Gun | null = gameState.ship!.gun;
-  if (shipGun && shipGun.state === "firing") {
+  const shipGun: Gun | null = ship.gun;
+  if (ship.state === "active" && shipGun && shipGun.state === "firing") {
     // get position of gun attached to ship as the starting position of new bullet
     const { bulletPosition, bulletVelocity } =
       shipGun.getInitialMotionStateOfBullet();
@@ -83,15 +91,13 @@ export function gameLoopUpdate(gameScreen: Viewport) {
       }
     }
     // if the rock has not collided with a bullet then check if it has collided with the ship
-    if (!hasRockCollided) {
+    if (!hasRockCollided && ship.state === "active") {
       hasRockCollided = testCollision(
         thisRock.boundary(),
-        gameState.ship!.boundary(),
+        ship.boundary(),
       );
       if (hasRockCollided) {
         changeGameState({ action: "delete ship" });
-        // add ship collision code
-        // explodeShip(); or reduceShields() - or use one of the automaticshields that gives invincibility for a few seconds
       }
     }
     // if collision with bullet or ship then remove rock, add score and add smaller rocks if needed
