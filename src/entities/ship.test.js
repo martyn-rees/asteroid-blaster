@@ -42,6 +42,7 @@ test("create a new ship", () => {
   const ship = setUp();
   expect(ship).toEqual({
     id: "ship",
+    state: "active",
     position: { x: 100, y: 100 },
     speedMax: 4,
     drag: 0.1,
@@ -53,6 +54,7 @@ test("create a new ship", () => {
     velocity: { speed: 0, direction: 1.5 * Math.PI },
     gun: null,
     isTriggerPressed: false,
+    explosionTimer: 0,
   });
 });
 
@@ -94,6 +96,7 @@ test("thrust ship North for 1 frame", () => {
   ship.update();
   expect(ship).toEqual({
     id: "ship",
+    state: "active",
     position: { x: 100, y: 99 },
     speedMax: 4,
     drag: 0.1,
@@ -105,6 +108,7 @@ test("thrust ship North for 1 frame", () => {
     velocity: { speed: 1, direction: 1.5 * Math.PI },
     gun: null,
     isTriggerPressed: false,
+    explosionTimer: 0,
   });
 
   expect(ship.velocity.direction).toBe(1.5 * Math.PI);
