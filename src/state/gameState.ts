@@ -2,6 +2,7 @@ import Rock from "../entities/rock.js";
 import Ship from "../entities/ship.js";
 import Bullet from "../entities/bullet.js";
 import { removeShipControlEvents, ShipActions } from "../input/ship-actions.js";
+import { MotionState } from "../entities/types.js";
 
 export interface Rocks {
   [index: string]: Rock;
@@ -16,6 +17,7 @@ export type GameState = {
   previousState: string;
   score: number;
   ship: Ship | undefined;
+  explodedShipMotionState: MotionState | undefined;
   rocks: Rocks;
   bullets: Bullets;
 };
@@ -25,6 +27,7 @@ export let gameState: GameState = {
   previousState: "",
   score: 0,
   ship: undefined,
+  explodedShipMotionState: undefined,
   rocks: {},
   bullets: {},
 };
@@ -56,8 +59,8 @@ export function changeGameState(change: GameStateAction) {
       gameState.ship = change.payload;
       break;
     case "delete ship":
-      // TODO: will need to remove ship when game ends. maybe add an explosion animation before removing the ship?
-      // gameState.ship = undefined;
+      gameState.explodedShipMotionState = gameState.ship?.motionState;
+      //gameState.ship = undefined;
       removeShipControlEvents();
       break;
     case "add rock":
