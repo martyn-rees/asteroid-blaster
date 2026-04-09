@@ -101,6 +101,7 @@ function onEnter(screen: string) {
     case "gameover":
       changeGameState({ action: "state", payload: "gameover" });
       showCursor();
+      removeFromScreen("pauseButton");
       endScreenTimer = setTimeout(() => {
         endScreenTimer = null;
         if (gameState.state === "gameover") {
