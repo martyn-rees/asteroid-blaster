@@ -35,6 +35,7 @@ export default class Ship {
   public gun: Gun | null;
   public isTriggerPressed: boolean;
   private explosionTimer: number;
+  private rotateDirection: -1 | 0 | 1;
 
   constructor(pos: Position, id: string, shipSpecs: ShipSpecs) {
     this.id = id;
@@ -56,6 +57,7 @@ export default class Ship {
     this.gun = null;
     this.isTriggerPressed = false;
     this.explosionTimer = 0;
+    this.rotateDirection = 0;
   }
 
   explode() {
@@ -83,7 +85,7 @@ export default class Ship {
     };
   }
 
-  updateActions({
+  setInput({
     thrust,
     rotateCounterClockwise,
     rotateClockwise,
@@ -95,25 +97,35 @@ export default class Ship {
     shoot: boolean;
   }) {
     this.thrustPower = thrust ? this.thrustMax : 0;
-    if (rotateCounterClockwise) {
-      this.rotation = changeRotation(-this.rotationSpeed, this.rotation);
-    }
-    if (rotateClockwise) {
-      this.rotation = changeRotation(this.rotationSpeed, this.rotation);
-    }
+    this.rotateDirection = rotateCounterClockwise
+      ? -1
+      : rotateClockwise
+        ? 1
+        : 0;
     this.isTriggerPressed = shoot;
   }
 
-  update(transformXCallback?: Function, transformYCallback?: Function) {
+  update(
+    transformXCallback?: Function,
+    transformYCallback?: Function,
+    dt: number = 1,
+  ) {
     if (this.state === "exploding") {
-      this.explosionTimer--;
+      this.explosionTimer -= dt;
       if (this.explosionTimer <= 0) this.state = "destroyed";
       return;
     }
     if (this.state === "destroyed") return;
 
+    if (this.rotateDirection !== 0) {
+      this.rotation = changeRotation(
+        this.rotateDirection * this.rotationSpeed * dt,
+        this.rotation,
+      );
+    }
+
     const maxSpeed = this.speedMax;
-    let driftSpeed: number = this.velocity.speed - this.drag;
+    let driftSpeed: number = this.velocity.speed - this.drag * dt;
     if (driftSpeed < 0) driftSpeed = 0;
     const driftDirection = this.velocity.direction;
     const thrustDirection = this.rotation;
@@ -121,10 +133,10 @@ export default class Ship {
     // update Motion State
     const newVelocity: Velocity = calculateNewVelocity(
       { speed: driftSpeed, direction: driftDirection },
-      { speed: this.thrustPower, direction: thrustDirection },
+      { speed: this.thrustPower * dt, direction: thrustDirection },
       maxSpeed,
     );
-    const newPosition = getNewPosition(this.position, newVelocity);
+    const newPosition = getNewPosition(this.position, newVelocity, dt);
     // use transforms to update position of rock on game screen
     // update x,y,velocity and direction of rotation
     this.position = transform(
@@ -141,7 +153,7 @@ export default class Ship {
         velocity: this.velocity,
         rotation: this.rotation,
       };
-      this.gun.update(this.isTriggerPressed);
+      this.gun.update(this.isTriggerPressed, dt);
     }
   }
 }

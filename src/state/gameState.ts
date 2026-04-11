@@ -51,7 +51,7 @@ export function changeGameState(change: GameStateAction) {
       gameState.state = change.payload;
       break;
     case "ship actions":
-      gameState.ship!.updateActions(change.payload);
+      gameState.ship!.setInput(change.payload);
       break;
     case "add ship":
       gameState.ship = change.payload;
