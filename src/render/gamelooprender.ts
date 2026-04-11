@@ -8,7 +8,6 @@ import { Bullets, Rocks } from "../state/gameState.js";
 import Ship from "../entities/ship.js";
 import Rock from "../entities/rock.js";
 import Gun from "../entities/gun.js";
-import { convertRadiansToDegrees } from "../utils/maths.js";
 
 import {
   addToScreen,
@@ -126,8 +125,7 @@ function removeOldItems(
 
 function updateItems(ship: Ship, rocks: Rocks, bullets: Bullets) {
   // redraw ship
-  const degrees = convertRadiansToDegrees(ship.rotation);
-  redrawOnScreen(ship.id, ship.position.x, ship.position.y, degrees);
+  redrawOnScreen(ship.id, ship.position.x, ship.position.y, ship.rotation);
   renderThrust(ship.thrustPower);
 
   // these lines are for testing - updates the ship's gun muzzle to check it's position is correct

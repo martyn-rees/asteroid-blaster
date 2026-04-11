@@ -10,7 +10,7 @@ function setUp(direction = 0) {
     initialVelocity: { speed: 1, direction: direction },
     size: "large",
     r: 70,
-    rotationRate: 1.5,
+    rotationRate: 1.5 * (Math.PI / 180),
   });
   return rock;
 }
@@ -22,7 +22,7 @@ test("create new rock", () => {
     index: 0,
     size: "large",
     r: 70,
-    rotationRate: 1.5,
+    rotationRate: 1.5 * (Math.PI / 180),
     velocity: { speed: 1, direction: 0 },
     position: { x: 100, y: 100 },
     rotation: 0,

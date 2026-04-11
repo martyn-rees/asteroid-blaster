@@ -45,9 +45,10 @@ function getRandomRockProps(rockProps: RockSpec) {
     rockProps.rotationRate.max,
   );
   rotationRate = Math.random() > 0.5 ? rotationRate : -rotationRate;
+  const rotationRateRadians = convertDegreestoRadians(rotationRate);
   let velocity = { speed, direction: directionRadians };
 
-  return { velocity, r, rotationRate };
+  return { velocity, r, rotationRate: rotationRateRadians };
 }
 
 export { getRandomEdgePosition, getRandomRockProps };
