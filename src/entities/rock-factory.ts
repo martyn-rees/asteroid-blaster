@@ -38,10 +38,10 @@ export function explodeRock(rock: Rock) {
   const explodedRockLocation = rock.rockPosition;
   const rockSize = rock.size;
   // explode rock in to smaller rocks
-  if (rockSize == "large") {
+  if (rockSize === "large") {
     addRock("medium", explodedRockLocation);
     addRock("medium", explodedRockLocation);
-  } else if (rockSize == "medium") {
+  } else if (rockSize === "medium") {
     addRock("small", explodedRockLocation);
     addRock("small", explodedRockLocation);
     addRock("small", explodedRockLocation);
