@@ -1,5 +1,7 @@
 export type RockSize = "large" | "medium" | "small";
 
+export type EdgeSide = "top" | "right" | "bottom" | "left";
+
 export type GamePhase = "start" | "playing" | "paused" | "gameover";
 
 export type BoundaryTransform = (n: number) => number;

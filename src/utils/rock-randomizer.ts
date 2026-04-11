@@ -1,4 +1,5 @@
 import { RockSpec } from "../assets/gamedata.ts";
+import { EdgeSide } from "../entities/types.ts";
 import { convertDegreestoRadians } from "./maths-motionstate.ts";
 
 // functions that reply on random numbers
@@ -11,7 +12,7 @@ function getRandomNumberInRange(min: number, max: number): number {
 }
 
 function getRandomEdgePosition(
-  edge: string,
+  edge: EdgeSide,
   screenSize: { screenWidth: number; screenHeight: number },
 ): { x: number; y: number } {
   switch (edge) {
@@ -30,7 +31,6 @@ function getRandomEdgePosition(
     case "left":
       return { x: 0, y: getRandomInt(screenSize.screenHeight) };
   }
-  return { x: getRandomInt(screenSize.screenWidth), y: 0 };
 }
 
 function getRandomRockProps(rockProps: RockSpec) {
