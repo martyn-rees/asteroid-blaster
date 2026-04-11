@@ -2,6 +2,7 @@ import Rock from "../entities/rock.ts";
 import Ship from "../entities/ship.ts";
 import Bullet from "../entities/bullet.ts";
 import { removeShipControlEvents, ShipActions } from "../input/ship-actions.ts";
+import { GamePhase } from "../entities/types.ts";
 
 export interface Rocks {
   [index: string]: Rock;
@@ -12,8 +13,8 @@ export interface Bullets {
 }
 
 export type GameState = {
-  state: string;
-  previousState: string;
+  state: GamePhase | "";
+  previousState: GamePhase | "";
   score: number;
   ship: Ship | undefined;
   rocks: Rocks;
@@ -31,7 +32,7 @@ export let gameState: GameState = {
 
 // Discriminated union ensures each action carries the correct payload type with no casts.
 type GameStateAction =
-  | { action: "state"; payload: string }
+  | { action: "state"; payload: GamePhase }
   | { action: "ship actions"; payload: ShipActions }
   | { action: "add ship"; payload: Ship }
   | { action: "delete ship" }

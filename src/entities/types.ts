@@ -1,3 +1,7 @@
+export type RockSize = "large" | "medium" | "small";
+
+export type GamePhase = "start" | "playing" | "paused" | "gameover";
+
 export type Position = {
   x: number;
   y: number;
