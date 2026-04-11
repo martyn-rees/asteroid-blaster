@@ -41,8 +41,8 @@ let previousRender = {
 // set show gun muzzle to display the poition of a ships gun to check it's in the correct position
 // set renderDelay to true to make the render loop run slower than the update loop.
 // so setting a longer render delay can quickly show any problems
-const debug = { showGunMuzzle: false, renderDelay: false };
-const DEBUG_RENDER_DELAY = 5;
+export const debug = { showGunMuzzle: false, renderDelay: false, fps: true };
+const DEBUG_RENDER_DELAY = 1;
 let debug_render_countdown = DEBUG_RENDER_DELAY;
 
 function debug_skipRenderForThisFrame(): boolean {
@@ -157,14 +157,20 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
   if (debug_skipRenderForThisFrame()) return false;
 
   // ship is only in currentShipIds when active — going non-active removes it from the DOM
-  const currentShipIds = new Set(ship && ship.state === "active" ? [ship.id] : []);
+  const currentShipIds = new Set(
+    ship && ship.state === "active" ? [ship.id] : [],
+  );
   const { added: newShipIds, removed: oldShipIds } = diffSets(
     currentShipIds,
     previousRender.shipIds,
   );
 
   // ship just transitioned to exploding this frame — add explosion element
-  if (ship && ship.state === "exploding" && previousRender.shipIds.has(ship.id)) {
+  if (
+    ship &&
+    ship.state === "exploding" &&
+    previousRender.shipIds.has(ship.id)
+  ) {
     const el = document.createElement("div");
     el.setAttribute("id", "shipExplosion");
     el.setAttribute("class", "ship-explosion");

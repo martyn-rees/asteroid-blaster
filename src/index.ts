@@ -5,6 +5,7 @@ import { gameLoopRender } from "./render/gamelooprender.ts";
 import { onEnter, onExit, setUpLevel } from "./events/events.ts";
 import { removeFromScreen } from "./render/dom-render.ts";
 import { updateFPS } from "./utils/fps.js";
+import { debug } from "./render/gamelooprender.js";
 
 export let gameScreen = new Viewport("gameScreen", 800, 400);
 
@@ -52,8 +53,12 @@ function step(timestamp: number) {
 }
 
 function gameLoop(timestamp: number) {
-  updateFPS(timestamp);
-  gameLoopUpdate(gameScreen);
+  if (debug.fps) updateFPS(timestamp);
+  const elapsed =
+    previousTimestamp === 0 ? TARGET_FRAME_MS : timestamp - previousTimestamp;
+  previousTimestamp = timestamp;
+  const dt = Math.min(elapsed / TARGET_FRAME_MS, 3);
+  gameLoopUpdate(gameScreen, dt);
   gameLoopRender(gameState, gameScreen.id);
 }
 
