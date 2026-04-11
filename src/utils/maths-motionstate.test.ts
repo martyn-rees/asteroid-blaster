@@ -5,7 +5,7 @@ import {
   getDirectionRadians,
   convertRadiansToDegrees,
   convertDegreestoRadians,
-} from "./maths";
+} from "./maths-motionstate.ts";
 
 describe("updating rotation", () => {
   test("change rotation from north to west", () => {

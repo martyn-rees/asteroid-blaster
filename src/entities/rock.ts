@@ -1,13 +1,13 @@
-import { getNewPosition } from "../utils/maths";
+import { getNewPosition } from "../utils/maths-motionstate.ts";
 // use left-hand cartesian coords (standard screen coords with +ve y axis pointing down)
 // rotation angles: 0 - east, 90 - south, 180 - west, 270 - north
-import { Circle, Position, Velocity } from "./types";
+import { Circle, Position, RockSize, Velocity } from "./types.ts";
 
 export default class Rock {
   static rockIDCounter = 0;
   public index: number;
   public id: string;
-  public size: string;
+  public size: RockSize;
   public r: number;
   public rotationRate: number;
   public velocity: Velocity;
@@ -23,7 +23,7 @@ export default class Rock {
   }: {
     initialPosition: Position;
     initialVelocity: Velocity;
-    size: string;
+    size: RockSize;
     r: number;
     rotationRate: number;
   }) {

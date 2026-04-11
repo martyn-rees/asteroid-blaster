@@ -1,13 +1,13 @@
 import Rock from "./rock.ts";
-import { changeGameState } from "../state/gameState.ts";
-import { Position } from "./types.ts";
+import { changeGameState } from "../state/game-state.ts";
+import { Position, RockSize } from "./types.ts";
 import {
   getRandomEdgePosition,
   getRandomRockProps,
-} from "./rock-randomizer.ts";
+} from "../utils/rock-randomizer.ts";
 import { rockType } from "../assets/gamedata.ts";
 
-function addRock(size: string, pos: Position) {
+function addRock(size: RockSize, pos: Position) {
   const { velocity, r, rotationRate } = getRandomRockProps(rockType[size]);
   const rock = new Rock({
     initialPosition: pos,
@@ -38,10 +38,10 @@ export function explodeRock(rock: Rock) {
   const explodedRockLocation = rock.rockPosition;
   const rockSize = rock.size;
   // explode rock in to smaller rocks
-  if (rockSize == "large") {
+  if (rockSize === "large") {
     addRock("medium", explodedRockLocation);
     addRock("medium", explodedRockLocation);
-  } else if (rockSize == "medium") {
+  } else if (rockSize === "medium") {
     addRock("small", explodedRockLocation);
     addRock("small", explodedRockLocation);
     addRock("small", explodedRockLocation);

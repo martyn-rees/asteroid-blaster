@@ -4,10 +4,10 @@
 // if ID is not in previous list then create element
 // if ID is in previous list then update element position and rotation
 // if ID is not in current list but is in previous list then remove element
-import { Bullets, Rocks } from "../state/gameState.js";
-import Ship from "../entities/ship.js";
-import Rock from "../entities/rock.js";
-import Gun from "../entities/gun.js";
+import { Bullets, Rocks } from "../state/game-state.ts";
+import Ship from "../entities/ship.ts";
+import Rock from "../entities/rock.ts";
+import Gun from "../entities/gun.ts";
 
 import {
   addToScreen,
@@ -18,10 +18,10 @@ import {
   playSound,
   createRockElement,
   displayScore,
-} from "./dom-render.js";
+} from "./dom-render.ts";
 
-import { asteroidsSVG, shipSVG } from "../assets/graphics.js";
-import { GameState } from "../state/gameState.js";
+import { asteroidsSVG, shipSVG } from "../assets/graphics.ts";
+import { GameState } from "../state/game-state.ts";
 
 function diffSets(current: Set<string>, previous: Set<string>) {
   return {
@@ -134,12 +134,12 @@ function updateItems(ship: Ship, rocks: Rocks, bullets: Bullets) {
     redrawOnScreen(gun.id, gun.muzzlePosition.x, gun.muzzlePosition.y);
   }
   // redraw rocks
-  for (var rockId in rocks) {
+  for (const rockId in rocks) {
     const rock: Rock = rocks[rockId];
     redrawOnScreen(rockId, rock.position.x, rock.position.y, rock.rotation);
   }
   // redraw bullets
-  for (var bulletId in bullets) {
+  for (const bulletId in bullets) {
     const bullet = bullets[bulletId];
     redrawOnScreen(bulletId, bullet.position.x, bullet.position.y);
   }

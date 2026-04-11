@@ -89,7 +89,7 @@ export function playSound(soundDescription: string) {
   let soundurl;
   if (soundDescription === "shoot") {
     soundurl = "./sounds/shoot.wav";
-  } else if (soundDescription == "rock-explosion") {
+  } else if (soundDescription === "rock-explosion") {
     soundurl = "./sounds/rock-explosion.mp3";
   } else {
     console.error(`sound description ${soundDescription} not recognised`);

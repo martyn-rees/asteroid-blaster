@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { constrainNumber, testCollision } from "./helper.js";
+import { constrainNumber, testCollision } from "./maths.ts";
 
 test("move position to other side of screen if it goes off the edge", () => {
   const num = constrainNumber(40, 0, 100);

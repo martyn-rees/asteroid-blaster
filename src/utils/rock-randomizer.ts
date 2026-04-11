@@ -1,5 +1,5 @@
-import { RockSpec } from "../assets/gamedata";
-import { convertDegreestoRadians } from "../utils/maths";
+import { RockSpec } from "../assets/gamedata.ts";
+import { convertDegreestoRadians } from "./maths-motionstate.ts";
 
 // functions that reply on random numbers
 // the result of these functions can not be determined in user tests so they are packages up in to this file

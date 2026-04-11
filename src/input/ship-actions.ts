@@ -1,4 +1,4 @@
-import { keyBindings } from "../assets/gamedata.js";
+import { keyBindings } from "../assets/gamedata.ts";
 
 export type ShipActions = {
   thrust: boolean;
@@ -24,7 +24,7 @@ function resetShipActions() {
 }
 
 function shipControlKeyEvent(ev: KeyboardEvent, isKeyDown: boolean) {
-  var key = ev.code;
+  const key = ev.code;
   if (key === keyBindings.rotateLeft) {
     shipActions.rotateCounterClockwise = isKeyDown;
   }
