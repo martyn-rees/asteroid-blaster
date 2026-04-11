@@ -51,12 +51,12 @@ export default class Bullet {
   }
 
   // change endurance, bulletPower and position
-  update(transformX?: Function, transformY?: Function) {
-    const newPosition = getNewPosition(this.position, this.velocity);
+  update(transformX?: Function, transformY?: Function, dt: number = 1) {
+    const newPosition = getNewPosition(this.position, this.velocity, dt);
     const screenPosition = transform(newPosition, transformX, transformY);
 
     this.position = screenPosition;
-    this.endurance--;
+    this.endurance -= dt;
     if (this.endurance <= 0) {
       this.bulletPower = 0;
     }

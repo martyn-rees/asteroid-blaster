@@ -11,7 +11,7 @@ export const redrawOnScreen = (
   el.style.left = x + "px";
   el.style.top = y + "px";
   if (rotation) {
-    el.style.transform = `rotate(${rotation}deg)`;
+    el.style.transform = `rotate(${rotation}rad)`;
   }
 };
 

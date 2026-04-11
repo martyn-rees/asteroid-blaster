@@ -12,33 +12,33 @@ import { constrainNumber, testCollision } from "../utils/helper";
 import { explodeRock } from "../entities/rock-factory";
 import { getShipActions } from "../input/ship-actions";
 import Viewport from "../entities/viewport";
-function updateMotionStates(gameState: GameState, gameScreen: Viewport) {
+function updateMotionStates(gameState: GameState, gameScreen: Viewport, dt: number) {
   const { ship, bullets, rocks } = gameState;
   // use constrainNumber as a callback in update method of ship, rock and bullet classes instead of passing in gameScreen dimensions
   const warpX = (x: number) => constrainNumber(x, 0, gameScreen.width);
   const warpY = (y: number) => constrainNumber(y, 0, gameScreen.height);
 
   // update ship position based on motion state
-  ship!.update(warpX, warpY);
+  ship!.update(warpX, warpY, dt);
 
   // update position of bullet based on motion state
   for (var bulletId in bullets) {
-    bullets[bulletId].update(warpX, warpY);
+    bullets[bulletId].update(warpX, warpY, dt);
   }
 
   // update position of rock based on motion state
   for (var rock in rocks) {
     const thisRock = rocks[rock];
-    thisRock.update(warpX, warpY);
+    thisRock.update(warpX, warpY, dt);
   }
 }
 
-export function gameLoopUpdate(gameScreen: Viewport) {
+export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
   const ship = gameState.ship!;
   if (ship.state === "active") {
     changeGameState({ action: "ship actions", payload: getShipActions() });
   }
-  updateMotionStates(gameState, gameScreen);
+  updateMotionStates(gameState, gameScreen, dt);
 
   if (ship.state === "destroyed") {
     changeGameState({ action: "state", payload: "gameover" });

@@ -4,8 +4,13 @@ import { gameLoopUpdate } from "./update/gameloopupdate.ts";
 import { gameLoopRender } from "./render/gamelooprender.ts";
 import { onEnter, onExit, setUpLevel } from "./events/events.ts";
 import { removeFromScreen } from "./render/dom-render.ts";
+import { updateFPS } from "./utils/fps.js";
+import { debug } from "./render/gamelooprender.js";
 
 export let gameScreen = new Viewport("gameScreen", 800, 400);
+
+const TARGET_FRAME_MS = 1000 / 60;
+let previousTimestamp = 0;
 
 // GAME loop code
 function step(timestamp: number) {
@@ -20,16 +25,17 @@ function step(timestamp: number) {
       break;
     case "playing":
       if (previousState === "start") {
-        // if previous "menu" exit menu screen, setUpGame (set up ship, asteroids, score), add pause
         onExit("start");
         setUpLevel();
         onEnter("playing");
+        previousTimestamp = 0;
       }
       if (previousState === "paused") {
         onExit("pause");
         onEnter("playing");
+        previousTimestamp = 0;
       }
-      gameLoop();
+      gameLoop(timestamp);
       break;
     case "paused":
       if (previousState === "playing") {
@@ -46,8 +52,13 @@ function step(timestamp: number) {
   window.requestAnimationFrame(step);
 }
 
-function gameLoop() {
-  const { gameState } = gameLoopUpdate(gameScreen);
+function gameLoop(timestamp: number) {
+  if (debug.fps) updateFPS(timestamp);
+  const elapsed =
+    previousTimestamp === 0 ? TARGET_FRAME_MS : timestamp - previousTimestamp;
+  previousTimestamp = timestamp;
+  const dt = Math.min(elapsed / TARGET_FRAME_MS, 3);
+  gameLoopUpdate(gameScreen, dt);
   gameLoopRender(gameState, gameScreen.id);
 }
 

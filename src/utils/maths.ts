@@ -8,13 +8,17 @@ function convertRadiansToDegrees(radians: number) {
   return +((180 / Math.PI) * radians).toFixed(1);
 }
 
-function getNewPosition(position: Position, velocity: Velocity): Position {
-  const dx = velocity.speed * Math.cos(velocity.direction);
-  const dy = velocity.speed * Math.sin(velocity.direction);
-  return {
-    x: position.x + dx,
-    y: position.y + dy,
-  };
+function getNewPosition(
+  position: Position,
+  velocity: Velocity,
+  dt: number = 1,
+): Position {
+  const dx = velocity.speed * Math.cos(velocity.direction) * dt;
+  const dy = velocity.speed * Math.sin(velocity.direction) * dt;
+  // toFixed returns a string .e.g. "1.5", the pre-pended plus turns it back in to a number 1.5 (losing any trailing 0's)
+  let x = +(position.x + dx).toFixed(1);
+  let y = +(position.y + dy).toFixed(1);
+  return { x, y };
 }
 
 // calculate new position of a point attached to another object

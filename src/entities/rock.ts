@@ -1,4 +1,4 @@
-import { convertDegreestoRadians } from "../utils/maths";
+import { getNewPosition } from "../utils/maths";
 // use left-hand cartesian coords (standard screen coords with +ve y axis pointing down)
 // rotation angles: 0 - east, 90 - south, 180 - west, 270 - north
 import { Circle, Position, Velocity } from "./types";
@@ -55,29 +55,13 @@ export default class Rock {
     };
   }
 
-  // return new position rounds to 1 decimal place
-  calculateNewPosition({
-    position,
-    velocity,
-  }: {
-    position: Position;
-    velocity: Velocity;
-  }): Position {
-    const radians = convertDegreestoRadians(velocity.direction);
-    const dx = velocity.speed * Math.cos(radians);
-    const dy = velocity.speed * Math.sin(radians);
-    // toFixed returns a string .e.g. "1.5", the pre-pended plus turns it back in to a number 1.5 (losing any trailing 0's)
-    let x = +(position.x + dx).toFixed(1);
-    let y = +(position.y + dy).toFixed(1);
-    return { x, y };
-  }
-
-  update(transformXCallback?: Function, transformYCallback?: Function) {
-    const newPosition = this.calculateNewPosition({
-      position: this.position,
-      velocity: this.velocity,
-    });
-    this.rotation += this.rotationRate;
+  update(
+    transformXCallback?: Function,
+    transformYCallback?: Function,
+    dt: number = 1,
+  ) {
+    const newPosition = getNewPosition(this.position, this.velocity, dt);
+    this.rotation += this.rotationRate * dt;
     // use transforms to update position of rock on game screen
     this.position.x = transformXCallback
       ? transformXCallback(newPosition.x)

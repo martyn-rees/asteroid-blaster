@@ -1,4 +1,5 @@
 import { RockSpec } from "../assets/gamedata";
+import { convertDegreestoRadians } from "../utils/maths";
 
 // functions that reply on random numbers
 // the result of these functions can not be determined in user tests so they are packages up in to this file
@@ -36,17 +37,18 @@ function getRandomRockProps(rockProps: RockSpec) {
   let speed = getRandomNumberInRange(rockProps.speed.min, rockProps.speed.max);
   let r = getRandomNumberInRange(rockProps.radius.min, rockProps.radius.max);
   // choose a random direction but avoid angles within 15 degrees to vertical or horizontal
-  let direction = getRandomNumberInRange(15, 75);
+  let directionDegrees = getRandomNumberInRange(15, 75);
   let quadrant = 90 * Math.floor(Math.random() * 4);
-  direction = direction + quadrant;
+  const directionRadians = convertDegreestoRadians(directionDegrees + quadrant);
   let rotationRate = getRandomNumberInRange(
     rockProps.rotationRate.min,
     rockProps.rotationRate.max,
   );
   rotationRate = Math.random() > 0.5 ? rotationRate : -rotationRate;
-  let velocity = { speed, direction };
+  const rotationRateRadians = convertDegreestoRadians(rotationRate);
+  let velocity = { speed, direction: directionRadians };
 
-  return { velocity, r, rotationRate };
+  return { velocity, r, rotationRate: rotationRateRadians };
 }
 
 export { getRandomEdgePosition, getRandomRockProps };
