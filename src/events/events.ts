@@ -1,11 +1,11 @@
-import { changeGameState, gameState } from "../state/game-state";
-import { createButton } from "../ui/button";
-import { addToScreen, removeFromScreen } from "../render/dom-render";
-import { addNewShip } from "../entities/ship-factory";
-import { addNewRocksForNewLevel } from "../entities/rock-factory";
-import { createStartScreen } from "../ui/startscreen";
-import { createEndScreen } from "../ui/endscreen";
-import { gameScreen } from "../index";
+import { changeGameState, gameState } from "../state/game-state.ts";
+import { createButton } from "../ui/button.ts";
+import { addToScreen, removeFromScreen } from "../render/dom-render.ts";
+import { addNewShip } from "../entities/ship-factory.ts";
+import { addNewRocksForNewLevel } from "../entities/rock-factory.ts";
+import { createStartScreen } from "../ui/startscreen.ts";
+import { createEndScreen } from "../ui/endscreen.ts";
+import { gameScreen } from "../index.ts";
 
 let cursorHideTimer: ReturnType<typeof setTimeout> | null = null;
 let endScreenTimer: ReturnType<typeof setTimeout> | null = null;

@@ -1,4 +1,4 @@
-import { keyBindings } from "../assets/gamedata";
+import { keyBindings } from "../assets/gamedata.ts";
 
 function formatKey(code: string): string {
   const labels: Record<string, string> = {
@@ -33,6 +33,8 @@ export function createStartScreen(onStart: () => void): HTMLElement {
     </div>
     <button id="startButton" class="start-screen__button">start</button>
   `;
-  el.querySelector("#startButton")!.addEventListener("click", onStart, { once: true });
+  el.querySelector("#startButton")!.addEventListener("click", onStart, {
+    once: true,
+  });
   return el;
 }

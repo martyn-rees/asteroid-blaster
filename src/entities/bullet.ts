@@ -1,6 +1,6 @@
-import { Circle, Position, Velocity } from "./types";
-import { getNewPosition } from "../utils/maths";
-import { transform } from "../utils/helper";
+import { Circle, Position, Velocity } from "./types.ts";
+import { getNewPosition } from "../utils/maths-motionstate.ts";
+import { transform } from "../utils/maths.ts";
 
 // bullet specifications
 // endurance - a bullet only lasts for a short time after being fired. Count this down every frame (or time if using time based animation)

@@ -1,12 +1,12 @@
-import Gun from "./gun";
+import Gun from "./gun.ts";
 import {
   calculateNewVelocity,
   changeRotation,
   getNewPosition,
   convertDegreestoRadians,
-} from "../utils/maths";
-import { transform } from "../utils/helper";
-import { Position, Velocity, MotionState, Circle } from "./types";
+} from "../utils/maths-motionstate.ts";
+import { transform } from "../utils/maths.ts";
+import { Position, Velocity, MotionState, Circle } from "./types.ts";
 
 export type ShipState = "active" | "exploding" | "destroyed";
 

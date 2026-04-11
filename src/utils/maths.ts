@@ -1,126 +1,41 @@
-import { Position, Velocity } from "../entities/types";
+import { Circle, Position } from "../entities/types.ts";
 
-function convertDegreestoRadians(degrees: number) {
-  return (Math.PI / 180) * degrees;
-}
+export const constrainNumber = (
+  n: number,
+  min: number,
+  max: number,
+): number => {
+  let constrainedNumber = n;
+  if (n < min) {
+    constrainedNumber = max + n;
+  } else if (n > max) {
+    constrainedNumber = n - max;
+  }
+  return constrainedNumber;
+};
 
-function convertRadiansToDegrees(radians: number) {
-  return +((180 / Math.PI) * radians).toFixed(1);
-}
-
-function getNewPosition(
+// transform functions are used to keep the a position within the playing field.
+// For example, if the position goes off the right edge of the screen it can be transformed to the left edge of the screen and vice versa.
+// This is done by passing in a transform function that takes a position and returns a new position that is within the playing field.
+export function transform(
   position: Position,
-  velocity: Velocity,
-  dt: number = 1,
+  transformX?: Function,
+  transformY?: Function,
 ): Position {
-  const dx = velocity.speed * Math.cos(velocity.direction) * dt;
-  const dy = velocity.speed * Math.sin(velocity.direction) * dt;
-  // toFixed returns a string .e.g. "1.5", the pre-pended plus turns it back in to a number 1.5 (losing any trailing 0's)
-  let x = +(position.x + dx).toFixed(1);
-  let y = +(position.y + dy).toFixed(1);
+  const x = transformX ? transformX(position.x) : position.x;
+  const y = transformY ? transformY(position.y) : position.y;
   return { x, y };
 }
 
-// calculate new position of a point attached to another object
-// position and rotation are for main object
-// offset is the position of the attached point relative to the main object when the main object is at rotation 0
-// TODO: refactor to use getNewPosition
-export function getNewPositionWithOffset(
-  position: Position,
-  rotation: number,
-  offset: Position,
-): Position {
-  const dx = offset.x;
-  const dy = offset.y;
-  const offsetLength = Math.sqrt(dx * dx + dy * dy);
-  const offsetAngle = getDirectionRadians(dx, dy);
+// p1 and p2 are objects with x and y properties
+const distanceBetweenPoints = (p1: Circle, p2: Circle): number => {
+  let dx = p1.x - p2.x;
+  let dy = p1.y - p2.y;
+  return Math.sqrt(dx * dx + dy * dy);
+};
 
-  const offsetVector = {
-    x: offsetLength * Math.cos(offsetAngle + rotation),
-    y: offsetLength * Math.sin(offsetAngle + rotation),
-  };
-
-  const x = parseFloat((position.x + offsetVector.x).toFixed(1));
-  const y = parseFloat((position.y + offsetVector.y).toFixed(1));
-  return { x, y };
-}
-
-function getComponentVelocity(
-  v1: Velocity,
-  v2: Velocity,
-): { dx: number; dy: number } {
-  // javascript math issues
-  // NB: if direction is North (degrees:270, radians: 1.5 * Math.PI) then Math.cos(v1.direction) can be close to -0.000000000001 instead of 0
-  const v1x = v1.speed * Math.cos(v1.direction);
-  const v1y = v1.speed * Math.sin(v1.direction);
-
-  const v2x = v2.speed * Math.cos(v2.direction);
-  const v2y = v2.speed * Math.sin(v2.direction);
-
-  let dx = +(v1x + v2x).toFixed(3);
-  let dy = +(v1y + v2y).toFixed(3);
-
-  return { dx, dy };
-}
-
-// calculate new speed and direction
-function calculateNewVelocity(
-  v1: Velocity,
-  v2: Velocity,
-  maxSpeed: number,
-): Velocity {
-  let { dx, dy } = getComponentVelocity(v1, v2);
-  let speed = Math.sqrt(dx * dx + dy * dy);
-  if (speed > maxSpeed) {
-    speed = maxSpeed;
-  }
-
-  const radians = getDirectionRadians(dx, dy);
-  return { speed: speed, direction: radians };
-}
-
-//TODO: this provides direction basded on change of movement along x and y axis but it could also return speed as well therefore returning velocity
-function getDirectionRadians(dx: number, dy: number): number {
-  let radians = 0;
-
-  if (dx > 0) {
-    radians = Math.atan(dy / dx);
-  } else if (dx < 0) {
-    radians = Math.PI + Math.atan(dy / dx);
-  } else {
-    if (dy < 0) {
-      radians = 1.5 * Math.PI;
-    } else if (dy > 0) {
-      radians = Math.PI / 2;
-    } else {
-      radians = 1.5 * Math.PI;
-    }
-  }
-
-  return radians;
-}
-
-function changeRotation(
-  rotationChange: number,
-  currentRotation: number,
-  format: string = "radians",
-): number {
-  const maxAngle = format === "degrees" ? 360 : 2 * Math.PI;
-  let rotation = currentRotation + rotationChange;
-  if (rotation < 0) {
-    rotation += maxAngle;
-  } else if (rotation >= maxAngle) {
-    rotation -= maxAngle;
-  }
-  return rotation;
-}
-
-export {
-  calculateNewVelocity,
-  convertDegreestoRadians,
-  convertRadiansToDegrees,
-  getComponentVelocity,
-  getNewPosition,
-  getDirectionRadians,
-  changeRotation,
+// c1 and c2 are objects with x, y and r properties
+export const testCollision = (c1: Circle, c2: Circle): boolean => {
+  let minDistance = c1.r + c2.r;
+  return distanceBetweenPoints(c1, c2) < minDistance ? true : false;
 };

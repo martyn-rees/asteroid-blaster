@@ -4,14 +4,14 @@ import {
   GameState,
   Rocks,
   Bullets,
-} from "../state/game-state";
-import Gun from "../entities/gun";
-import Bullet from "../entities/bullet";
-import { bulletSpecs, rockType } from "../assets/gamedata";
-import { constrainNumber, testCollision } from "../utils/helper";
-import { explodeRock } from "../entities/rock-factory";
-import { getShipActions } from "../input/ship-actions";
-import Viewport from "../entities/viewport";
+} from "../state/game-state.ts";
+import Gun from "../entities/gun.ts";
+import Bullet from "../entities/bullet.ts";
+import { bulletSpecs, rockType } from "../assets/gamedata.ts";
+import { constrainNumber, testCollision } from "../utils/maths.ts";
+import { explodeRock } from "../entities/rock-factory.ts";
+import { getShipActions } from "../input/ship-actions.ts";
+import Viewport from "../entities/viewport.ts";
 function updateMotionStates(
   gameState: GameState,
   gameScreen: Viewport,
@@ -26,12 +26,12 @@ function updateMotionStates(
   ship!.update(warpX, warpY, dt);
 
   // update position of bullet based on motion state
-  for (var bulletId in bullets) {
+  for (const bulletId in bullets) {
     bullets[bulletId].update(warpX, warpY, dt);
   }
 
   // update position of rock based on motion state
-  for (var rockId in rocks) {
+  for (const rockId in rocks) {
     const thisRock = rocks[rockId];
     thisRock.update(warpX, warpY, dt);
   }
@@ -67,7 +67,7 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
   // this could be moved to collision function where it loops over bullets to save looping over bullets twice but for now its kept separate for clarity
   // this also changes gameState.bullets as action: "delete bullet" removes any dead bullets from gameState.bullets so this should return the new array
   const currentBullets: Bullets = { ...gameState.bullets };
-  for (var bulletId in currentBullets) {
+  for (const bulletId in currentBullets) {
     const thisBullet = currentBullets[bulletId];
     if (thisBullet.bulletPower === 0) {
       changeGameState({ action: "delete bullet", payload: thisBullet });
@@ -77,13 +77,13 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
   // currentRocks and currentBullets are array copies so not using the gameState arrays directly as the gameState arrays get updated inside the loop
   const currentRocks: Rocks = { ...gameState.rocks };
   // test each rock for collision with bullets and ship
-  for (var rockId in currentRocks) {
+  for (const rockId in currentRocks) {
     let hasRockCollided: boolean = false;
     const thisRock = currentRocks[rockId];
     // test rock against each bullet until collision is found - if collision then remove bullet and record a collision has happened and break out of bullet loop
     // BUG: it's possible that a bullet can hit 2 rocks if using currentBullets above. The alternative is to use gameState.bullets directly but this array also
     // gets amended if a bullet hits a rock
-    for (var bulletId in gameState.bullets) {
+    for (const bulletId in gameState.bullets) {
       const thisBullet = gameState.bullets[bulletId];
       hasRockCollided = testCollision(
         thisRock.boundary(),

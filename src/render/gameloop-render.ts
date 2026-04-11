@@ -134,12 +134,12 @@ function updateItems(ship: Ship, rocks: Rocks, bullets: Bullets) {
     redrawOnScreen(gun.id, gun.muzzlePosition.x, gun.muzzlePosition.y);
   }
   // redraw rocks
-  for (var rockId in rocks) {
+  for (const rockId in rocks) {
     const rock: Rock = rocks[rockId];
     redrawOnScreen(rockId, rock.position.x, rock.position.y, rock.rotation);
   }
   // redraw bullets
-  for (var bulletId in bullets) {
+  for (const bulletId in bullets) {
     const bullet = bullets[bulletId];
     redrawOnScreen(bulletId, bullet.position.x, bullet.position.y);
   }
