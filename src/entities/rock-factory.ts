@@ -1,5 +1,5 @@
 import Rock from "./rock.ts";
-import { changeGameState } from "../state/gameState.ts";
+import { changeGameState } from "../state/game-state.ts";
 import { Position } from "./types.ts";
 import {
   getRandomEdgePosition,

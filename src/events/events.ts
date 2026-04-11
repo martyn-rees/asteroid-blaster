@@ -1,4 +1,4 @@
-import { changeGameState, gameState } from "../state/gameState";
+import { changeGameState, gameState } from "../state/game-state";
 import { createButton } from "../ui/button";
 import { addToScreen, removeFromScreen } from "../render/dom-render";
 import { addNewShip } from "../entities/ship-factory";

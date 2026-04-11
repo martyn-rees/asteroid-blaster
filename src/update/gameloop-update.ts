@@ -4,7 +4,7 @@ import {
   GameState,
   Rocks,
   Bullets,
-} from "../state/gameState";
+} from "../state/game-state";
 import Gun from "../entities/gun";
 import Bullet from "../entities/bullet";
 import { bulletSpecs, rockType } from "../assets/gamedata";
@@ -12,7 +12,11 @@ import { constrainNumber, testCollision } from "../utils/helper";
 import { explodeRock } from "../entities/rock-factory";
 import { getShipActions } from "../input/ship-actions";
 import Viewport from "../entities/viewport";
-function updateMotionStates(gameState: GameState, gameScreen: Viewport, dt: number) {
+function updateMotionStates(
+  gameState: GameState,
+  gameScreen: Viewport,
+  dt: number,
+) {
   const { ship, bullets, rocks } = gameState;
   // use constrainNumber as a callback in update method of ship, rock and bullet classes instead of passing in gameScreen dimensions
   const warpX = (x: number) => constrainNumber(x, 0, gameScreen.width);
@@ -27,8 +31,8 @@ function updateMotionStates(gameState: GameState, gameScreen: Viewport, dt: numb
   }
 
   // update position of rock based on motion state
-  for (var rock in rocks) {
-    const thisRock = rocks[rock];
+  for (var rockId in rocks) {
+    const thisRock = rocks[rockId];
     thisRock.update(warpX, warpY, dt);
   }
 }
@@ -92,10 +96,7 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
     }
     // if the rock has not collided with a bullet then check if it has collided with the ship
     if (!hasRockCollided && ship.state === "active") {
-      hasRockCollided = testCollision(
-        thisRock.boundary(),
-        ship.boundary(),
-      );
+      hasRockCollided = testCollision(thisRock.boundary(), ship.boundary());
       if (hasRockCollided) {
         changeGameState({ action: "delete ship" });
       }

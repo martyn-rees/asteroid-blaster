@@ -1,11 +1,11 @@
 import Viewport from "./entities/viewport.ts";
-import { changeGameState, gameState } from "./state/gameState.ts";
-import { gameLoopUpdate } from "./update/gameloopupdate.ts";
-import { gameLoopRender } from "./render/gamelooprender.ts";
+import { changeGameState, gameState } from "./state/game-state.ts";
+import { gameLoopUpdate } from "./update/gameloop-update.ts";
+import { gameLoopRender } from "./render/gameloop-render.ts";
 import { onEnter, onExit, setUpLevel } from "./events/events.ts";
 import { removeFromScreen } from "./render/dom-render.ts";
-import { updateFPS } from "./utils/fps.js";
-import { debug } from "./render/gamelooprender.js";
+import { updateFPS } from "./utils/fps.ts";
+import { debug } from "./render/gameloop-render.ts";
 
 export let gameScreen = new Viewport("gameScreen", 800, 400);
 
