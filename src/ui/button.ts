@@ -7,7 +7,7 @@ export function createButton({
   label: string;
   id: string;
   className: string;
-  onClick: Function;
+  onClick: () => void;
 }): HTMLElement {
   // eg. <button id="startButton" class="start-button press-start-2p-regular">start</button>
   let button = document.createElement("button");

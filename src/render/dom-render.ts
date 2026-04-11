@@ -1,3 +1,5 @@
+import { RockSize } from "../entities/types.ts";
+
 // change position and rotation to element already on screen
 // TODO maybe provide additonalCLass property which could be used for examples such as ships thrust
 // could be Display.update
@@ -63,7 +65,7 @@ export function createRockElement({
   id: string;
   r: number;
   asteroidImage: string;
-  size: string;
+  size: RockSize;
 }): HTMLElement {
   let rockStyle = `height:${2 * r}px; width:${2 * r}px; margin-left:-${r}px; margin-top:-${r}px;`;
   const rockClass = size === "small" ? "rock" : "rock glow";

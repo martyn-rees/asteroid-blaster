@@ -1,4 +1,5 @@
 import { changeGameState, gameState } from "../state/game-state.ts";
+import { GamePhase } from "../entities/types.ts";
 import { createButton } from "../ui/button.ts";
 import { addToScreen, removeFromScreen } from "../render/dom-render.ts";
 import { addNewShip } from "../entities/ship-factory.ts";
@@ -77,7 +78,7 @@ function setUpLevel() {
   );
 }
 
-function onEnter(screen: string) {
+function onEnter(screen: GamePhase) {
   switch (screen) {
     case "start":
       changeGameState({ action: "state", payload: "start" });
@@ -93,7 +94,7 @@ function onEnter(screen: string) {
       addPauseButton();
       hideCursor();
       break;
-    case "pause":
+    case "paused":
       changeGameState({ action: "state", payload: "paused" });
       removeFromScreen("pauseButton");
       addResumeButton();
@@ -118,12 +119,12 @@ function onEnter(screen: string) {
 }
 
 // buttons onClick events are automatically removed so do not need to clean up attachedEvent
-function onExit(screen: string) {
+function onExit(screen: GamePhase) {
   switch (screen) {
     case "start":
       removeFromScreen("startScreen");
       break;
-    case "pause":
+    case "paused":
       removeFromScreen("resumeButton");
       showCursor();
       break;

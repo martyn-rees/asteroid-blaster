@@ -22,14 +22,14 @@ export function handleStateTransition(
         onResetTimer();
       }
       if (previousState === "paused") {
-        onExit("pause");
+        onExit("paused");
         onEnter("playing");
         onResetTimer();
       }
       break;
     case "paused":
       if (previousState === "playing") {
-        onEnter("pause");
+        onEnter("paused");
       }
       break;
     case "gameover":
