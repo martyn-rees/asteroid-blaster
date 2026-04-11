@@ -1,12 +1,14 @@
-import { changeGameState } from "../state/gameState";
+import { changeGameState, gameState } from "../state/gameState";
 import { createButton } from "../ui/button";
 import { addToScreen, removeFromScreen } from "../render/dom-render";
 import { addNewShip } from "../entities/ship-factory";
 import { addNewRocksForNewLevel } from "../entities/rock-factory";
 import { createStartScreen } from "../ui/startscreen";
+import { createEndScreen } from "../ui/endscreen";
 import { gameScreen } from "../index";
 
 let cursorHideTimer: ReturnType<typeof setTimeout> | null = null;
+let endScreenTimer: ReturnType<typeof setTimeout> | null = null;
 
 function onMouseMove() {
   const el = document.getElementById(gameScreen.id);
@@ -37,7 +39,6 @@ function showCursor() {
   }
 }
 
-
 function addPauseButton() {
   const pauseButton = createButton({
     label: "pause",
@@ -60,7 +61,11 @@ function addResumeButton() {
 
 // add ship and then add rocks after a set time and set score to 0
 function setUpLevel() {
-  changeGameState({ action: "score", payload: 0 });
+  if (endScreenTimer) {
+    clearTimeout(endScreenTimer);
+    endScreenTimer = null;
+  }
+  changeGameState({ action: "reset game" });
   addNewShip(gameScreen.centre);
   setTimeout(
     () =>
@@ -76,7 +81,12 @@ function onEnter(screen: string) {
   switch (screen) {
     case "start":
       changeGameState({ action: "state", payload: "start" });
-      addToScreen(createStartScreen(() => changeGameState({ action: "state", payload: "playing" })), gameScreen.id);
+      addToScreen(
+        createStartScreen(() =>
+          changeGameState({ action: "state", payload: "playing" }),
+        ),
+        gameScreen.id,
+      );
       break;
     case "playing":
       changeGameState({ action: "state", payload: "playing" });
@@ -87,6 +97,22 @@ function onEnter(screen: string) {
       changeGameState({ action: "state", payload: "paused" });
       removeFromScreen("pauseButton");
       addResumeButton();
+      break;
+    case "gameover":
+      changeGameState({ action: "state", payload: "gameover" });
+      showCursor();
+      removeFromScreen("pauseButton");
+      endScreenTimer = setTimeout(() => {
+        endScreenTimer = null;
+        if (gameState.state === "gameover") {
+          addToScreen(
+            createEndScreen(gameState.score, () =>
+              changeGameState({ action: "state", payload: "start" }),
+            ),
+            gameScreen.id,
+          );
+        }
+      }, 3000);
       break;
   }
 }

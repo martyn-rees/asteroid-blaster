@@ -39,7 +39,8 @@ type GameStateAction =
   | { action: "delete rock"; payload: Rock }
   | { action: "add bullet"; payload: Bullet }
   | { action: "delete bullet"; payload: Bullet }
-  | { action: "score"; payload: number };
+  | { action: "score"; payload: number }
+  | { action: "reset game" };
 
 // Do not destructure to ({ action, payload }) — it severs the link between them
 // and breaks type narrowing, requiring manual casts in each case.
@@ -56,8 +57,7 @@ export function changeGameState(change: GameStateAction) {
       gameState.ship = change.payload;
       break;
     case "delete ship":
-      // TODO: will need to remove ship when game ends. maybe add an explosion animation before removing the ship?
-      // gameState.ship = undefined;
+      gameState.ship?.explode();
       removeShipControlEvents();
       break;
     case "add rock":
@@ -74,6 +74,12 @@ export function changeGameState(change: GameStateAction) {
       break;
     case "score":
       gameState.score += change.payload;
+      break;
+    case "reset game":
+      gameState.ship = undefined;
+      gameState.rocks = {};
+      gameState.bullets = {};
+      gameState.score = 0;
       break;
   }
 }

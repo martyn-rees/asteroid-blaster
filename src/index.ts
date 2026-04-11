@@ -3,6 +3,7 @@ import { changeGameState, gameState } from "./state/gameState.ts";
 import { gameLoopUpdate } from "./update/gameloopupdate.ts";
 import { gameLoopRender } from "./render/gamelooprender.ts";
 import { onEnter, onExit, setUpLevel } from "./events/events.ts";
+import { removeFromScreen } from "./render/dom-render.ts";
 
 export let gameScreen = new Viewport("gameScreen", 800, 400);
 
@@ -13,6 +14,7 @@ function step(timestamp: number) {
   switch (currentState) {
     case "start":
       if (previousState !== "start") {
+        if (previousState === "gameover") removeFromScreen("endScreen");
         onEnter("start");
       }
       break;
@@ -35,7 +37,9 @@ function step(timestamp: number) {
       }
       break;
     case "gameover":
-      console.log("gameover");
+      if (previousState === "playing") {
+        onEnter("gameover");
+      }
       break;
   }
 
