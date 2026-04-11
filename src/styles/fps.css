@@ -1,0 +1,13 @@
+
+.fps {
+    position: absolute;
+    bottom: 24px;
+    right: 10px;
+    color: #666;
+    font-size: 10px;
+    pointer-events: none;
+}
+
+.fps--stats {
+    bottom: 8px;
+}
