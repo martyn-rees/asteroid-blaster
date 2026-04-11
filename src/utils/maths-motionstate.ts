@@ -102,7 +102,7 @@ function getDirectionRadians(dx: number, dy: number): number {
 function changeRotation(
   rotationChange: number,
   currentRotation: number,
-  format: string = "radians",
+  format: "degrees" | "radians" = "radians",
 ): number {
   const maxAngle = format === "degrees" ? 360 : 2 * Math.PI;
   let rotation = currentRotation + rotationChange;

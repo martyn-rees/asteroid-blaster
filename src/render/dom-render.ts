@@ -1,4 +1,4 @@
-import { RockSize } from "../entities/types.ts";
+import { RockSize, SoundEffect } from "../entities/types.ts";
 
 // change position and rotation to element already on screen
 // TODO maybe provide additonalCLass property which could be used for examples such as ships thrust
@@ -87,7 +87,7 @@ export function removeFromScreen(elId: string) {
   }
 }
 
-export function getSoundForAction(action: string): string {
+export function getSoundForAction(action: SoundEffect): string {
   if (action === "shoot") {
     return "./sounds/shoot.wav";
   } else if (action === "rock-explosion") {
@@ -98,7 +98,7 @@ export function getSoundForAction(action: string): string {
   }
 }
 
-export function playSound(soundDescription: string) {
+export function playSound(soundDescription: SoundEffect) {
   const soundurl: string = getSoundForAction(soundDescription);
   if (soundurl !== "") {
     const sound = new Audio(soundurl);
