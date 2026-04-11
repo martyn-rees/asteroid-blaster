@@ -1,4 +1,5 @@
 import Gun from "./gun.ts";
+import { BoundaryTransform } from "./types.ts";
 import {
   calculateNewVelocity,
   changeRotation,
@@ -106,8 +107,8 @@ export default class Ship {
   }
 
   update(
-    transformXCallback?: Function,
-    transformYCallback?: Function,
+    transformXCallback?: BoundaryTransform,
+    transformYCallback?: BoundaryTransform,
     dt: number = 1,
   ) {
     if (this.state === "exploding") {

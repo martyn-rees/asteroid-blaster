@@ -85,18 +85,23 @@ export function removeFromScreen(elId: string) {
   }
 }
 
-export function playSound(soundDescription: string) {
-  let soundurl;
-  if (soundDescription === "shoot") {
-    soundurl = "./sounds/shoot.wav";
-  } else if (soundDescription === "rock-explosion") {
-    soundurl = "./sounds/rock-explosion.mp3";
+export function getSoundForAction(action: string): string {
+  if (action === "shoot") {
+    return "./sounds/shoot.wav";
+  } else if (action === "rock-explosion") {
+    return "./sounds/rock-explosion.mp3";
   } else {
-    console.error(`sound description ${soundDescription} not recognised`);
-    return;
+    console.error(`Sound action ${action} not recognised`);
+    return "";
   }
-  const sound = new Audio(soundurl);
-  sound.volume = 0.1;
-  sound.load();
-  sound.play();
+}
+
+export function playSound(soundDescription: string) {
+  const soundurl: string = getSoundForAction(soundDescription);
+  if (soundurl !== "") {
+    const sound = new Audio(soundurl);
+    sound.volume = 0.1;
+    sound.load();
+    sound.play();
+  }
 }

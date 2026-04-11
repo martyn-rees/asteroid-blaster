@@ -24,7 +24,6 @@ function getNewPosition(
 // calculate new position of a point attached to another object
 // position and rotation are for main object
 // offset is the position of the attached point relative to the main object when the main object is at rotation 0
-// TODO: refactor to use getNewPosition
 export function getNewPositionWithOffset(
   position: Position,
   rotation: number,
