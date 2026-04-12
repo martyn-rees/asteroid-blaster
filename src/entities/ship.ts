@@ -1,5 +1,5 @@
 import Gun from "./gun.ts";
-import { BoundaryTransform } from "./types.ts";
+import { BoundaryTransform } from "../types.ts";
 import {
   calculateNewVelocity,
   changeRotation,
@@ -7,7 +7,7 @@ import {
   convertDegreestoRadians,
 } from "../utils/maths-motionstate.ts";
 import { transform } from "../utils/maths.ts";
-import { Position, Velocity, MotionState, Circle } from "./types.ts";
+import { Position, Velocity, MotionState, Circle } from "../types.ts";
 
 export type ShipState = "active" | "exploding" | "destroyed";
 

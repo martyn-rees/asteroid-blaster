@@ -1,4 +1,4 @@
-import { Position, Velocity } from "../entities/types.ts";
+import { Position, Velocity } from "../types.ts";
 
 function convertDegreestoRadians(degrees: number) {
   return (Math.PI / 180) * degrees;

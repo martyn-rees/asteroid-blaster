@@ -1,4 +1,4 @@
-import { GamePhase } from "../entities/types.ts";
+import { GamePhase } from "../types.ts";
 import { onEnter, onExit, setUpLevel } from "../events/events.ts";
 import { removeFromScreen } from "../render/dom-render.ts";
 

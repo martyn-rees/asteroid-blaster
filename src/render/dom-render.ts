@@ -1,4 +1,4 @@
-import { RockSize, SoundEffect } from "../entities/types.ts";
+import { RockSize, SoundEffect } from "../types.ts";
 
 // change position and rotation to element already on screen
 // TODO maybe provide additonalCLass property which could be used for examples such as ships thrust

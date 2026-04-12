@@ -1,8 +1,8 @@
 import { getNewPosition } from "../utils/maths-motionstate.ts";
-import { BoundaryTransform } from "./types.ts";
+import { BoundaryTransform } from "../types.ts";
 // use left-hand cartesian coords (standard screen coords with +ve y axis pointing down)
 // rotation angles: 0 - east, 90 - south, 180 - west, 270 - north
-import { Circle, Position, RockSize, Velocity } from "./types.ts";
+import { Circle, Position, RockSize, Velocity } from "../types.ts";
 
 export default class Rock {
   static rockIDCounter = 0;

@@ -1,5 +1,5 @@
 import { RockSpec } from "../assets/gamedata.ts";
-import { EdgeSide } from "../entities/types.ts";
+import { EdgeSide } from "../types.ts";
 import { convertDegreestoRadians } from "./maths-motionstate.ts";
 
 // functions that reply on random numbers

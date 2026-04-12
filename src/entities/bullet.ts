@@ -1,5 +1,5 @@
-import { Circle, Position, Velocity } from "./types.ts";
-import { BoundaryTransform } from "./types.ts";
+import { Circle, Position, Velocity } from "../types.ts";
+import { BoundaryTransform } from "../types.ts";
 import { getNewPosition } from "../utils/maths-motionstate.ts";
 import { transform } from "../utils/maths.ts";
 

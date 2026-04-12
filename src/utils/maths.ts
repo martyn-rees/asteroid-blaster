@@ -1,4 +1,4 @@
-import { BoundaryTransform, Circle, Position } from "../entities/types.ts";
+import { BoundaryTransform, Circle, Position } from "../types.ts";
 
 export const constrainNumber = (
   n: number,

@@ -1,5 +1,5 @@
 import { changeGameState, gameState } from "../state/game-state.ts";
-import { GamePhase } from "../entities/types.ts";
+import { GamePhase } from "../types.ts";
 import { createButton } from "../ui/button.ts";
 import { addToScreen, removeFromScreen } from "../render/dom-render.ts";
 import { addNewShip } from "../entities/ship-factory.ts";
