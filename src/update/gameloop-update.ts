@@ -19,21 +19,23 @@ function updateMotionStates(
 ) {
   const { ship, bullets, rocks } = gameState;
   // use constrainNumber as a callback in update method of ship, rock and bullet classes instead of passing in gameScreen dimensions
-  const warpX = (x: number) => constrainNumber(x, 0, gameScreen.width);
-  const warpY = (y: number) => constrainNumber(y, 0, gameScreen.height);
+  const warpPosition = ({ x, y }: { x: number; y: number }) => ({
+    x: constrainNumber(x, 0, gameScreen.width),
+    y: constrainNumber(y, 0, gameScreen.height),
+  });
 
   // update ship position based on motion state
-  ship!.update(warpX, warpY, dt);
+  ship!.update(warpPosition, dt);
 
   // update position of bullet based on motion state
   for (const bulletId in bullets) {
-    bullets[bulletId].update(warpX, warpY, dt);
+    bullets[bulletId].update(warpPosition, dt);
   }
 
   // update position of rock based on motion state
   for (const rockId in rocks) {
     const thisRock = rocks[rockId];
-    thisRock.update(warpX, warpY, dt);
+    thisRock.update(warpPosition, dt);
   }
 }
 

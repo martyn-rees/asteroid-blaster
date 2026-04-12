@@ -1,5 +1,5 @@
 import Gun from "./gun.ts";
-import { BoundaryTransform } from "../types.ts";
+import { PositionTransform } from "../types.ts";
 import {
   calculateNewVelocity,
   changeRotation,
@@ -107,8 +107,7 @@ export default class Ship {
   }
 
   update(
-    transformXCallback?: BoundaryTransform,
-    transformYCallback?: BoundaryTransform,
+    transformPosition?: PositionTransform,
     dt: number = 1,
   ) {
     if (this.state === "exploding") {
@@ -140,11 +139,7 @@ export default class Ship {
     const newPosition = getNewPosition(this.position, newVelocity, dt);
     // use transforms to update position of rock on game screen
     // update x,y,velocity and direction of rotation
-    this.position = transform(
-      newPosition,
-      transformXCallback,
-      transformYCallback,
-    );
+    this.position = transform(newPosition, transformPosition);
     this.velocity = newVelocity;
 
     // update gun state

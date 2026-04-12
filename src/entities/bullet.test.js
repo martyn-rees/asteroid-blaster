@@ -63,12 +63,12 @@ test("bullet movement after 2 frames", () => {
 });
 
 test("bullet movement after 2 frames with transform", () => {
-  const transformCallback = (x) => {
-    return 10;
+  const transformCallback = (pos) => {
+    return { x: 10, y: 10 };
   };
   const bullet = setUp();
   bullet.update();
-  bullet.update(transformCallback, transformCallback);
+  bullet.update(transformCallback);
   expect(bullet.position.x).toBe(10);
   expect(bullet.position.y).toBe(10);
 });

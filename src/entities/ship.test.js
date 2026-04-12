@@ -223,8 +223,8 @@ test("ships rotation resets after 360 degrees", () => {
 });
 
 test("ship movement after 2 frames with transform", () => {
-  const transformCallback = (x) => {
-    return 10;
+  const transformCallback = (pos) => {
+    return { x: 10, y: 10 };
   };
   const ship = setUp();
   ship.setInput(
@@ -232,7 +232,7 @@ test("ship movement after 2 frames with transform", () => {
       thrust: true,
     }),
   );
-  ship.update(transformCallback, transformCallback);
+  ship.update(transformCallback);
   expect(ship.position.x).toBe(10);
   expect(ship.position.y).toBe(10);
 });

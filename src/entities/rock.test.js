@@ -76,11 +76,11 @@ test("rock movement after 2 frames moving North", () => {
 });
 
 test("rock movement after 2 frames with transform", () => {
-  const transformCallback = (x) => {
-    return 10;
+  const transformCallback = (pos) => {
+    return { x: 10, y: 10 };
   };
   const rock = setUp();
   rock.update();
-  rock.update(transformCallback, transformCallback);
+  rock.update(transformCallback);
   expect(rock.rockPosition).toStrictEqual({ x: 10, y: 10 });
 });
