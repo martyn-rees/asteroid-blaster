@@ -1,7 +1,8 @@
 import { getNewPosition } from "../utils/maths-motionstate.ts";
+import { PositionTransform } from "../types.ts";
 // use left-hand cartesian coords (standard screen coords with +ve y axis pointing down)
 // rotation angles: 0 - east, 90 - south, 180 - west, 270 - north
-import { Circle, Position, RockSize, Velocity } from "./types.ts";
+import { Circle, Position, RockSize, Velocity } from "../types.ts";
 
 export default class Rock {
   static rockIDCounter = 0;
@@ -56,18 +57,11 @@ export default class Rock {
   }
 
   update(
-    transformXCallback?: Function,
-    transformYCallback?: Function,
+    transformPosition?: PositionTransform,
     dt: number = 1,
   ) {
     const newPosition = getNewPosition(this.position, this.velocity, dt);
     this.rotation += this.rotationRate * dt;
-    // use transforms to update position of rock on game screen
-    this.position.x = transformXCallback
-      ? transformXCallback(newPosition.x)
-      : newPosition.x;
-    this.position.y = transformYCallback
-      ? transformYCallback(newPosition.y)
-      : newPosition.y;
+    this.position = transformPosition ? transformPosition(newPosition) : newPosition;
   }
 }

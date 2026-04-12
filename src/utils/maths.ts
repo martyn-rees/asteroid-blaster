@@ -1,4 +1,4 @@
-import { Circle, Position } from "../entities/types.ts";
+import { Circle, Position, PositionTransform } from "../types.ts";
 
 export const constrainNumber = (
   n: number,
@@ -19,12 +19,9 @@ export const constrainNumber = (
 // This is done by passing in a transform function that takes a position and returns a new position that is within the playing field.
 export function transform(
   position: Position,
-  transformX?: Function,
-  transformY?: Function,
+  transformPosition?: PositionTransform,
 ): Position {
-  const x = transformX ? transformX(position.x) : position.x;
-  const y = transformY ? transformY(position.y) : position.y;
-  return { x, y };
+  return transformPosition ? transformPosition(position) : position;
 }
 
 // p1 and p2 are objects with x and y properties

@@ -1,4 +1,4 @@
-import { Position, Velocity } from "../entities/types.ts";
+import { Position, Velocity } from "../types.ts";
 
 function convertDegreestoRadians(degrees: number) {
   return (Math.PI / 180) * degrees;
@@ -24,7 +24,6 @@ function getNewPosition(
 // calculate new position of a point attached to another object
 // position and rotation are for main object
 // offset is the position of the attached point relative to the main object when the main object is at rotation 0
-// TODO: refactor to use getNewPosition
 export function getNewPositionWithOffset(
   position: Position,
   rotation: number,
@@ -103,7 +102,7 @@ function getDirectionRadians(dx: number, dy: number): number {
 function changeRotation(
   rotationChange: number,
   currentRotation: number,
-  format: string = "radians",
+  format: "degrees" | "radians" = "radians",
 ): number {
   const maxAngle = format === "degrees" ? 360 : 2 * Math.PI;
   let rotation = currentRotation + rotationChange;

@@ -21,7 +21,7 @@ export const gunSpec = {
 
 type Range = { min: number; max: number };
 
-import { RockSize } from "../entities/types.ts";
+import { RockSize } from "../types.ts";
 
 export type RockSpec = {
   description: RockSize;

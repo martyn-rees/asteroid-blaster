@@ -1,6 +1,6 @@
 import Rock from "./rock.ts";
 import { changeGameState } from "../state/game-state.ts";
-import { Position, RockSize } from "./types.ts";
+import { EdgeSide, Position, RockSize } from "../types.ts";
 import {
   getRandomEdgePosition,
   getRandomRockProps,
@@ -27,7 +27,7 @@ export function addNewRocksForNewLevel({
   screenSize: { screenWidth: number; screenHeight: number };
 }) {
   for (let i = 0; i < rockAmount; i++) {
-    const borders: string[] = ["top", "right", "bottom", "left"];
+    const borders: EdgeSide[] = ["top", "right", "bottom", "left"];
     const edge = borders[i % 4];
     const posXY = getRandomEdgePosition(edge, screenSize);
     addRock("large", posXY);

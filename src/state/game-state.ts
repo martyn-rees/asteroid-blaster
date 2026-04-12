@@ -2,7 +2,7 @@ import Rock from "../entities/rock.ts";
 import Ship from "../entities/ship.ts";
 import Bullet from "../entities/bullet.ts";
 import { removeShipControlEvents, ShipActions } from "../input/ship-actions.ts";
-import { GamePhase } from "../entities/types.ts";
+import { GamePhase } from "../types.ts";
 
 export interface Rocks {
   [index: string]: Rock;

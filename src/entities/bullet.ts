@@ -1,4 +1,4 @@
-import { Circle, Position, Velocity } from "./types.ts";
+import { Circle, Position, PositionTransform, Velocity } from "../types.ts";
 import { getNewPosition } from "../utils/maths-motionstate.ts";
 import { transform } from "../utils/maths.ts";
 
@@ -51,9 +51,12 @@ export default class Bullet {
   }
 
   // change endurance, bulletPower and position
-  update(transformX?: Function, transformY?: Function, dt: number = 1) {
+  update(
+    transformPosition?: PositionTransform,
+    dt: number = 1,
+  ) {
     const newPosition = getNewPosition(this.position, this.velocity, dt);
-    const screenPosition = transform(newPosition, transformX, transformY);
+    const screenPosition = transform(newPosition, transformPosition);
 
     this.position = screenPosition;
     this.endurance -= dt;

@@ -1,4 +1,5 @@
 import Gun from "./gun.ts";
+import { PositionTransform } from "../types.ts";
 import {
   calculateNewVelocity,
   changeRotation,
@@ -6,7 +7,7 @@ import {
   convertDegreestoRadians,
 } from "../utils/maths-motionstate.ts";
 import { transform } from "../utils/maths.ts";
-import { Position, Velocity, MotionState, Circle } from "./types.ts";
+import { Position, Velocity, MotionState, Circle } from "../types.ts";
 
 export type ShipState = "active" | "exploding" | "destroyed";
 
@@ -106,8 +107,7 @@ export default class Ship {
   }
 
   update(
-    transformXCallback?: Function,
-    transformYCallback?: Function,
+    transformPosition?: PositionTransform,
     dt: number = 1,
   ) {
     if (this.state === "exploding") {
@@ -139,11 +139,7 @@ export default class Ship {
     const newPosition = getNewPosition(this.position, newVelocity, dt);
     // use transforms to update position of rock on game screen
     // update x,y,velocity and direction of rotation
-    this.position = transform(
-      newPosition,
-      transformXCallback,
-      transformYCallback,
-    );
+    this.position = transform(newPosition, transformPosition);
     this.velocity = newVelocity;
 
     // update gun state

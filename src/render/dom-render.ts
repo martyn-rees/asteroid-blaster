@@ -1,3 +1,5 @@
+import { RockSize, SoundEffect } from "../types.ts";
+
 // change position and rotation to element already on screen
 // TODO maybe provide additonalCLass property which could be used for examples such as ships thrust
 // could be Display.update
@@ -63,7 +65,7 @@ export function createRockElement({
   id: string;
   r: number;
   asteroidImage: string;
-  size: string;
+  size: RockSize;
 }): HTMLElement {
   let rockStyle = `height:${2 * r}px; width:${2 * r}px; margin-left:-${r}px; margin-top:-${r}px;`;
   const rockClass = size === "small" ? "rock" : "rock glow";
@@ -85,18 +87,23 @@ export function removeFromScreen(elId: string) {
   }
 }
 
-export function playSound(soundDescription: string) {
-  let soundurl;
-  if (soundDescription === "shoot") {
-    soundurl = "./sounds/shoot.wav";
-  } else if (soundDescription === "rock-explosion") {
-    soundurl = "./sounds/rock-explosion.mp3";
+export function getSoundForAction(action: SoundEffect): string {
+  if (action === "shoot") {
+    return "./sounds/shoot.wav";
+  } else if (action === "rock-explosion") {
+    return "./sounds/rock-explosion.mp3";
   } else {
-    console.error(`sound description ${soundDescription} not recognised`);
-    return;
+    console.error(`Sound action ${action} not recognised`);
+    return "";
   }
-  const sound = new Audio(soundurl);
-  sound.volume = 0.1;
-  sound.load();
-  sound.play();
+}
+
+export function playSound(soundDescription: SoundEffect) {
+  const soundurl: string = getSoundForAction(soundDescription);
+  if (soundurl !== "") {
+    const sound = new Audio(soundurl);
+    sound.volume = 0.1;
+    sound.load();
+    sound.play();
+  }
 }
