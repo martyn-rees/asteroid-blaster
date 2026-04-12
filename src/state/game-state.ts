@@ -1,7 +1,11 @@
 import Rock from "../entities/rock.ts";
 import Ship from "../entities/ship.ts";
 import Bullet from "../entities/bullet.ts";
-import { removeShipControlEvents, ShipActions } from "../input/ship-actions.ts";
+import {
+  removeShipControlEvents,
+  addShipControlEvents,
+  ShipActions,
+} from "../input/ship-actions.ts";
 import { GamePhase } from "../types.ts";
 
 export interface Rocks {
@@ -55,6 +59,7 @@ export function changeGameState(change: GameStateAction) {
       gameState.ship!.setInput(change.payload);
       break;
     case "add ship":
+      addShipControlEvents();
       gameState.ship = change.payload;
       break;
     case "delete ship":
