@@ -1,11 +1,14 @@
 import { Position, Velocity } from "../types.ts";
 
+const DECIMAL_PLACES = 3;
+const round = (n: number): number => +n.toFixed(DECIMAL_PLACES);
+
 function convertDegreestoRadians(degrees: number) {
   return (Math.PI / 180) * degrees;
 }
 
 function convertRadiansToDegrees(radians: number) {
-  return +((180 / Math.PI) * radians).toFixed(1);
+  return round((180 / Math.PI) * radians);
 }
 
 function getNewPosition(
@@ -15,9 +18,8 @@ function getNewPosition(
 ): Position {
   const dx = velocity.speed * Math.cos(velocity.direction) * dt;
   const dy = velocity.speed * Math.sin(velocity.direction) * dt;
-  // toFixed returns a string .e.g. "1.5", the pre-pended plus turns it back in to a number 1.5 (losing any trailing 0's)
-  let x = +(position.x + dx).toFixed(1);
-  let y = +(position.y + dy).toFixed(1);
+  let x = round(position.x + dx);
+  let y = round(position.y + dy);
   return { x, y };
 }
 
@@ -39,8 +41,8 @@ export function getNewPositionWithOffset(
     y: offsetLength * Math.sin(offsetAngle + rotation),
   };
 
-  const x = parseFloat((position.x + offsetVector.x).toFixed(1));
-  const y = parseFloat((position.y + offsetVector.y).toFixed(1));
+  const x = round(position.x + offsetVector.x);
+  const y = round(position.y + offsetVector.y);
   return { x, y };
 }
 
@@ -56,8 +58,8 @@ function getComponentVelocity(
   const v2x = v2.speed * Math.cos(v2.direction);
   const v2y = v2.speed * Math.sin(v2.direction);
 
-  let dx = +(v1x + v2x).toFixed(3);
-  let dy = +(v1y + v2y).toFixed(3);
+  let dx = round(v1x + v2x);
+  let dy = round(v1y + v2y);
 
   return { dx, dy };
 }

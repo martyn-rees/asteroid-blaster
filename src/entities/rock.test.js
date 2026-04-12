@@ -51,7 +51,7 @@ test("rock movement after 2 frames moving SouthEast", () => {
   const rock = setUp(Math.PI / 4);
   rock.update();
   rock.update();
-  expect(rock.rockPosition).toStrictEqual({ x: 101.4, y: 101.4 });
+  expect(rock.rockPosition).toStrictEqual({ x: 101.414, y: 101.414 });
 });
 
 test("rock movement after 2 frames moving South", () => {
@@ -65,7 +65,7 @@ test("rock movement after 2 frames moving SouthWest", () => {
   const rock = setUp(Math.PI * 0.75);
   rock.update();
   rock.update();
-  expect(rock.rockPosition).toStrictEqual({ x: 98.6, y: 101.4 });
+  expect(rock.rockPosition).toStrictEqual({ x: 98.586, y: 101.414 });
 });
 
 test("rock movement after 2 frames moving North", () => {
