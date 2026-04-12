@@ -40,8 +40,8 @@ let previousRender = {
 // set show gun muzzle to display the poition of a ships gun to check it's in the correct position
 // set renderDelay to true to make the render loop run slower than the update loop.
 // so setting a longer render delay can quickly show any problems
-export const debug = { showGunMuzzle: false, renderDelay: false, fps: true };
-const DEBUG_RENDER_DELAY = 1;
+export const debug = { showGunMuzzle: false, renderDelay: true, fps: true };
+const DEBUG_RENDER_DELAY = 2;
 let debug_render_countdown = DEBUG_RENDER_DELAY;
 
 function debug_skipRenderForThisFrame(): boolean {
