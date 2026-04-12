@@ -40,7 +40,11 @@ function updateMotionStates(
 }
 
 export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
-  const ship = gameState.ship!;
+  if (!gameState.ship) {
+    return { gameState };
+  }
+
+  const ship = gameState.ship;
   if (ship.state === "active") {
     changeGameState({ action: "ship actions", payload: getShipActions() });
   }
