@@ -34,6 +34,16 @@ export let gameState: GameState = {
   bullets: {},
 };
 
+// Audit trail of all state changes for debugging and replaying
+type StateChange = {
+  action: string;
+  payload?: unknown;
+  timestamp: number;
+};
+
+const MAX_HISTORY = 10000;
+const stateHistory: StateChange[] = [];
+
 // Discriminated union ensures each action carries the correct payload type with no casts.
 type GameStateAction =
   | { action: "state"; payload: GamePhase }
@@ -50,42 +60,111 @@ type GameStateAction =
 // Do not destructure to ({ action, payload }) — it severs the link between them
 // and breaks type narrowing, requiring manual casts in each case.
 export function changeGameState(change: GameStateAction) {
+  const timestamp = performance.now();
+
+  // Log state change to history before applying it
+  stateHistory.push({
+    action: change.action,
+    payload: (change as any).payload,
+    timestamp,
+  });
+
+  // Keep history bounded to prevent memory bloat
+  if (stateHistory.length > MAX_HISTORY) {
+    stateHistory.shift();
+  }
+
   switch (change.action) {
     case "state":
-      gameState.previousState = gameState.state;
-      gameState.state = change.payload;
+      gameState = {
+        ...gameState,
+        previousState: gameState.state,
+        state: change.payload,
+      };
       break;
+
     case "ship actions":
       gameState.ship!.setInput(change.payload);
       break;
+
     case "add ship":
       addShipControlEvents();
-      gameState.ship = change.payload;
+      gameState = {
+        ...gameState,
+        ship: change.payload,
+      };
       break;
+
     case "delete ship":
       gameState.ship?.explode();
       removeShipControlEvents();
+      console.log(stateHistory);
       break;
+
     case "add rock":
-      gameState.rocks[change.payload.id] = change.payload;
+      gameState = {
+        ...gameState,
+        rocks: {
+          ...gameState.rocks,
+          [change.payload.id]: change.payload,
+        },
+      };
       break;
+
     case "delete rock":
-      delete gameState.rocks[change.payload.id];
+      const { [change.payload.id]: _, ...remainingRocks } = gameState.rocks;
+      gameState = {
+        ...gameState,
+        rocks: remainingRocks,
+      };
       break;
+
     case "add bullet":
-      gameState.bullets[change.payload.id] = change.payload;
+      gameState = {
+        ...gameState,
+        bullets: {
+          ...gameState.bullets,
+          [change.payload.id]: change.payload,
+        },
+      };
       break;
+
     case "delete bullet":
-      delete gameState.bullets[change.payload.id];
+      const { [change.payload.id]: __, ...remainingBullets } =
+        gameState.bullets;
+      gameState = {
+        ...gameState,
+        bullets: remainingBullets,
+      };
       break;
+
     case "score":
-      gameState.score += change.payload;
+      gameState = {
+        ...gameState,
+        score: gameState.score + change.payload,
+      };
       break;
+
     case "reset game":
-      gameState.ship = undefined;
-      gameState.rocks = {};
-      gameState.bullets = {};
-      gameState.score = 0;
+      clearStateHistory();
+      gameState = {
+        state: "",
+        previousState: "",
+        score: 0,
+        ship: undefined,
+        rocks: {},
+        bullets: {},
+      };
       break;
   }
+}
+
+// Debug utility: view the state history
+export function getStateHistory() {
+  return stateHistory;
+}
+
+// Debug utility: clear history (useful for resetting between games)
+export function clearStateHistory() {
+  stateHistory.length = 0;
 }
