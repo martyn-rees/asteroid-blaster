@@ -89,60 +89,43 @@ export function changeGameState(change: GameStateAction) {
 
     case "add ship":
       addShipControlEvents();
-      gameState = {
-        ...gameState,
-        ship: change.payload,
-      };
+      gameState = { ...gameState, ship: change.payload };
       break;
 
     case "delete ship":
       gameState.ship?.explode();
       removeShipControlEvents();
-      console.log(stateHistory);
       break;
 
     case "add rock":
-      gameState = {
-        ...gameState,
-        rocks: {
-          ...gameState.rocks,
-          [change.payload.id]: change.payload,
-        },
+      const updatedRocks = {
+        ...gameState.rocks,
+        [change.payload.id]: change.payload,
       };
+      gameState = { ...gameState, rocks: updatedRocks };
       break;
 
     case "delete rock":
       const { [change.payload.id]: _, ...remainingRocks } = gameState.rocks;
-      gameState = {
-        ...gameState,
-        rocks: remainingRocks,
-      };
+      gameState = { ...gameState, rocks: remainingRocks };
       break;
 
     case "add bullet":
-      gameState = {
-        ...gameState,
-        bullets: {
-          ...gameState.bullets,
-          [change.payload.id]: change.payload,
-        },
+      const updatedBullets = {
+        ...gameState.bullets,
+        [change.payload.id]: change.payload,
       };
+      gameState = { ...gameState, bullets: updatedBullets };
       break;
 
     case "delete bullet":
       const { [change.payload.id]: __, ...remainingBullets } =
         gameState.bullets;
-      gameState = {
-        ...gameState,
-        bullets: remainingBullets,
-      };
+      gameState = { ...gameState, bullets: remainingBullets };
       break;
 
     case "score":
-      gameState = {
-        ...gameState,
-        score: gameState.score + change.payload,
-      };
+      gameState = { ...gameState, score: gameState.score + change.payload };
       break;
 
     case "reset game":
