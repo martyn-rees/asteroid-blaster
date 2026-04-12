@@ -142,7 +142,10 @@ export function changeGameState(change: GameStateAction) {
   }
 }
 
-// Debug utility: view the state history
+/**
+ * Debug utility: Returns the full state change history for this session.
+ * Useful for debugging state transitions. Limited to last 10k entries.
+ */
 export function getStateHistory() {
   return stateHistory;
 }
