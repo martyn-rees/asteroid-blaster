@@ -50,8 +50,12 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
   }
   updateMotionStates(gameState, gameScreen, dt);
 
+  // guard ensures gameover is only dispatched once — without it, the game loop
+  // continuing in gameover state would dispatch it every frame
   if (ship.state === "destroyed") {
-    changeGameState({ action: "state", payload: "gameover" });
+    if (gameState.state === "playing") {
+      changeGameState({ action: "state", payload: "gameover" });
+    }
     return { gameState };
   }
 
