@@ -21,6 +21,10 @@ export function displayScore(score: number) {
   document.getElementById("gameScore")!.innerHTML = "SCORE: " + score;
 }
 
+export function displayHiScore(hiScore: number) {
+  document.getElementById("gameHiScore")!.innerHTML = "HI-SCORE: " + hiScore;
+}
+
 export const renderThrust = (thrustPower: number) => {
   const thrustStyle = thrustPower > 0 ? "block" : "none";
   document.getElementById("thrust")!.style.display = thrustStyle;
