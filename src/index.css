@@ -96,7 +96,13 @@
 
 .game-screen__score {
     color: white;
-    text-align: center;
+    display: flex;
+    gap: 12px;
+}
+
+.score__value {
+    min-width: 6ch;
+    text-align: left;
 }
 
 .game-screen__damage {
