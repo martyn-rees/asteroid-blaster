@@ -20,6 +20,7 @@ export type GameState = {
   state: GamePhase | "";
   previousState: GamePhase | "";
   score: number;
+  hiScore: number;
   ship: Ship | undefined;
   rocks: Rocks;
   bullets: Bullets;
@@ -29,6 +30,7 @@ export let gameState: GameState = {
   state: "",
   previousState: "",
   score: 0,
+  hiScore: 0,
   ship: undefined,
   rocks: {},
   bullets: {},
@@ -55,6 +57,7 @@ type GameStateAction =
   | { action: "add bullet"; payload: Bullet }
   | { action: "delete bullet"; payload: Bullet }
   | { action: "score"; payload: number }
+  | { action: "update hi-score" }
   | { action: "reset game" };
 
 // Do not destructure to ({ action, payload }) — it severs the link between them
@@ -128,12 +131,20 @@ export function changeGameState(change: GameStateAction) {
       gameState = { ...gameState, score: gameState.score + change.payload };
       break;
 
+    case "update hi-score":
+      gameState = {
+        ...gameState,
+        hiScore: Math.max(gameState.hiScore, gameState.score),
+      };
+      break;
+
     case "reset game":
       clearStateHistory();
       gameState = {
         state: "",
         previousState: "",
         score: 0,
+        hiScore: gameState.hiScore,
         ship: undefined,
         rocks: {},
         bullets: {},

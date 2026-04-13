@@ -34,6 +34,7 @@ let previousRender = {
   shipIds: new Set<string>(),
   rockIds: new Set<string>(),
   bulletIds: new Set<string>(),
+  score: -1,
 };
 
 // can set the debug mode on by setting the debug object
@@ -220,12 +221,15 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
   redrawBullets(bullets);
   redrawRocks(rocks);
 
-  displayScore(score);
+  if (score !== previousRender.score) {
+    displayScore(score);
+  }
 
   previousRender = {
     shipIds: currentShipIds,
     rockIds: currentRockIds,
     bulletIds: currentBulletIds,
+    score,
   };
   return true;
 }

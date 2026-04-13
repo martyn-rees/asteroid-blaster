@@ -88,9 +88,21 @@
     background-image: url(/images/background.jpg);
 }
 
+.game-screen__scores {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+}
+
 .game-screen__score {
     color: white;
-    text-align: center;
+    display: flex;
+    gap: 12px;
+}
+
+.score__value {
+    min-width: 6ch;
+    text-align: left;
 }
 
 .game-screen__damage {

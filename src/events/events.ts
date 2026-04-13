@@ -1,7 +1,12 @@
 import { changeGameState, gameState } from "../state/game-state.ts";
 import { GamePhase } from "../types.ts";
 import { createButton } from "../ui/button.ts";
-import { addToScreen, removeFromScreen } from "../render/dom-render.ts";
+import {
+  addToScreen,
+  removeFromScreen,
+  displayScore,
+  displayHiScore,
+} from "../render/dom-render.ts";
 import { addNewShip } from "../entities/ship-factory.ts";
 import { addNewRocksForNewLevel } from "../entities/rock-factory.ts";
 import { createStartScreen } from "../ui/startscreen.ts";
@@ -82,6 +87,8 @@ function onEnter(screen: GamePhase) {
   switch (screen) {
     case "start":
       changeGameState({ action: "state", payload: "start" });
+      displayScore(gameState.score);
+      displayHiScore(gameState.hiScore);
       addToScreen(
         createStartScreen(() =>
           changeGameState({ action: "state", payload: "playing" }),
@@ -101,17 +108,20 @@ function onEnter(screen: GamePhase) {
       break;
     case "gameover":
       changeGameState({ action: "state", payload: "gameover" });
+      changeGameState({ action: "update hi-score" });
       showCursor();
       removeFromScreen("pauseButton");
       endScreenTimer = setTimeout(() => {
         endScreenTimer = null;
         if (gameState.state === "gameover") {
           addToScreen(
-            createEndScreen(gameState.score, () =>
+            createEndScreen(gameState.score, gameState.hiScore, () =>
               changeGameState({ action: "state", payload: "start" }),
             ),
             gameScreen.id,
           );
+
+          displayHiScore(gameState.hiScore);
         }
       }, 3000);
       break;
