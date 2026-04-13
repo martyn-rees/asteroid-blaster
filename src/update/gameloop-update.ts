@@ -50,8 +50,22 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
   }
   updateMotionStates(gameState, gameScreen, dt);
 
+  // remove bullets that have expired — must run before the destroyed check so
+  // bullets fired just before ship death are still cleaned up during gameover
+  const currentBullets: Bullets = { ...gameState.bullets };
+  for (const bulletId in currentBullets) {
+    const thisBullet = currentBullets[bulletId];
+    if (thisBullet.bulletPower === 0) {
+      changeGameState({ action: "delete bullet", payload: thisBullet });
+    }
+  }
+
+  // guard ensures gameover is only dispatched once — without it, the game loop
+  // continuing in gameover state would dispatch it every frame
   if (ship.state === "destroyed") {
-    changeGameState({ action: "state", payload: "gameover" });
+    if (gameState.state === "playing") {
+      changeGameState({ action: "state", payload: "gameover" });
+    }
     return { gameState };
   }
 
@@ -67,17 +81,6 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
       bulletSpecs,
     });
     changeGameState({ action: "add bullet", payload: bullet });
-  }
-
-  // - remove dead bullets - if power <= 0
-  // this could be moved to collision function where it loops over bullets to save looping over bullets twice but for now its kept separate for clarity
-  // this also changes gameState.bullets as action: "delete bullet" removes any dead bullets from gameState.bullets so this should return the new array
-  const currentBullets: Bullets = { ...gameState.bullets };
-  for (const bulletId in currentBullets) {
-    const thisBullet = currentBullets[bulletId];
-    if (thisBullet.bulletPower === 0) {
-      changeGameState({ action: "delete bullet", payload: thisBullet });
-    }
   }
 
   // currentRocks and currentBullets are array copies so not using the gameState arrays directly as the gameState arrays get updated inside the loop

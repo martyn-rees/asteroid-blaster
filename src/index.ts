@@ -13,11 +13,14 @@ let previousTimestamp = 0;
 
 // GAME loop code
 function step(timestamp: number) {
+  // handle state transitions and reset gameloop timer on state change
   handleStateTransition(gameState.state, gameState.previousState, () => {
     previousTimestamp = 0;
   });
 
-  if (gameState.state === "playing") gameLoop(timestamp);
+  // also run during gameover so rocks continue animating in the background
+  if (gameState.state === "playing" || gameState.state === "gameover")
+    gameLoop(timestamp);
 
   window.requestAnimationFrame(step);
 }

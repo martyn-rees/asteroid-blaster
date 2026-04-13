@@ -58,14 +58,7 @@ function debug_skipRenderForThisFrame(): boolean {
   return false;
 }
 
-function addNewItems(
-  newShipIds: Set<string>,
-  newBulletIds: Set<string>,
-  newRockIds: Set<string>,
-  screenId: string,
-  rocks: Rocks,
-  bullets: Bullets,
-) {
+function displayNewShips(newShipIds: Set<string>, screenId: string) {
   newShipIds.forEach((shipId) => {
     const shipEl = createElement(shipId, "ship", null, shipSVG());
     addToScreen(shipEl, screenId);
@@ -75,7 +68,13 @@ function addNewItems(
       addToScreen(gunEl, screenId);
     }
   });
+}
 
+function displayNewBullets(
+  newBulletIds: Set<string>,
+  screenId: string,
+  bullets: Bullets,
+) {
   newBulletIds.forEach((bulletId: string) => {
     const bullet = bullets[bulletId];
     if (bullet) {
@@ -86,7 +85,13 @@ function addNewItems(
       console.error("bulletId doesn't exist in bullets", bulletId);
     }
   });
+}
 
+function displayNewRocks(
+  newRockIds: Set<string>,
+  screenId: string,
+  rocks: Rocks,
+) {
   newRockIds.forEach((rockId: string) => {
     const rock = rocks[rockId];
     if (rock) {
@@ -104,27 +109,26 @@ function addNewItems(
   });
 }
 
-function removeOldItems(
-  oldShipIds: Set<string>,
-  oldRockIds: Set<string>,
-  oldBulletIds: Set<string>,
-) {
+function removeOldShips(oldShipIds: Set<string>) {
   oldShipIds.forEach((shipId: string) => {
     removeFromScreen(shipId);
   });
+}
 
+function removeOldBullets(oldBulletIds: Set<string>) {
   oldBulletIds.forEach((bulletId: string) => {
     removeFromScreen(bulletId);
   });
+}
 
+function removeOldRocks(oldRockIds: Set<string>) {
   oldRockIds.forEach((rockId: string) => {
     removeFromScreen(rockId);
     playSound("rock-explosion");
   });
 }
 
-function updateItems(ship: Ship, rocks: Rocks, bullets: Bullets) {
-  // redraw ship
+function redrawShip(ship: Ship) {
   redrawOnScreen(ship.id, ship.position.x, ship.position.y, ship.rotation);
   renderThrust(ship.thrustPower);
 
@@ -133,15 +137,19 @@ function updateItems(ship: Ship, rocks: Rocks, bullets: Bullets) {
     const gun: Gun = ship!.gun!;
     redrawOnScreen(gun.id, gun.muzzlePosition.x, gun.muzzlePosition.y);
   }
-  // redraw rocks
-  for (const rockId in rocks) {
-    const rock: Rock = rocks[rockId];
-    redrawOnScreen(rockId, rock.position.x, rock.position.y, rock.rotation);
-  }
-  // redraw bullets
+}
+
+function redrawBullets(bullets: Bullets) {
   for (const bulletId in bullets) {
     const bullet = bullets[bulletId];
     redrawOnScreen(bulletId, bullet.position.x, bullet.position.y);
+  }
+}
+
+function redrawRocks(rocks: Rocks) {
+  for (const rockId in rocks) {
+    const rock: Rock = rocks[rockId];
+    redrawOnScreen(rockId, rock.position.x, rock.position.y, rock.rotation);
   }
 }
 
@@ -195,14 +203,22 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
     previousRender.bulletIds,
   );
 
-  // ADD NEW ITEMS
-  addNewItems(newShipIds, newBulletIds, newRockIds, screenId, rocks, bullets);
+  // DISPLAY NEW ITEMS
+  displayNewShips(newShipIds, screenId);
+  displayNewBullets(newBulletIds, screenId, bullets);
+  displayNewRocks(newRockIds, screenId, rocks);
 
   // REMOVE OLD ITEMS
-  removeOldItems(oldShipIds, oldRockIds, oldBulletIds);
+  removeOldShips(oldShipIds);
+  removeOldBullets(oldBulletIds);
+  removeOldRocks(oldRockIds);
 
-  // UPDATE ITEMS
-  if (ship && ship.state === "active") updateItems(ship, rocks, bullets);
+  // REDRAW ITEMS
+  if (ship && ship.state === "active") {
+    redrawShip(ship);
+  }
+  redrawBullets(bullets);
+  redrawRocks(rocks);
 
   displayScore(score);
 
