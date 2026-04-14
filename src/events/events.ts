@@ -9,6 +9,7 @@ import {
 } from "../render/dom-render.ts";
 import { addNewShip } from "../entities/ship-factory.ts";
 import { startLevel } from "../level-start.ts";
+import { resetRenderer } from "../render/gameloop-render.ts";
 import { createStartScreen } from "../ui/startscreen.ts";
 import { createEndScreen } from "../ui/endscreen.ts";
 import { gameScreen } from "../index.ts";
@@ -72,6 +73,7 @@ function setUpLevel() {
     endScreenTimer = null;
   }
   changeGameState({ action: "reset game" });
+  resetRenderer();
   addNewShip(gameScreen.centre);
   startLevel({ level: gameState.level, screenId: gameScreen.id, screenSize: gameScreen.dimensions });
 }
