@@ -64,10 +64,10 @@ describe("showLevelAnnouncement", () => {
   });
 
   it("adds rocks after 2 seconds when state is playing", () => {
-    showLevelAnnouncement({ level: 1, screenSize, screenId });
+    showLevelAnnouncement({ level: 3, screenSize, screenId });
     vi.advanceTimersByTime(2000);
     expect(mockAddNewRocksForNewLevel).toHaveBeenCalledWith({
-      rockAmount: 4,
+      level: 3,
       screenSize,
     });
   });
@@ -85,24 +85,6 @@ describe("showLevelAnnouncement", () => {
     vi.advanceTimersByTime(2000);
     expect(mockChangeGameState).toHaveBeenCalledWith({
       action: "clear level pending",
-    });
-  });
-
-  it("scales rock amount with level", () => {
-    showLevelAnnouncement({ level: 3, screenSize, screenId });
-    vi.advanceTimersByTime(2000);
-    expect(mockAddNewRocksForNewLevel).toHaveBeenCalledWith({
-      rockAmount: 8,
-      screenSize,
-    });
-  });
-
-  it("caps rock amount at 16 for high levels", () => {
-    showLevelAnnouncement({ level: 10, screenSize, screenId });
-    vi.advanceTimersByTime(2000);
-    expect(mockAddNewRocksForNewLevel).toHaveBeenCalledWith({
-      rockAmount: 16,
-      screenSize,
     });
   });
 });

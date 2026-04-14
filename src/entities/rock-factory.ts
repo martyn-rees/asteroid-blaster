@@ -1,11 +1,15 @@
 import Rock from "./rock.ts";
-import { changeGameState } from "../state/game-state.ts";
+import { changeGameState, gameState } from "../state/game-state.ts";
 import { EdgeSide, Position, RockSize } from "../types.ts";
 import {
   getRandomEdgePosition,
   getRandomRockProps,
 } from "../utils/rock-randomizer.ts";
-import { rockType } from "../assets/gamedata.ts";
+import { rockType, levelData } from "../assets/gamedata.ts";
+
+function getLevelConfig(level: number) {
+  return levelData[level - 1] ?? levelData[levelData.length - 1];
+}
 
 function addRock(size: RockSize, pos: Position) {
   const { velocity, r, rotationRate } = getRandomRockProps(rockType[size]);
@@ -20,13 +24,14 @@ function addRock(size: RockSize, pos: Position) {
 }
 
 export function addNewRocksForNewLevel({
-  rockAmount,
+  level,
   screenSize,
 }: {
-  rockAmount: number;
+  level: number;
   screenSize: { screenWidth: number; screenHeight: number };
 }) {
-  for (let i = 0; i < rockAmount; i++) {
+  const { largeRocks } = getLevelConfig(level);
+  for (let i = 0; i < largeRocks; i++) {
     const borders: EdgeSide[] = ["top", "right", "bottom", "left"];
     const edge = borders[i % 4];
     const posXY = getRandomEdgePosition(edge, screenSize);
@@ -37,14 +42,15 @@ export function addNewRocksForNewLevel({
 export function explodeRock(rock: Rock) {
   const explodedRockLocation = rock.rockPosition;
   const rockSize = rock.size;
-  // explode rock in to smaller rocks
+  const { largeRockExplosions, mediumRockExplosions } = getLevelConfig(gameState.level);
   if (rockSize === "large") {
-    addRock("medium", explodedRockLocation);
-    addRock("medium", explodedRockLocation);
+    for (let i = 0; i < largeRockExplosions; i++) {
+      addRock("medium", explodedRockLocation);
+    }
   } else if (rockSize === "medium") {
-    addRock("small", explodedRockLocation);
-    addRock("small", explodedRockLocation);
-    addRock("small", explodedRockLocation);
+    for (let i = 0; i < mediumRockExplosions; i++) {
+      addRock("small", explodedRockLocation);
+    }
   }
   changeGameState({ action: "delete rock", payload: rock });
 }

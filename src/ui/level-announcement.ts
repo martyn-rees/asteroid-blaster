@@ -18,7 +18,6 @@ export function showLevelAnnouncement({
   screenSize: { screenWidth: number; screenHeight: number };
   screenId: string;
 }) {
-  const rockAmount = Math.min(2 + level * 2, 16);
   const announcement = createElement(
     ANNOUNCEMENT_ID,
     "level-announcement press-start-2p-regular",
@@ -30,7 +29,7 @@ export function showLevelAnnouncement({
   setTimeout(() => {
     removeFromScreen(ANNOUNCEMENT_ID);
     if (gameState.state === "playing") {
-      addNewRocksForNewLevel({ rockAmount, screenSize });
+      addNewRocksForNewLevel({ level, screenSize });
     }
     changeGameState({ action: "clear level pending" });
   }, ANNOUNCEMENT_DELAY_MS);
