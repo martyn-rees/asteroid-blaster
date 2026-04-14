@@ -9,9 +9,10 @@ import Gun from "../entities/gun.ts";
 import Bullet from "../entities/bullet.ts";
 import { bulletSpecs, rockType } from "../assets/gamedata.ts";
 import { constrainNumber, testCollision } from "../utils/maths.ts";
-import { explodeRock } from "../entities/rock-factory.ts";
+import { explodeRock, addNewRocksForNewLevel } from "../entities/rock-factory.ts";
 import { getShipActions } from "../input/ship-actions.ts";
 import Viewport from "../entities/viewport.ts";
+import { addToScreen, removeFromScreen, createElement } from "../render/dom-render.ts";
 function updateMotionStates(
   gameState: GameState,
   gameScreen: Viewport,
@@ -117,6 +118,35 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
       changeGameState({ action: "score", payload: valueOfRock });
       explodeRock(currentRocks[rockId]);
     }
+  }
+
+  // detect when all rocks are cleared while the ship is still active
+  if (
+    Object.keys(gameState.rocks).length === 0 &&
+    ship.state === "active" &&
+    gameState.state === "playing" &&
+    !gameState.nextLevelPending
+  ) {
+    changeGameState({ action: "next level" });
+    const level = gameState.level;
+    const announcement = createElement(
+      "levelAnnouncement",
+      "level-announcement press-start-2p-regular",
+      null,
+      null,
+    );
+    announcement.textContent = `LEVEL ${level}`;
+    addToScreen(announcement, gameScreen.id);
+    setTimeout(() => {
+      removeFromScreen("levelAnnouncement");
+      if (gameState.state === "playing") {
+        addNewRocksForNewLevel({
+          rockAmount: Math.min(2 + level * 2, 16),
+          screenSize: gameScreen.dimensions,
+        });
+      }
+      changeGameState({ action: "clear level pending" });
+    }, 2000);
   }
 
   return { gameState };
