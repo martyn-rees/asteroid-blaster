@@ -136,6 +136,10 @@ export const levelData: LevelData[] = [
   },
 ];
 
+export function getLevelConfig(level: number): LevelData {
+  return levelData[level - 1] ?? levelData[levelData.length - 1];
+}
+
 export const keyBindings = {
   rotateLeft: "ArrowLeft",
   rotateRight: "ArrowRight",

@@ -5,11 +5,7 @@ import {
   getRandomEdgePosition,
   getRandomRockProps,
 } from "../utils/rock-randomizer.ts";
-import { rockType, levelData } from "../assets/gamedata.ts";
-
-function getLevelConfig(level: number) {
-  return levelData[level - 1] ?? levelData[levelData.length - 1];
-}
+import { rockType, getLevelConfig } from "../assets/gamedata.ts";
 
 function addRock(size: RockSize, pos: Position) {
   const { velocity, r, rotationRate } = getRandomRockProps(rockType[size]);

@@ -92,9 +92,10 @@ describe("explodeRock", () => {
   });
 
   it("spawns small rocks when a medium rock explodes", () => {
+    mockGameState.level = 3; // mediumRockExplosions: 3
     explodeRock(makeMockRock("medium"));
     const rocks = addedRocks();
-    expect(rocks).toHaveLength(levelData[1].mediumRockExplosions);
+    expect(rocks).toHaveLength(levelData[2].mediumRockExplosions);
     expect(rocks.every((r) => r.size === "small")).toBe(true);
   });
 
