@@ -6,10 +6,9 @@ import {
   removeFromScreen,
   displayScore,
   displayHiScore,
-  createElement,
 } from "../render/dom-render.ts";
+import { showLevelAnnouncement } from "../ui/level-announcement.ts";
 import { addNewShip } from "../entities/ship-factory.ts";
-import { addNewRocksForNewLevel } from "../entities/rock-factory.ts";
 import { createStartScreen } from "../ui/startscreen.ts";
 import { createEndScreen } from "../ui/endscreen.ts";
 import { gameScreen } from "../index.ts";
@@ -74,22 +73,11 @@ function setUpLevel() {
   }
   changeGameState({ action: "reset game" });
   addNewShip(gameScreen.centre);
-  const announcement = createElement(
-    "levelAnnouncement",
-    "level-announcement press-start-2p-regular",
-    null,
-    null,
-  );
-  announcement.textContent = "LEVEL 1";
-  addToScreen(announcement, gameScreen.id);
-  setTimeout(() => {
-    removeFromScreen("levelAnnouncement");
-    addNewRocksForNewLevel({
-      rockAmount: 4,
-      screenSize: gameScreen.dimensions,
-    });
-    changeGameState({ action: "clear level pending" });
-  }, 2000);
+  showLevelAnnouncement({
+    level: gameState.level,
+    screenSize: gameScreen.dimensions,
+    screenId: gameScreen.id,
+  });
 }
 
 function onEnter(screen: GamePhase) {

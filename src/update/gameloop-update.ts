@@ -9,10 +9,10 @@ import Gun from "../entities/gun.ts";
 import Bullet from "../entities/bullet.ts";
 import { bulletSpecs, rockType } from "../assets/gamedata.ts";
 import { constrainNumber, testCollision } from "../utils/maths.ts";
-import { explodeRock, addNewRocksForNewLevel } from "../entities/rock-factory.ts";
+import { explodeRock } from "../entities/rock-factory.ts";
 import { getShipActions } from "../input/ship-actions.ts";
 import Viewport from "../entities/viewport.ts";
-import { addToScreen, removeFromScreen, createElement } from "../render/dom-render.ts";
+import { showLevelAnnouncement } from "../ui/level-announcement.ts";
 function updateMotionStates(
   gameState: GameState,
   gameScreen: Viewport,
@@ -128,25 +128,11 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
     !gameState.nextLevelPending
   ) {
     changeGameState({ action: "next level" });
-    const level = gameState.level;
-    const announcement = createElement(
-      "levelAnnouncement",
-      "level-announcement press-start-2p-regular",
-      null,
-      null,
-    );
-    announcement.textContent = `LEVEL ${level}`;
-    addToScreen(announcement, gameScreen.id);
-    setTimeout(() => {
-      removeFromScreen("levelAnnouncement");
-      if (gameState.state === "playing") {
-        addNewRocksForNewLevel({
-          rockAmount: Math.min(2 + level * 2, 16),
-          screenSize: gameScreen.dimensions,
-        });
-      }
-      changeGameState({ action: "clear level pending" });
-    }, 2000);
+    showLevelAnnouncement({
+      level: gameState.level,
+      screenSize: gameScreen.dimensions,
+      screenId: gameScreen.id,
+    });
   }
 
   return { gameState };
