@@ -3,7 +3,6 @@ import {
   addToScreen,
   removeFromScreen,
 } from "../render/dom-render.ts";
-import { addNewRocksForNewLevel } from "../entities/rock-factory.ts";
 import { changeGameState, gameState } from "../state/game-state.ts";
 
 const ANNOUNCEMENT_DELAY_MS = 2000;
@@ -11,12 +10,12 @@ const ANNOUNCEMENT_ID = "levelAnnouncement";
 
 export function showLevelAnnouncement({
   level,
-  screenSize,
   screenId,
+  onComplete,
 }: {
   level: number;
-  screenSize: { screenWidth: number; screenHeight: number };
   screenId: string;
+  onComplete: () => void;
 }) {
   const announcement = createElement(
     ANNOUNCEMENT_ID,
@@ -29,7 +28,7 @@ export function showLevelAnnouncement({
   setTimeout(() => {
     removeFromScreen(ANNOUNCEMENT_ID);
     if (gameState.state === "playing") {
-      addNewRocksForNewLevel({ level, screenSize });
+      onComplete();
     }
     changeGameState({ action: "clear level pending" });
   }, ANNOUNCEMENT_DELAY_MS);

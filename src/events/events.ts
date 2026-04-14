@@ -7,8 +7,8 @@ import {
   displayScore,
   displayHiScore,
 } from "../render/dom-render.ts";
-import { showLevelAnnouncement } from "../ui/level-announcement.ts";
 import { addNewShip } from "../entities/ship-factory.ts";
+import { startLevel } from "../level-start.ts";
 import { createStartScreen } from "../ui/startscreen.ts";
 import { createEndScreen } from "../ui/endscreen.ts";
 import { gameScreen } from "../index.ts";
@@ -73,11 +73,7 @@ function setUpLevel() {
   }
   changeGameState({ action: "reset game" });
   addNewShip(gameScreen.centre);
-  showLevelAnnouncement({
-    level: gameState.level,
-    screenSize: gameScreen.dimensions,
-    screenId: gameScreen.id,
-  });
+  startLevel({ level: gameState.level, screenId: gameScreen.id, screenSize: gameScreen.dimensions });
 }
 
 function onEnter(screen: GamePhase) {

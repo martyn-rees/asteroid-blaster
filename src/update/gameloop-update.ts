@@ -10,9 +10,9 @@ import Bullet from "../entities/bullet.ts";
 import { bulletSpecs, rockType } from "../assets/gamedata.ts";
 import { constrainNumber, testCollision } from "../utils/maths.ts";
 import { explodeRock } from "../entities/rock-factory.ts";
+import { startLevel } from "../level-start.ts";
 import { getShipActions } from "../input/ship-actions.ts";
 import Viewport from "../entities/viewport.ts";
-import { showLevelAnnouncement } from "../ui/level-announcement.ts";
 function updateMotionStates(
   gameState: GameState,
   gameScreen: Viewport,
@@ -128,11 +128,7 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
     !gameState.nextLevelPending
   ) {
     changeGameState({ action: "next level" });
-    showLevelAnnouncement({
-      level: gameState.level,
-      screenSize: gameScreen.dimensions,
-      screenId: gameScreen.id,
-    });
+    startLevel({ level: gameState.level, screenId: gameScreen.id, screenSize: gameScreen.dimensions });
   }
 
   return { gameState };
