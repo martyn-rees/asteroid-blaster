@@ -116,7 +116,7 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
       const rockSize = thisRock.size;
       const valueOfRock = rockType[rockSize].value;
       changeGameState({ action: "score", payload: valueOfRock });
-      explodeRock(currentRocks[rockId]);
+      explodeRock(currentRocks[rockId], gameState.level);
     }
   }
 

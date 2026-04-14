@@ -1,5 +1,5 @@
 import Rock from "./rock.ts";
-import { changeGameState, gameState } from "../state/game-state.ts";
+import { changeGameState } from "../state/game-state.ts";
 import { EdgeSide, Position, RockSize } from "../types.ts";
 import {
   getRandomEdgePosition,
@@ -35,10 +35,10 @@ export function addNewRocksForNewLevel({
   }
 }
 
-export function explodeRock(rock: Rock) {
+export function explodeRock(rock: Rock, level: number) {
   const explodedRockLocation = rock.rockPosition;
   const rockSize = rock.size;
-  const { largeRockExplosions, mediumRockExplosions } = getLevelConfig(gameState.level);
+  const { largeRockExplosions, mediumRockExplosions } = getLevelConfig(level);
   if (rockSize === "large") {
     for (let i = 0; i < largeRockExplosions; i++) {
       addRock("medium", explodedRockLocation);

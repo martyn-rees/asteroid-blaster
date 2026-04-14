@@ -3,15 +3,11 @@ import { addNewRocksForNewLevel, explodeRock } from "./rock-factory.ts";
 import { levelData } from "../assets/gamedata.ts";
 import Rock from "./rock.ts";
 
-const mockGameState = vi.hoisted(() => ({ level: 1 as number }));
 const mockChangeGameState = vi.hoisted(() => vi.fn());
 const mockGetRandomEdgePosition = vi.hoisted(() => vi.fn());
 const mockGetRandomRockProps = vi.hoisted(() => vi.fn());
 
 vi.mock("../state/game-state.ts", () => ({
-  get gameState() {
-    return mockGameState;
-  },
   changeGameState: mockChangeGameState,
 }));
 
@@ -72,7 +68,6 @@ describe("addNewRocksForNewLevel", () => {
 
 describe("explodeRock", () => {
   beforeEach(() => {
-    mockGameState.level = 2;
     mockGetRandomRockProps.mockReturnValue({ velocity: {}, r: 30, rotationRate: 1 });
   });
 
@@ -85,28 +80,27 @@ describe("explodeRock", () => {
   }
 
   it("spawns medium rocks when a large rock explodes", () => {
-    explodeRock(makeMockRock("large"));
+    explodeRock(makeMockRock("large"), 2);
     const rocks = addedRocks();
     expect(rocks).toHaveLength(levelData[1].largeRockExplosions);
     expect(rocks.every((r) => r.size === "medium")).toBe(true);
   });
 
   it("spawns small rocks when a medium rock explodes", () => {
-    mockGameState.level = 3; // mediumRockExplosions: 3
-    explodeRock(makeMockRock("medium"));
+    explodeRock(makeMockRock("medium"), 3);
     const rocks = addedRocks();
     expect(rocks).toHaveLength(levelData[2].mediumRockExplosions);
     expect(rocks.every((r) => r.size === "small")).toBe(true);
   });
 
   it("spawns no rocks when a small rock explodes", () => {
-    explodeRock(makeMockRock("small"));
+    explodeRock(makeMockRock("small"), 1);
     expect(addedRocks()).toHaveLength(0);
   });
 
   it("deletes the exploded rock", () => {
     const rock = makeMockRock("large");
-    explodeRock(rock);
+    explodeRock(rock, 2);
     expect(mockChangeGameState).toHaveBeenCalledWith({
       action: "delete rock",
       payload: rock,
@@ -114,14 +108,12 @@ describe("explodeRock", () => {
   });
 
   it("level 1 medium rocks produce no small rocks", () => {
-    mockGameState.level = 1;
-    explodeRock(makeMockRock("medium"));
+    explodeRock(makeMockRock("medium"), 1);
     expect(addedRocks()).toHaveLength(0);
   });
 
   it("falls back to last level config for levels beyond levelData", () => {
-    mockGameState.level = 99;
-    explodeRock(makeMockRock("large"));
+    explodeRock(makeMockRock("large"), 99);
     const lastLevel = levelData[levelData.length - 1];
     expect(addedRocks()).toHaveLength(lastLevel.largeRockExplosions);
   });
