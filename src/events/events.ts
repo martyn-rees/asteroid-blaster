@@ -8,7 +8,8 @@ import {
   displayHiScore,
 } from "../render/dom-render.ts";
 import { addNewShip } from "../entities/ship-factory.ts";
-import { addNewRocksForNewLevel } from "../entities/rock-factory.ts";
+import { startLevel } from "../level-start.ts";
+import { resetRenderer } from "../render/gameloop-render.ts";
 import { createStartScreen } from "../ui/startscreen.ts";
 import { createEndScreen } from "../ui/endscreen.ts";
 import { gameScreen } from "../index.ts";
@@ -65,22 +66,16 @@ function addResumeButton() {
   addToScreen(resumeButton, gameScreen.id);
 }
 
-// add ship and then add rocks after a set time and set score to 0
+// add ship and then show level announcement and add rocks after a delay
 function setUpLevel() {
   if (endScreenTimer) {
     clearTimeout(endScreenTimer);
     endScreenTimer = null;
   }
   changeGameState({ action: "reset game" });
+  resetRenderer();
   addNewShip(gameScreen.centre);
-  setTimeout(
-    () =>
-      addNewRocksForNewLevel({
-        rockAmount: 8,
-        screenSize: gameScreen.dimensions,
-      }),
-    1000,
-  );
+  startLevel({ level: gameState.level, screenId: gameScreen.id, screenSize: gameScreen.dimensions });
 }
 
 function onEnter(screen: GamePhase) {

@@ -10,6 +10,7 @@ import Bullet from "../entities/bullet.ts";
 import { bulletSpecs, rockType } from "../assets/gamedata.ts";
 import { constrainNumber, testCollision } from "../utils/maths.ts";
 import { explodeRock } from "../entities/rock-factory.ts";
+import { startLevel } from "../level-start.ts";
 import { getShipActions } from "../input/ship-actions.ts";
 import Viewport from "../entities/viewport.ts";
 function updateMotionStates(
@@ -115,8 +116,19 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
       const rockSize = thisRock.size;
       const valueOfRock = rockType[rockSize].value;
       changeGameState({ action: "score", payload: valueOfRock });
-      explodeRock(currentRocks[rockId]);
+      explodeRock(currentRocks[rockId], gameState.level);
     }
+  }
+
+  // detect when all rocks are cleared while the ship is still active
+  if (
+    Object.keys(gameState.rocks).length === 0 &&
+    ship.state === "active" &&
+    gameState.state === "playing" &&
+    !gameState.nextLevelPending
+  ) {
+    changeGameState({ action: "next level" });
+    startLevel({ level: gameState.level, screenId: gameScreen.id, screenSize: gameScreen.dimensions });
   }
 
   return { gameState };

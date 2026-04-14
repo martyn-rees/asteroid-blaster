@@ -21,6 +21,8 @@ export type GameState = {
   previousState: GamePhase | "";
   score: number;
   hiScore: number;
+  level: number;
+  nextLevelPending: boolean;
   ship: Ship | undefined;
   rocks: Rocks;
   bullets: Bullets;
@@ -31,6 +33,8 @@ export let gameState: GameState = {
   previousState: "",
   score: 0,
   hiScore: 0,
+  level: 1,
+  nextLevelPending: true,
   ship: undefined,
   rocks: {},
   bullets: {},
@@ -58,6 +62,8 @@ type GameStateAction =
   | { action: "delete bullet"; payload: Bullet }
   | { action: "score"; payload: number }
   | { action: "update hi-score" }
+  | { action: "next level" }
+  | { action: "clear level pending" }
   | { action: "reset game" };
 
 // Do not destructure to ({ action, payload }) — it severs the link between them
@@ -138,6 +144,14 @@ export function changeGameState(change: GameStateAction) {
       };
       break;
 
+    case "next level":
+      gameState = { ...gameState, level: gameState.level + 1, nextLevelPending: true };
+      break;
+
+    case "clear level pending":
+      gameState = { ...gameState, nextLevelPending: false };
+      break;
+
     case "reset game":
       clearStateHistory();
       gameState = {
@@ -145,6 +159,8 @@ export function changeGameState(change: GameStateAction) {
         previousState: "",
         score: 0,
         hiScore: gameState.hiScore,
+        level: 1,
+        nextLevelPending: true,
         ship: undefined,
         rocks: {},
         bullets: {},

@@ -37,6 +37,21 @@ let previousRender = {
   score: -1,
 };
 
+// Clears all tracked DOM elements and resets render state for a new game.
+// Must be called on game reset — without this, the diff against previousRender
+// would never see old elements as removed, leaving them frozen on screen.
+export function resetRenderer() {
+  previousRender.shipIds.forEach((id) => removeFromScreen(id));
+  previousRender.rockIds.forEach((id) => removeFromScreen(id));
+  previousRender.bulletIds.forEach((id) => removeFromScreen(id));
+  previousRender = {
+    shipIds: new Set<string>(),
+    rockIds: new Set<string>(),
+    bulletIds: new Set<string>(),
+    score: -1,
+  };
+}
+
 // can set the debug mode on by setting the debug object
 // set show gun muzzle to display the poition of a ships gun to check it's in the correct position
 // set renderDelay to true to make the render loop run slower than the update loop.

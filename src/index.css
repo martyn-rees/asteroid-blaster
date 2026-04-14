@@ -175,3 +175,15 @@
     background: white;
     color: black;
 }
+
+.level-announcement {
+    position: absolute;
+    top: 33%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 24px;
+    text-align: center;
+    pointer-events: none;
+    letter-spacing: 4px;
+}
