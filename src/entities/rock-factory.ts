@@ -2,10 +2,8 @@ import Rock from "./rock.ts";
 import { changeGameState } from "../state/game-state.ts";
 import { EdgeSide, Position } from "../types.ts";
 import { RockSize } from "../assets/game-entity-specs.ts";
-import {
-  getRandomEdgePosition,
-  getRandomRockProps,
-} from "./rock-randomizer.ts";
+import { getRandomRockProps } from "./rock-randomizer.ts";
+import { getRandomEdgePosition } from "../utils/random-generators.ts";
 import { rockType } from "../assets/game-entity-specs.ts";
 import { getLevelConfig } from "../assets/level-config.ts";
 

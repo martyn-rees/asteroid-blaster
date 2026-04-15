@@ -1,14 +1,11 @@
 import { RockSpec } from "../assets/game-entity-specs.ts";
 import { convertDegreestoRadians } from "../utils/maths-motionstate.ts";
-import {
-  getRandomNumberInRange,
-  getRandomEdgePosition,
-} from "../utils/random-generators.ts";
+import { getRandomNumberInRange } from "../utils/random-generators.ts";
 
 // functions that rely on random numbers
 // the results of these functions cannot be determined in tests so they are packaged
 // in to this file to make the random dependency easy to mock
-function getRandomRockProps(rockProps: RockSpec) {
+export function getRandomRockProps(rockProps: RockSpec) {
   let speed = getRandomNumberInRange(rockProps.speed.min, rockProps.speed.max);
   let r = getRandomNumberInRange(rockProps.radius.min, rockProps.radius.max);
   // choose a random direction but avoid angles within 15 degrees to vertical or horizontal
@@ -25,5 +22,3 @@ function getRandomRockProps(rockProps: RockSpec) {
 
   return { velocity, r, rotationRate: rotationRateRadians };
 }
-
-export { getRandomEdgePosition, getRandomRockProps };

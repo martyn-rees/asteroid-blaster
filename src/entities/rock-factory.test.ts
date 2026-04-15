@@ -11,9 +11,12 @@ vi.mock("../state/game-state.ts", () => ({
   changeGameState: mockChangeGameState,
 }));
 
-vi.mock("../utils/rock-randomizer.ts", () => ({
-  getRandomEdgePosition: mockGetRandomEdgePosition,
+vi.mock("./rock-randomizer.ts", () => ({
   getRandomRockProps: mockGetRandomRockProps,
+}));
+
+vi.mock("../utils/random-generators.ts", () => ({
+  getRandomEdgePosition: mockGetRandomEdgePosition,
 }));
 
 vi.mock("../assets/level-config.ts", () => ({
