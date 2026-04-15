@@ -1,38 +1,13 @@
 import { RockSpec } from "../assets/gamedata.ts";
-import { EdgeSide } from "../types.ts";
 import { convertDegreestoRadians } from "./maths-motionstate.ts";
+import {
+  getRandomNumberInRange,
+  getRandomEdgePosition,
+} from "./random-generators.ts";
 
-// functions that reply on random numbers
-// the result of these functions can not be determined in user tests so they are packages up in to this file
-
-const getRandomInt = (n: number): number => Math.floor(Math.random() * (n + 1));
-
-function getRandomNumberInRange(min: number, max: number): number {
-  return min + Math.random() * (max - min);
-}
-
-function getRandomEdgePosition(
-  edge: EdgeSide,
-  screenSize: { screenWidth: number; screenHeight: number },
-): { x: number; y: number } {
-  switch (edge) {
-    case "top":
-      return { x: getRandomInt(screenSize.screenWidth), y: 0 };
-    case "right":
-      return {
-        x: screenSize.screenWidth,
-        y: getRandomInt(screenSize.screenHeight),
-      };
-    case "bottom":
-      return {
-        x: getRandomInt(screenSize.screenWidth),
-        y: screenSize.screenHeight,
-      };
-    case "left":
-      return { x: 0, y: getRandomInt(screenSize.screenHeight) };
-  }
-}
-
+// functions that rely on random numbers
+// the results of these functions cannot be determined in tests so they are packaged
+// in to this file to make the random dependency easy to mock
 function getRandomRockProps(rockProps: RockSpec) {
   let speed = getRandomNumberInRange(rockProps.speed.min, rockProps.speed.max);
   let r = getRandomNumberInRange(rockProps.radius.min, rockProps.radius.max);
