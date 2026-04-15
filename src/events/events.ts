@@ -8,33 +8,33 @@ import { startLevel } from "../ui/level-start.ts";
 import { resetRenderer } from "../render/gameloop-render.ts";
 import { createStartScreen } from "../ui/startscreen.ts";
 import { createEndScreen } from "../ui/endscreen.ts";
-import gameScreen from "../entities/game-screen.ts";
 import { hideCursor, showCursor } from "./cursor-events.ts";
+import Viewport from "../entities/viewport.ts";
 
 let endScreenTimer: ReturnType<typeof setTimeout> | null = null;
 
-function addPauseButton() {
+function addPauseButton(screenId: string) {
   const pauseButton = createButton({
     label: "pause",
     id: "pauseButton",
     className: "pause-button",
     onClick: () => changeGameState({ action: "state", payload: "paused" }),
   });
-  addToScreen(pauseButton, gameScreen.id);
+  addToScreen(pauseButton, screenId);
 }
 
-function addResumeButton() {
+function addResumeButton(screenId: string) {
   const resumeButton = createButton({
     label: "resume",
     id: "resumeButton",
     className: "pause-button",
     onClick: () => changeGameState({ action: "state", payload: "playing" }),
   });
-  addToScreen(resumeButton, gameScreen.id);
+  addToScreen(resumeButton, screenId);
 }
 
 // add ship and then show level announcement and add rocks after a delay
-function setUpLevel() {
+function setUpLevel(gameScreen: Viewport) {
   if (endScreenTimer) {
     clearTimeout(endScreenTimer);
     endScreenTimer = null;
@@ -49,7 +49,7 @@ function setUpLevel() {
   });
 }
 
-function onEnter(screen: GamePhase) {
+function onEnter(screen: GamePhase, gameScreen: Viewport) {
   switch (screen) {
     case "start":
       changeGameState({ action: "state", payload: "start" });
@@ -64,18 +64,18 @@ function onEnter(screen: GamePhase) {
       break;
     case "playing":
       changeGameState({ action: "state", payload: "playing" });
-      addPauseButton();
-      hideCursor();
+      addPauseButton(gameScreen.id);
+      hideCursor(gameScreen.id);
       break;
     case "paused":
       changeGameState({ action: "state", payload: "paused" });
       removeFromScreen("pauseButton");
-      addResumeButton();
+      addResumeButton(gameScreen.id);
       break;
     case "gameover":
       changeGameState({ action: "state", payload: "gameover" });
       changeGameState({ action: "update hi-score" });
-      showCursor();
+      showCursor(gameScreen.id);
       removeFromScreen("pauseButton");
       endScreenTimer = setTimeout(() => {
         endScreenTimer = null;
@@ -86,7 +86,6 @@ function onEnter(screen: GamePhase) {
             ),
             gameScreen.id,
           );
-
           displayHiScore(gameState.hiScore);
         }
       }, 3000);
@@ -95,14 +94,14 @@ function onEnter(screen: GamePhase) {
 }
 
 // buttons onClick events are automatically removed so do not need to clean up attachedEvent
-function onExit(screen: GamePhase) {
+function onExit(screen: GamePhase, gameScreen: Viewport) {
   switch (screen) {
     case "start":
       removeFromScreen("startScreen");
       break;
     case "paused":
       removeFromScreen("resumeButton");
-      showCursor();
+      showCursor(gameScreen.id);
       break;
   }
 }

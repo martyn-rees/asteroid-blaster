@@ -12,7 +12,7 @@ let previousTimestamp = 0;
 // GAME loop code
 function step(timestamp: number) {
   // handle state transitions and reset gameloop timer on state change
-  handleStateTransition(gameState.state, gameState.previousState, () => {
+  handleStateTransition(gameState.state, gameState.previousState, gameScreen, () => {
     previousTimestamp = 0;
   });
 
