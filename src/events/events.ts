@@ -8,7 +8,7 @@ import { startLevel } from "../ui/level-start.ts";
 import { resetRenderer } from "../render/gameloop-render.ts";
 import { createStartScreen } from "../ui/startscreen.ts";
 import { createEndScreen } from "../ui/endscreen.ts";
-import { gameScreen } from "../index.ts";
+import gameScreen from "../entities/game-screen.ts";
 import { hideCursor, showCursor } from "./cursor-events.ts";
 
 let endScreenTimer: ReturnType<typeof setTimeout> | null = null;
