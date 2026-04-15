@@ -1,4 +1,4 @@
-import { gameScreen } from "../index.ts";
+import gameScreen from "../entities/game-screen.ts";
 
 let cursorHideTimer: ReturnType<typeof setTimeout> | null = null;
 
