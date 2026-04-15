@@ -1,9 +1,9 @@
 import { RockSpec } from "../assets/gamedata.ts";
-import { convertDegreestoRadians } from "./maths-motionstate.ts";
+import { convertDegreestoRadians } from "../utils/maths-motionstate.ts";
 import {
   getRandomNumberInRange,
   getRandomEdgePosition,
-} from "./random-generators.ts";
+} from "../utils/random-generators.ts";
 
 // functions that rely on random numbers
 // the results of these functions cannot be determined in tests so they are packaged

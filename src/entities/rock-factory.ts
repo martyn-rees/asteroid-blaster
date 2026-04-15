@@ -4,7 +4,7 @@ import { EdgeSide, Position, RockSize } from "../types.ts";
 import {
   getRandomEdgePosition,
   getRandomRockProps,
-} from "../utils/rock-randomizer.ts";
+} from "./rock-randomizer.ts";
 import { rockType, getLevelConfig } from "../assets/gamedata.ts";
 
 function addRock(size: RockSize, pos: Position) {
