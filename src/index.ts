@@ -1,5 +1,7 @@
-import gameScreen from "./entities/game-screen.ts";
+import Viewport from "./entities/viewport.ts";
 import { changeGameState, gameState } from "./state/game-state.ts";
+
+const gameScreen = new Viewport("gameScreen", 800, 400);
 import { handleStateTransition } from "./state/state-machine.ts";
 import { gameLoopUpdate } from "./update/gameloop-update.ts";
 import { gameLoopRender } from "./render/gameloop-render.ts";
@@ -12,7 +14,7 @@ let previousTimestamp = 0;
 // GAME loop code
 function step(timestamp: number) {
   // handle state transitions and reset gameloop timer on state change
-  handleStateTransition(gameState.state, gameState.previousState, () => {
+  handleStateTransition(gameState.state, gameState.previousState, gameScreen, () => {
     previousTimestamp = 0;
   });
 
