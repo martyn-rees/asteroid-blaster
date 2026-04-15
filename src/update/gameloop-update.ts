@@ -10,7 +10,7 @@ import Bullet from "../entities/bullet.ts";
 import { bulletSpecs, rockType } from "../assets/game-entity-specs.ts";
 import { constrainNumber, testCollision } from "../utils/maths.ts";
 import { explodeRock } from "../entities/rock-factory.ts";
-import { startLevel } from "../level-start.ts";
+import { startLevel } from "../ui/level-start.ts";
 import { getShipActions } from "../input/ship-actions.ts";
 import Viewport from "../entities/viewport.ts";
 function updateMotionStates(

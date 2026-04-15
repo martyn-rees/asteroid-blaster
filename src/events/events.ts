@@ -4,7 +4,7 @@ import { createButton } from "../ui/button.ts";
 import { addToScreen, removeFromScreen } from "../render/dom-render.ts";
 import { displayHiScore, displayScore } from "../render/score-render.ts";
 import { addNewShip } from "../entities/ship-factory.ts";
-import { startLevel } from "../level-start.ts";
+import { startLevel } from "../ui/level-start.ts";
 import { resetRenderer } from "../render/gameloop-render.ts";
 import { createStartScreen } from "../ui/startscreen.ts";
 import { createEndScreen } from "../ui/endscreen.ts";
