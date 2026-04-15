@@ -13,38 +13,9 @@ import { resetRenderer } from "../render/gameloop-render.ts";
 import { createStartScreen } from "../ui/startscreen.ts";
 import { createEndScreen } from "../ui/endscreen.ts";
 import { gameScreen } from "../index.ts";
+import { hideCursor, showCursor } from "./cursor-events.ts";
 
-let cursorHideTimer: ReturnType<typeof setTimeout> | null = null;
 let endScreenTimer: ReturnType<typeof setTimeout> | null = null;
-
-function onMouseMove() {
-  const el = document.getElementById(gameScreen.id);
-  if (!el) return;
-  el.style.cursor = "default";
-  if (cursorHideTimer) clearTimeout(cursorHideTimer);
-  cursorHideTimer = setTimeout(() => {
-    el.style.cursor = "none";
-  }, 2000);
-}
-
-function hideCursor() {
-  const el = document.getElementById(gameScreen.id);
-  if (!el) return;
-  el.style.cursor = "none";
-  // delay attaching mousemove so the click that triggered this doesn't immediately show the cursor again
-  setTimeout(() => el.addEventListener("mousemove", onMouseMove), 100);
-}
-
-function showCursor() {
-  const el = document.getElementById(gameScreen.id);
-  if (!el) return;
-  el.style.cursor = "default";
-  el.removeEventListener("mousemove", onMouseMove);
-  if (cursorHideTimer) {
-    clearTimeout(cursorHideTimer);
-    cursorHideTimer = null;
-  }
-}
 
 function addPauseButton() {
   const pauseButton = createButton({
@@ -75,7 +46,11 @@ function setUpLevel() {
   changeGameState({ action: "reset game" });
   resetRenderer();
   addNewShip(gameScreen.centre);
-  startLevel({ level: gameState.level, screenId: gameScreen.id, screenSize: gameScreen.dimensions });
+  startLevel({
+    level: gameState.level,
+    screenId: gameScreen.id,
+    screenSize: gameScreen.dimensions,
+  });
 }
 
 function onEnter(screen: GamePhase) {
