@@ -1,7 +1,8 @@
+// Planned replacement for createEndScreen — will render a richer end screen with animated GIFs.
 export const endScreen = () => `
 <div class="gameover-screen" id="gameoverScreen">
     <img src="./images/stranded_square.gif" class="gameover-end" alt="stranded image" />
-    <img src="./images/fixing_square.gif" class="gameover-end" alt="stranded image" style="
+    <img src="./images/fixing_square.gif" class="gameover-end" alt="stranded image" />
     </div>
 `;
 
