@@ -1,5 +1,5 @@
 import { RockSpec } from "../assets/game-entity-specs.ts";
-import { convertDegreesToRadians } from "../utils/maths-motionstate.ts";
+import { convertDegreesToRadians } from "../utils/maths.ts";
 import { getRandomNumberInRange } from "../utils/random-generators.ts";
 
 // functions that rely on random numbers

@@ -4,9 +4,8 @@ import {
   calculateNewVelocity,
   changeRotation,
   getNewPosition,
-  convertDegreesToRadians,
-} from "../utils/maths-motionstate.ts";
-import { transform } from "../utils/maths.ts";
+} from "../utils/physics.ts";
+import { transform, convertDegreesToRadians } from "../utils/maths.ts";
 import { Position, Velocity, MotionState, Circle } from "../types.ts";
 
 export type ShipState = "active" | "exploding" | "destroyed";

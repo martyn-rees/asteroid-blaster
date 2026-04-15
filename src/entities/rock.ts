@@ -1,4 +1,4 @@
-import { getNewPosition } from "../utils/maths-motionstate.ts";
+import { getNewPosition } from "../utils/physics.ts";
 import { PositionTransform } from "../types.ts";
 // use left-hand cartesian coords (standard screen coords with +ve y axis pointing down)
 // rotation angles: 0 - east, 90 - south, 180 - west, 270 - north

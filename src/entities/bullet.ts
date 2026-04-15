@@ -1,5 +1,5 @@
 import { Circle, Position, PositionTransform, Velocity } from "../types.ts";
-import { getNewPosition } from "../utils/maths-motionstate.ts";
+import { getNewPosition } from "../utils/physics.ts";
 import { transform } from "../utils/maths.ts";
 
 // bullet specifications

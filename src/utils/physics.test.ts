@@ -3,9 +3,8 @@ import {
   changeRotation,
   getComponentVelocity,
   getDirectionRadians,
-  convertRadiansToDegrees,
-  convertDegreesToRadians,
-} from "./maths-motionstate.ts";
+} from "./physics.ts";
+import { convertRadiansToDegrees, convertDegreesToRadians } from "./maths.ts";
 
 describe("updating rotation", () => {
   test("change rotation from north to west", () => {
