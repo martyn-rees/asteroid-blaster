@@ -1,10 +1,11 @@
 import { beforeEach, expect, test } from "vitest";
-import Bullet from "./bullet";
+import Bullet from "./bullet.ts";
+import { PositionTransform } from "../types.ts";
 
-// left hand cartesian coords reverse y-asix
+// left hand cartesian coords reverse y-axis
 // directions: east 0, south Math.PI/2, west Math.PI, north 1.5 * Math.PI
 
-function setUp(x = 100, y = 100) {
+function setUp(x: number = 100, y: number = 100): Bullet {
   return new Bullet({
     initialPosition: { x, y },
     velocity: { speed: 4, direction: 0 },
@@ -63,9 +64,7 @@ test("bullet movement after 2 frames", () => {
 });
 
 test("bullet movement after 2 frames with transform", () => {
-  const transformCallback = (pos) => {
-    return { x: 10, y: 10 };
-  };
+  const transformCallback: PositionTransform = () => ({ x: 10, y: 10 });
   const bullet = setUp();
   bullet.update();
   bullet.update(transformCallback);
