@@ -3,7 +3,7 @@ import { Position, Velocity } from "../types.ts";
 const DECIMAL_PLACES = 3;
 const round = (n: number): number => +n.toFixed(DECIMAL_PLACES);
 
-function convertDegreestoRadians(degrees: number) {
+function convertDegreesToRadians(degrees: number) {
   return (Math.PI / 180) * degrees;
 }
 
@@ -118,7 +118,7 @@ function changeRotation(
 
 export {
   calculateNewVelocity,
-  convertDegreestoRadians,
+  convertDegreesToRadians,
   convertRadiansToDegrees,
   getComponentVelocity,
   getNewPosition,

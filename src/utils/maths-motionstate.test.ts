@@ -4,7 +4,7 @@ import {
   getComponentVelocity,
   getDirectionRadians,
   convertRadiansToDegrees,
-  convertDegreestoRadians,
+  convertDegreesToRadians,
 } from "./maths-motionstate.ts";
 
 describe("updating rotation", () => {
@@ -79,8 +79,8 @@ describe("get velocity from changes in x and y positions", () => {
 
 describe("test angle conversion", () => {
   test("degrees to radians", () => {
-    expect(convertDegreestoRadians(0)).toBe(0);
-    expect(convertDegreestoRadians(180)).toBe(Math.PI);
+    expect(convertDegreesToRadians(0)).toBe(0);
+    expect(convertDegreesToRadians(180)).toBe(Math.PI);
   });
   test("radians to degrees", () => {
     expect(convertRadiansToDegrees(0)).toBe(0);

@@ -1,5 +1,5 @@
 import { RockSpec } from "../assets/game-entity-specs.ts";
-import { convertDegreestoRadians } from "../utils/maths-motionstate.ts";
+import { convertDegreesToRadians } from "../utils/maths-motionstate.ts";
 import { getRandomNumberInRange } from "../utils/random-generators.ts";
 
 // functions that rely on random numbers
@@ -11,13 +11,13 @@ export function getRandomRockProps(rockProps: RockSpec) {
   // choose a random direction but avoid angles within 15 degrees to vertical or horizontal
   let directionDegrees = getRandomNumberInRange(15, 75);
   let quadrant = 90 * Math.floor(Math.random() * 4);
-  const directionRadians = convertDegreestoRadians(directionDegrees + quadrant);
+  const directionRadians = convertDegreesToRadians(directionDegrees + quadrant);
   let rotationRate = getRandomNumberInRange(
     rockProps.rotationRate.min,
     rockProps.rotationRate.max,
   );
   rotationRate = Math.random() > 0.5 ? rotationRate : -rotationRate;
-  const rotationRateRadians = convertDegreestoRadians(rotationRate);
+  const rotationRateRadians = convertDegreesToRadians(rotationRate);
   let velocity = { speed, direction: directionRadians };
 
   return { velocity, r, rotationRate: rotationRateRadians };
