@@ -19,20 +19,34 @@ function addRock(size: RockSize, pos: Position) {
   changeGameState({ action: "add rock", payload: rock });
 }
 
-export function addNewRocksForNewLevel({
+function spawnRockBatch({
+  rocksToAdd,
+  rockSize,
+  screenSize,
+}: {
+  rocksToAdd: number;
+  rockSize: RockSize;
+  screenSize: { screenWidth: number; screenHeight: number };
+}) {
+  for (let i = 0; i < rocksToAdd; i++) {
+    const borders: EdgeSide[] = ["top", "right", "bottom", "left"];
+    const edge = borders[i % 4];
+    const pos: Position = getRandomEdgePosition(edge, screenSize);
+    addRock(rockSize, pos);
+  }
+}
+
+export function spawnRocks({
   level,
   screenSize,
 }: {
   level: number;
   screenSize: { screenWidth: number; screenHeight: number };
 }) {
-  const { largeRocks } = getLevelConfig(level);
-  for (let i = 0; i < largeRocks; i++) {
-    const borders: EdgeSide[] = ["top", "right", "bottom", "left"];
-    const edge = borders[i % 4];
-    const posXY = getRandomEdgePosition(edge, screenSize);
-    addRock("large", posXY);
-  }
+  const { largeRocks, mediumRocks, smallRocks } = getLevelConfig(level);
+  spawnRockBatch({ rocksToAdd: largeRocks, rockSize: "large", screenSize });
+  spawnRockBatch({ rocksToAdd: mediumRocks, rockSize: "medium", screenSize });
+  spawnRockBatch({ rocksToAdd: smallRocks, rockSize: "small", screenSize });
 }
 
 export function explodeRock(rock: Rock, level: number) {
