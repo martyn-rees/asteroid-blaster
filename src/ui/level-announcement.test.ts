@@ -59,14 +59,12 @@ describe("showLevelAnnouncement", () => {
   });
 
   it("calls onComplete after 2 seconds when state is playing", () => {
-    const onComplete = vi.fn();
     showLevelAnnouncement({ level: 3, screenId, onComplete });
     vi.advanceTimersByTime(2000);
     expect(onComplete).toHaveBeenCalledOnce();
   });
 
   it("does not call onComplete if state changes before timer fires", () => {
-    const onComplete = vi.fn();
     showLevelAnnouncement({ level: 1, screenId, onComplete });
     mockGameState.state = "gameover";
     vi.advanceTimersByTime(2000);
