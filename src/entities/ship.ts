@@ -4,9 +4,8 @@ import {
   calculateNewVelocity,
   changeRotation,
   getNewPosition,
-  convertDegreestoRadians,
-} from "../utils/maths-motionstate.ts";
-import { transform } from "../utils/maths.ts";
+} from "../utils/physics.ts";
+import { transform, convertDegreesToRadians } from "../utils/maths.ts";
 import { Position, Velocity, MotionState, Circle } from "../types.ts";
 
 export type ShipState = "active" | "exploding" | "destroyed";
@@ -48,7 +47,7 @@ export default class Ship {
     this.drag = shipSpecs.drag;
     this.thrustMax = shipSpecs.thrustMax;
     this.r = shipSpecs.radius;
-    this.rotationSpeed = convertDegreestoRadians(shipSpecs.rotationSpeed);
+    this.rotationSpeed = convertDegreesToRadians(shipSpecs.rotationSpeed);
     // ship state // point North
     this.rotation = 1.5 * Math.PI;
     this.thrustPower = 0;
@@ -106,10 +105,7 @@ export default class Ship {
     this.isTriggerPressed = shoot;
   }
 
-  update(
-    transformPosition?: PositionTransform,
-    dt: number = 1,
-  ) {
+  update(transformPosition?: PositionTransform, dt: number = 1) {
     if (this.state === "exploding") {
       this.explosionTimer -= dt;
       if (this.explosionTimer <= 0) this.state = "destroyed";

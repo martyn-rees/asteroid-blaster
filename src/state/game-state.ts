@@ -22,7 +22,7 @@ export type GameState = {
   score: number;
   hiScore: number;
   level: number;
-  nextLevelPending: boolean;
+  levelStartPending: boolean;
   ship: Ship | undefined;
   rocks: Rocks;
   bullets: Bullets;
@@ -34,7 +34,7 @@ export let gameState: GameState = {
   score: 0,
   hiScore: 0,
   level: 1,
-  nextLevelPending: true,
+  levelStartPending: true,
   ship: undefined,
   rocks: {},
   bullets: {},
@@ -145,11 +145,11 @@ export function changeGameState(change: GameStateAction) {
       break;
 
     case "next level":
-      gameState = { ...gameState, level: gameState.level + 1, nextLevelPending: true };
+      gameState = { ...gameState, level: gameState.level + 1, levelStartPending: true };
       break;
 
     case "clear level pending":
-      gameState = { ...gameState, nextLevelPending: false };
+      gameState = { ...gameState, levelStartPending: false };
       break;
 
     case "reset game":
@@ -160,7 +160,7 @@ export function changeGameState(change: GameStateAction) {
         score: 0,
         hiScore: gameState.hiScore,
         level: 1,
-        nextLevelPending: true,
+        levelStartPending: true,
         ship: undefined,
         rocks: {},
         bullets: {},

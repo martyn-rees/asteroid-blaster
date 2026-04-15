@@ -1,11 +1,11 @@
 import Rock from "./rock.ts";
 import { changeGameState } from "../state/game-state.ts";
-import { EdgeSide, Position, RockSize } from "../types.ts";
-import {
-  getRandomEdgePosition,
-  getRandomRockProps,
-} from "../utils/rock-randomizer.ts";
-import { rockType, getLevelConfig } from "../assets/gamedata.ts";
+import { EdgeSide, Position } from "../types.ts";
+import { RockSize } from "../assets/game-entity-specs.ts";
+import { getRandomRockProps } from "./rock-randomizer.ts";
+import { getRandomEdgePosition } from "../utils/random-generators.ts";
+import { rockType } from "../assets/game-entity-specs.ts";
+import { getLevelConfig } from "../assets/level-config.ts";
 
 function addRock(size: RockSize, pos: Position) {
   const { velocity, r, rotationRate } = getRandomRockProps(rockType[size]);
@@ -19,20 +19,34 @@ function addRock(size: RockSize, pos: Position) {
   changeGameState({ action: "add rock", payload: rock });
 }
 
-export function addNewRocksForNewLevel({
+function spawnRockBatch({
+  rocksToAdd,
+  rockSize,
+  screenSize,
+}: {
+  rocksToAdd: number;
+  rockSize: RockSize;
+  screenSize: { screenWidth: number; screenHeight: number };
+}) {
+  for (let i = 0; i < rocksToAdd; i++) {
+    const borders: EdgeSide[] = ["top", "right", "bottom", "left"];
+    const edge = borders[i % 4];
+    const pos: Position = getRandomEdgePosition(edge, screenSize);
+    addRock(rockSize, pos);
+  }
+}
+
+export function spawnRocks({
   level,
   screenSize,
 }: {
   level: number;
   screenSize: { screenWidth: number; screenHeight: number };
 }) {
-  const { largeRocks } = getLevelConfig(level);
-  for (let i = 0; i < largeRocks; i++) {
-    const borders: EdgeSide[] = ["top", "right", "bottom", "left"];
-    const edge = borders[i % 4];
-    const posXY = getRandomEdgePosition(edge, screenSize);
-    addRock("large", posXY);
-  }
+  const { largeRocks, mediumRocks, smallRocks } = getLevelConfig(level);
+  spawnRockBatch({ rocksToAdd: largeRocks, rockSize: "large", screenSize });
+  spawnRockBatch({ rocksToAdd: mediumRocks, rockSize: "medium", screenSize });
+  spawnRockBatch({ rocksToAdd: smallRocks, rockSize: "small", screenSize });
 }
 
 export function explodeRock(rock: Rock, level: number) {

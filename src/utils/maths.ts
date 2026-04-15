@@ -36,3 +36,13 @@ export const testCollision = (c1: Circle, c2: Circle): boolean => {
   let minDistance = c1.r + c2.r;
   return distanceBetweenPoints(c1, c2) < minDistance ? true : false;
 };
+
+export function convertDegreesToRadians(degrees: number) {
+  return (Math.PI / 180) * degrees;
+}
+
+export function convertRadiansToDegrees(radians: number) {
+  const DECIMAL_PLACES = 3;
+  const round = (n: number): number => +n.toFixed(DECIMAL_PLACES);
+  return round((180 / Math.PI) * radians);
+}

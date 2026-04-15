@@ -29,7 +29,7 @@ export function showLevelAnnouncement({
     removeFromScreen(ANNOUNCEMENT_ID);
     if (gameState.state === "playing") {
       onComplete();
+      changeGameState({ action: "clear level pending" });
     }
-    changeGameState({ action: "clear level pending" });
   }, ANNOUNCEMENT_DELAY_MS);
 }

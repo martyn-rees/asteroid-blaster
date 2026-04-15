@@ -1,12 +1,10 @@
-import Viewport from "./entities/viewport.ts";
+import gameScreen from "./entities/game-screen.ts";
 import { changeGameState, gameState } from "./state/game-state.ts";
 import { handleStateTransition } from "./state/state-machine.ts";
 import { gameLoopUpdate } from "./update/gameloop-update.ts";
 import { gameLoopRender } from "./render/gameloop-render.ts";
-import { updateFPS } from "./utils/fps.ts";
-import { debug } from "./render/gameloop-render.ts";
-
-export let gameScreen = new Viewport("gameScreen", 800, 400);
+import { updateFPS } from "./render/fps.ts";
+import { renderConfig } from "./render/gameloop-render.ts";
 
 const TARGET_FRAME_MS = 1000 / 60;
 let previousTimestamp = 0;
@@ -26,7 +24,7 @@ function step(timestamp: number) {
 }
 
 function gameLoop(timestamp: number) {
-  if (debug.fps) updateFPS(timestamp);
+  if (renderConfig.showFps) updateFPS(timestamp);
   const elapsed =
     previousTimestamp === 0 ? TARGET_FRAME_MS : timestamp - previousTimestamp;
   previousTimestamp = timestamp;

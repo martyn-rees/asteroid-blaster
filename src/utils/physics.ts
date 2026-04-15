@@ -3,15 +3,7 @@ import { Position, Velocity } from "../types.ts";
 const DECIMAL_PLACES = 3;
 const round = (n: number): number => +n.toFixed(DECIMAL_PLACES);
 
-function convertDegreestoRadians(degrees: number) {
-  return (Math.PI / 180) * degrees;
-}
-
-function convertRadiansToDegrees(radians: number) {
-  return round((180 / Math.PI) * radians);
-}
-
-function getNewPosition(
+export function getNewPosition(
   position: Position,
   velocity: Velocity,
   dt: number = 1,
@@ -46,7 +38,7 @@ export function getNewPositionWithOffset(
   return { x, y };
 }
 
-function getComponentVelocity(
+export function getComponentVelocity(
   v1: Velocity,
   v2: Velocity,
 ): { dx: number; dy: number } {
@@ -65,7 +57,7 @@ function getComponentVelocity(
 }
 
 // calculate new speed and direction
-function calculateNewVelocity(
+export function calculateNewVelocity(
   v1: Velocity,
   v2: Velocity,
   maxSpeed: number,
@@ -81,7 +73,7 @@ function calculateNewVelocity(
 }
 
 //TODO: this provides direction basded on change of movement along x and y axis but it could also return speed as well therefore returning velocity
-function getDirectionRadians(dx: number, dy: number): number {
+export function getDirectionRadians(dx: number, dy: number): number {
   let radians = 0;
 
   if (dx > 0) {
@@ -101,7 +93,7 @@ function getDirectionRadians(dx: number, dy: number): number {
   return radians;
 }
 
-function changeRotation(
+export function changeRotation(
   rotationChange: number,
   currentRotation: number,
   format: "degrees" | "radians" = "radians",
@@ -115,13 +107,3 @@ function changeRotation(
   }
   return rotation;
 }
-
-export {
-  calculateNewVelocity,
-  convertDegreestoRadians,
-  convertRadiansToDegrees,
-  getComponentVelocity,
-  getNewPosition,
-  getDirectionRadians,
-  changeRotation,
-};

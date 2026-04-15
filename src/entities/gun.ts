@@ -4,7 +4,7 @@ import {
   getComponentVelocity,
   getDirectionRadians,
   getNewPositionWithOffset,
-} from "../utils/maths-motionstate.ts";
+} from "../utils/physics.ts";
 import { Position, Velocity } from "../types.ts";
 
 export type GunState =

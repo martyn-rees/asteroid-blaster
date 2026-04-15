@@ -59,25 +59,31 @@ describe("showLevelAnnouncement", () => {
   });
 
   it("calls onComplete after 2 seconds when state is playing", () => {
-    const onComplete = vi.fn();
     showLevelAnnouncement({ level: 3, screenId, onComplete });
     vi.advanceTimersByTime(2000);
     expect(onComplete).toHaveBeenCalledOnce();
   });
 
   it("does not call onComplete if state changes before timer fires", () => {
-    const onComplete = vi.fn();
     showLevelAnnouncement({ level: 1, screenId, onComplete });
     mockGameState.state = "gameover";
     vi.advanceTimersByTime(2000);
     expect(onComplete).not.toHaveBeenCalled();
   });
 
-  it("clears level pending after 2 seconds regardless of game state", () => {
+  it("clears level pending after 2 seconds when state is playing", () => {
+    showLevelAnnouncement({ level: 1, screenId, onComplete });
+    vi.advanceTimersByTime(2000);
+    expect(mockChangeGameState).toHaveBeenCalledWith({
+      action: "clear level pending",
+    });
+  });
+
+  it("does not clear level pending if state changes before timer fires", () => {
     showLevelAnnouncement({ level: 1, screenId, onComplete });
     mockGameState.state = "gameover";
     vi.advanceTimersByTime(2000);
-    expect(mockChangeGameState).toHaveBeenCalledWith({
+    expect(mockChangeGameState).not.toHaveBeenCalledWith({
       action: "clear level pending",
     });
   });

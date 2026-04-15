@@ -15,10 +15,11 @@ import {
   createElement,
   redrawOnScreen,
   renderThrust,
-  playSound,
   createRockElement,
-  displayScore,
 } from "./dom-render.ts";
+
+import { displayScore } from "../render/score-render.ts";
+import { playSound } from "./sound-render.ts";
 
 import { asteroidsSVG, shipSVG } from "../assets/graphics.ts";
 import { GameState } from "../state/game-state.ts";
@@ -52,24 +53,23 @@ export function resetRenderer() {
   };
 }
 
-// can set the debug mode on by setting the debug object
-// set show gun muzzle to display the poition of a ships gun to check it's in the correct position
-// set renderDelay to true to make the render loop run slower than the update loop.
-// so setting a longer render delay can quickly show any problems
-export const debug = { showGunMuzzle: false, renderDelay: true, fps: true };
-const DEBUG_RENDER_DELAY = 2;
-let debug_render_countdown = DEBUG_RENDER_DELAY;
+// dev-only — shows a marker at the gun muzzle position to verify bullet alignment
+export const debug = { showGunMuzzle: false };
 
-function debug_skipRenderForThisFrame(): boolean {
-  // code to delay rendering for number of frames specified by DEBUG_RENDER_DELAY
-  // use this for testing if rendering truly is separated from update to game model
-  if (debug.renderDelay === true) {
-    debug_render_countdown--;
-    if (debug_render_countdown <= 0) {
-      debug_render_countdown = DEBUG_RENDER_DELAY;
-    } else {
+// frameSkip: render every Nth update frame. 1 = render every frame (no throttle).
+// Values above 1 reduce render frequency, decoupling it from the update rate.
+// showFps: display current, min and max FPS on screen.
+export const renderConfig = { frameSkip: 2, showFps: true };
+
+let renderFrameCount = 0;
+
+function skipRenderForThisFrame(): boolean {
+  if (renderConfig.frameSkip > 1) {
+    renderFrameCount++;
+    if (renderFrameCount < renderConfig.frameSkip) {
       return true;
     }
+    renderFrameCount = 0;
   }
   return false;
 }
@@ -176,7 +176,7 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
 
   // if in render debug mode to test if update and render are de-coupled
   // this line can force this rendering to be skipped for a designated number of frames
-  if (debug_skipRenderForThisFrame()) return false;
+  if (skipRenderForThisFrame()) return false;
 
   // ship is only in currentShipIds when active — going non-active removes it from the DOM
   const currentShipIds = new Set(

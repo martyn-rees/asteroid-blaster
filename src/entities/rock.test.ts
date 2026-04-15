@@ -1,18 +1,16 @@
 import { expect, test } from "vitest";
-import Rock from "./rock";
+import Rock from "./rock.ts";
+import { PositionTransform } from "../types.ts";
 
-function setUp(direction = 0) {
-  // reset the static variable that creates a unique ID
+function setUp(direction: number = 0): Rock {
   Rock.rockIDCounter = 0;
-
-  const rock = new Rock({
+  return new Rock({
     initialPosition: { x: 100, y: 100 },
-    initialVelocity: { speed: 1, direction: direction },
+    initialVelocity: { speed: 1, direction },
     size: "large",
     r: 70,
     rotationRate: 1.5 * (Math.PI / 180),
   });
-  return rock;
 }
 
 test("create new rock", () => {
@@ -76,9 +74,7 @@ test("rock movement after 2 frames moving North", () => {
 });
 
 test("rock movement after 2 frames with transform", () => {
-  const transformCallback = (pos) => {
-    return { x: 10, y: 10 };
-  };
+  const transformCallback: PositionTransform = () => ({ x: 10, y: 10 });
   const rock = setUp();
   rock.update();
   rock.update(transformCallback);
