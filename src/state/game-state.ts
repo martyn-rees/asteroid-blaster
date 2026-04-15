@@ -1,11 +1,7 @@
 import Rock from "../entities/rock.ts";
 import Ship from "../entities/ship.ts";
 import Bullet from "../entities/bullet.ts";
-import {
-  removeShipControlEvents,
-  addShipControlEvents,
-  ShipActions,
-} from "../input/ship-actions.ts";
+import { ShipActions } from "../input/ship-actions.ts";
 import { GamePhase } from "../types.ts";
 
 export interface Rocks {
@@ -66,6 +62,9 @@ type GameStateAction =
   | { action: "clear level pending" }
   | { action: "reset game" };
 
+// Pure state dispatcher — updates gameState only. No side effects (input, DOM,
+// audio, timers) belong here. Callers are responsible for any lifecycle work
+// (e.g. attaching/detaching input listeners) alongside their dispatch call.
 // Do not destructure to ({ action, payload }) — it severs the link between them
 // and breaks type narrowing, requiring manual casts in each case.
 export function changeGameState(change: GameStateAction) {
@@ -97,13 +96,11 @@ export function changeGameState(change: GameStateAction) {
       break;
 
     case "add ship":
-      addShipControlEvents();
       gameState = { ...gameState, ship: change.payload };
       break;
 
     case "delete ship":
       gameState.ship?.explode();
-      removeShipControlEvents();
       break;
 
     case "add rock":

@@ -11,7 +11,7 @@ import { bulletSpecs, rockType } from "../assets/game-entity-specs.ts";
 import { constrainNumber, testCollision } from "../utils/maths.ts";
 import { explodeRock } from "../entities/rock-factory.ts";
 import { startLevel } from "../ui/level-start.ts";
-import { getShipActions } from "../input/ship-actions.ts";
+import { getShipActions, removeShipControlEvents } from "../input/ship-actions.ts";
 import Viewport from "../entities/viewport.ts";
 function updateMotionStates(
   gameState: GameState,
@@ -110,6 +110,7 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
       hasRockCollided = testCollision(thisRock.boundary(), ship.boundary());
       if (hasRockCollided) {
         changeGameState({ action: "delete ship" });
+        removeShipControlEvents();
       }
     }
     // Remove the rock, update score, and spawn smaller rocks regardless of
