@@ -25,3 +25,9 @@ export type Circle = {
   y: number;
   r: number;
 };
+
+export interface GameEntity {
+  id: string;
+  update(transformPosition?: PositionTransform, dt?: number): void;
+  boundary(): Circle;
+}
