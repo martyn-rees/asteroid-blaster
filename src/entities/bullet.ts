@@ -1,4 +1,4 @@
-import { Circle, Position, PositionTransform, Velocity } from "../types.ts";
+import { Circle, GameEntity, Position, PositionTransform, Velocity } from "../types.ts";
 import { getNewPosition } from "../utils/physics.ts";
 import { transform } from "../utils/maths.ts";
 
@@ -15,7 +15,7 @@ export type BulletSpec = {
 
 // left hand cartesian coords reverse y-asix
 // directions: east 0, south Math.PI/2, west Math.PI, north 1.5 * Math.PI
-export default class Bullet {
+export default class Bullet implements GameEntity {
   static bulletIDCounter = 0;
   public id: string;
   public bulletPower: number;

@@ -6,7 +6,7 @@ import {
   getNewPosition,
 } from "../utils/physics.ts";
 import { transform, convertDegreesToRadians } from "../utils/maths.ts";
-import { Position, Velocity, MotionState, Circle } from "../types.ts";
+import { Position, Velocity, MotionState, Circle, GameEntity } from "../types.ts";
 
 export type ShipState = "active" | "exploding" | "destroyed";
 
@@ -20,7 +20,7 @@ type ShipSpecs = {
   rotationSpeed: number;
 };
 
-export default class Ship {
+export default class Ship implements GameEntity {
   public id: string;
   public state: ShipState;
   public position: Position;
