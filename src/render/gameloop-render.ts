@@ -16,8 +16,9 @@ import {
   redrawOnScreen,
   renderThrust,
   createRockElement,
-  displayScore,
 } from "./dom-render.ts";
+
+import { displayScore } from "../render/score-render.ts";
 import { playSound } from "./sound-render.ts";
 
 import { asteroidsSVG, shipSVG } from "../assets/graphics.ts";
