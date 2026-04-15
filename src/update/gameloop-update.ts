@@ -19,24 +19,20 @@ function updateMotionStates(
   dt: number,
 ) {
   const { ship, bullets, rocks } = gameState;
-  // use constrainNumber as a callback in update method of ship, rock and bullet classes instead of passing in gameScreen dimensions
+  // warpPosition wraps coordinates that go off one edge of the screen to the opposite edge
   const warpPosition = ({ x, y }: { x: number; y: number }) => ({
     x: constrainNumber(x, 0, gameScreen.width),
     y: constrainNumber(y, 0, gameScreen.height),
   });
 
-  // update ship position based on motion state
   ship!.update(warpPosition, dt);
 
-  // update position of bullet based on motion state
   for (const bulletId in bullets) {
     bullets[bulletId].update(warpPosition, dt);
   }
 
-  // update position of rock based on motion state
   for (const rockId in rocks) {
-    const thisRock = rocks[rockId];
-    thisRock.update(warpPosition, dt);
+    rocks[rockId].update(warpPosition, dt);
   }
 }
 
@@ -51,8 +47,9 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
   }
   updateMotionStates(gameState, gameScreen, dt);
 
-  // remove bullets that have expired — must run before the destroyed check so
-  // bullets fired just before ship death are still cleaned up during gameover
+  // Snapshot bullets before expiry check so deletions don't affect iteration.
+  // Runs before the destroyed check so bullets fired just before ship death
+  // are still cleaned up if the game transitions to gameover this frame.
   const currentBullets: Bullets = { ...gameState.bullets };
   for (const bulletId in currentBullets) {
     const thisBullet = currentBullets[bulletId];
@@ -61,8 +58,9 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
     }
   }
 
-  // guard ensures gameover is only dispatched once — without it, the game loop
-  // continuing in gameover state would dispatch it every frame
+  // Once destroyed, dispatch gameover once and stop processing further updates.
+  // The guard on gameState.state prevents gameover being dispatched every frame
+  // while the loop continues running to keep rocks animating on the end screen.
   if (ship.state === "destroyed") {
     if (gameState.state === "playing") {
       changeGameState({ action: "state", payload: "gameover" });
@@ -70,10 +68,9 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
     return { gameState };
   }
 
-  // - add new bullets - if ACTION.shoot
+  // Spawn a bullet from the gun muzzle when the ship is firing.
   const shipGun: Gun | null = ship.gun;
   if (ship.state === "active" && shipGun && shipGun.state === "firing") {
-    // get position of gun attached to ship as the starting position of new bullet
     const { bulletPosition, bulletVelocity } =
       shipGun.getInitialMotionStateOfBullet();
     const bullet = new Bullet({
@@ -84,15 +81,19 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
     changeGameState({ action: "add bullet", payload: bullet });
   }
 
-  // currentRocks and currentBullets are array copies so not using the gameState arrays directly as the gameState arrays get updated inside the loop
+  // Snapshot rocks at the start of the frame so the loop isn't affected by rocks
+  // being deleted mid-iteration when a collision is detected.
   const currentRocks: Rocks = { ...gameState.rocks };
-  // test each rock for collision with bullets and ship
+
   for (const rockId in currentRocks) {
     let hasRockCollided: boolean = false;
     const thisRock = currentRocks[rockId];
-    // test rock against each bullet until collision is found - if collision then remove bullet and record a collision has happened and break out of bullet loop
-    // BUG: it's possible that a bullet can hit 2 rocks if using currentBullets above. The alternative is to use gameState.bullets directly but this array also
-    // gets amended if a bullet hits a rock
+
+    // Test this rock against each live bullet. Iterates gameState.bullets directly
+    // (not a snapshot) so that bullets deleted earlier in this loop aren't tested again.
+    // Known edge case: a fast-moving bullet could register a hit on two rocks in the
+    // same frame if it overlaps both simultaneously. Fixing this would require a
+    // per-frame set of consumed bullet IDs, which adds complexity for a rare case.
     for (const bulletId in gameState.bullets) {
       const thisBullet = gameState.bullets[bulletId];
       hasRockCollided = testCollision(
@@ -104,14 +105,15 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
         break;
       }
     }
-    // if the rock has not collided with a bullet then check if it has collided with the ship
+    // Only check ship collision if no bullet hit was found this frame.
     if (!hasRockCollided && ship.state === "active") {
       hasRockCollided = testCollision(thisRock.boundary(), ship.boundary());
       if (hasRockCollided) {
         changeGameState({ action: "delete ship" });
       }
     }
-    // if collision with bullet or ship then remove rock, add score and add smaller rocks if needed
+    // Remove the rock, update score, and spawn smaller rocks regardless of
+    // whether the collision was with a bullet or the ship.
     if (hasRockCollided) {
       const rockSize = thisRock.size;
       const valueOfRock = rockType[rockSize].value;
@@ -120,7 +122,8 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
     }
   }
 
-  // detect when all rocks are cleared while the ship is still active
+  // Advance to the next level when all rocks are cleared. nextLevelPending
+  // prevents this firing again on subsequent frames before the new rocks spawn.
   if (
     Object.keys(gameState.rocks).length === 0 &&
     ship.state === "active" &&
