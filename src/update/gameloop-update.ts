@@ -7,7 +7,7 @@ import {
 } from "../state/game-state.ts";
 import Gun from "../entities/gun.ts";
 import Bullet from "../entities/bullet.ts";
-import { bulletSpecs, rockType } from "../assets/gamedata.ts";
+import { bulletSpecs, rockType } from "../assets/game-entity-specs.ts";
 import { constrainNumber, testCollision } from "../utils/maths.ts";
 import { explodeRock } from "../entities/rock-factory.ts";
 import { startLevel } from "../level-start.ts";
@@ -128,7 +128,11 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
     !gameState.nextLevelPending
   ) {
     changeGameState({ action: "next level" });
-    startLevel({ level: gameState.level, screenId: gameScreen.id, screenSize: gameScreen.dimensions });
+    startLevel({
+      level: gameState.level,
+      screenId: gameScreen.id,
+      screenSize: gameScreen.dimensions,
+    });
   }
 
   return { gameState };

@@ -16,7 +16,7 @@ vi.mock("../utils/rock-randomizer.ts", () => ({
   getRandomRockProps: mockGetRandomRockProps,
 }));
 
-vi.mock("../assets/gamedata.ts", () => ({
+vi.mock("../assets/level-config.ts", () => ({
   getLevelConfig: mockGetLevelConfig,
   rockType: {
     large: {},
@@ -55,7 +55,11 @@ describe("spawnRocks", () => {
 
   beforeEach(() => {
     mockGetRandomEdgePosition.mockReturnValue({ x: 0, y: 0 });
-    mockGetRandomRockProps.mockReturnValue({ velocity: {}, r: 70, rotationRate: 0.5 });
+    mockGetRandomRockProps.mockReturnValue({
+      velocity: {},
+      r: 70,
+      rotationRate: 0.5,
+    });
   });
 
   afterEach(() => {
@@ -63,25 +67,41 @@ describe("spawnRocks", () => {
   });
 
   it("spawns the correct number of large rocks from config", () => {
-    mockGetLevelConfig.mockReturnValue({ largeRocks: 4, mediumRocks: 0, smallRocks: 0 });
+    mockGetLevelConfig.mockReturnValue({
+      largeRocks: 4,
+      mediumRocks: 0,
+      smallRocks: 0,
+    });
     spawnRocks({ level: 1, screenSize });
     expect(addedRocks().filter((r) => r.size === "large")).toHaveLength(4);
   });
 
   it("spawns the correct number of medium rocks from config", () => {
-    mockGetLevelConfig.mockReturnValue({ largeRocks: 0, mediumRocks: 3, smallRocks: 0 });
+    mockGetLevelConfig.mockReturnValue({
+      largeRocks: 0,
+      mediumRocks: 3,
+      smallRocks: 0,
+    });
     spawnRocks({ level: 1, screenSize });
     expect(addedRocks().filter((r) => r.size === "medium")).toHaveLength(3);
   });
 
   it("spawns the correct number of small rocks from config", () => {
-    mockGetLevelConfig.mockReturnValue({ largeRocks: 0, mediumRocks: 0, smallRocks: 2 });
+    mockGetLevelConfig.mockReturnValue({
+      largeRocks: 0,
+      mediumRocks: 0,
+      smallRocks: 2,
+    });
     spawnRocks({ level: 1, screenSize });
     expect(addedRocks().filter((r) => r.size === "small")).toHaveLength(2);
   });
 
   it("spawns rocks of multiple sizes from config", () => {
-    mockGetLevelConfig.mockReturnValue({ largeRocks: 2, mediumRocks: 1, smallRocks: 3 });
+    mockGetLevelConfig.mockReturnValue({
+      largeRocks: 2,
+      mediumRocks: 1,
+      smallRocks: 3,
+    });
     spawnRocks({ level: 1, screenSize });
     const rocks = addedRocks();
     expect(rocks.filter((r) => r.size === "large")).toHaveLength(2);
@@ -90,7 +110,11 @@ describe("spawnRocks", () => {
   });
 
   it("spawns no rocks when config returns zero for all sizes", () => {
-    mockGetLevelConfig.mockReturnValue({ largeRocks: 0, mediumRocks: 0, smallRocks: 0 });
+    mockGetLevelConfig.mockReturnValue({
+      largeRocks: 0,
+      mediumRocks: 0,
+      smallRocks: 0,
+    });
     spawnRocks({ level: 1, screenSize });
     expect(addedRocks()).toHaveLength(0);
   });
@@ -98,7 +122,11 @@ describe("spawnRocks", () => {
 
 describe("explodeRock", () => {
   beforeEach(() => {
-    mockGetRandomRockProps.mockReturnValue({ velocity: {}, r: 30, rotationRate: 1 });
+    mockGetRandomRockProps.mockReturnValue({
+      velocity: {},
+      r: 30,
+      rotationRate: 1,
+    });
     mockGetRandomEdgePosition.mockReturnValue({ x: 0, y: 0 });
   });
 
@@ -115,7 +143,10 @@ describe("explodeRock", () => {
   }
 
   it("spawns medium rocks when a large rock explodes", () => {
-    mockGetLevelConfig.mockReturnValue({ largeRockExplosions: 3, mediumRockExplosions: 2 });
+    mockGetLevelConfig.mockReturnValue({
+      largeRockExplosions: 3,
+      mediumRockExplosions: 2,
+    });
     explodeRock(makeMockRock("large"), 1);
     const rocks = addedRocks();
     expect(rocks).toHaveLength(3);
@@ -123,7 +154,10 @@ describe("explodeRock", () => {
   });
 
   it("spawns small rocks when a medium rock explodes", () => {
-    mockGetLevelConfig.mockReturnValue({ largeRockExplosions: 2, mediumRockExplosions: 4 });
+    mockGetLevelConfig.mockReturnValue({
+      largeRockExplosions: 2,
+      mediumRockExplosions: 4,
+    });
     explodeRock(makeMockRock("medium"), 1);
     const rocks = addedRocks();
     expect(rocks).toHaveLength(4);
@@ -131,25 +165,37 @@ describe("explodeRock", () => {
   });
 
   it("spawns no rocks when a small rock explodes", () => {
-    mockGetLevelConfig.mockReturnValue({ largeRockExplosions: 2, mediumRockExplosions: 2 });
+    mockGetLevelConfig.mockReturnValue({
+      largeRockExplosions: 2,
+      mediumRockExplosions: 2,
+    });
     explodeRock(makeMockRock("small"), 1);
     expect(addedRocks()).toHaveLength(0);
   });
 
   it("spawns no medium rocks when largeRockExplosions is zero", () => {
-    mockGetLevelConfig.mockReturnValue({ largeRockExplosions: 0, mediumRockExplosions: 2 });
+    mockGetLevelConfig.mockReturnValue({
+      largeRockExplosions: 0,
+      mediumRockExplosions: 2,
+    });
     explodeRock(makeMockRock("large"), 1);
     expect(addedRocks()).toHaveLength(0);
   });
 
   it("spawns no small rocks when mediumRockExplosions is zero", () => {
-    mockGetLevelConfig.mockReturnValue({ largeRockExplosions: 2, mediumRockExplosions: 0 });
+    mockGetLevelConfig.mockReturnValue({
+      largeRockExplosions: 2,
+      mediumRockExplosions: 0,
+    });
     explodeRock(makeMockRock("medium"), 1);
     expect(addedRocks()).toHaveLength(0);
   });
 
   it("deletes the exploded rock", () => {
-    mockGetLevelConfig.mockReturnValue({ largeRockExplosions: 2, mediumRockExplosions: 2 });
+    mockGetLevelConfig.mockReturnValue({
+      largeRockExplosions: 2,
+      mediumRockExplosions: 2,
+    });
     const rock = makeMockRock("large");
     explodeRock(rock, 1);
     expect(mockChangeGameState).toHaveBeenCalledWith({

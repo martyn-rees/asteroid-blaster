@@ -1,4 +1,4 @@
-import { RockSpec } from "../assets/gamedata.ts";
+import { RockSpec } from "../assets/game-entity-specs.ts";
 import { convertDegreestoRadians } from "../utils/maths-motionstate.ts";
 import {
   getRandomNumberInRange,
