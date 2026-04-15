@@ -122,13 +122,13 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
     }
   }
 
-  // Advance to the next level when all rocks are cleared. nextLevelPending
+  // Advance to the next level when all rocks are cleared. levelStartPending
   // prevents this firing again on subsequent frames before the new rocks spawn.
   if (
     Object.keys(gameState.rocks).length === 0 &&
     ship.state === "active" &&
     gameState.state === "playing" &&
-    !gameState.nextLevelPending
+    !gameState.levelStartPending
   ) {
     changeGameState({ action: "next level" });
     startLevel({
