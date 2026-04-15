@@ -15,10 +15,10 @@ import {
   createElement,
   redrawOnScreen,
   renderThrust,
-  playSound,
   createRockElement,
   displayScore,
 } from "./dom-render.ts";
+import { playSound } from "./sound-render.ts";
 
 import { asteroidsSVG, shipSVG } from "../assets/graphics.ts";
 import { GameState } from "../state/game-state.ts";
