@@ -64,11 +64,18 @@ describe("showLevelAnnouncement", () => {
     expect(onComplete).toHaveBeenCalledOnce();
   });
 
-  it("does not call onComplete if state changes before timer fires", () => {
+  it("does not call onComplete if state is gameover when timer fires", () => {
     showLevelAnnouncement({ level: 1, screenId, onComplete });
     mockGameState.state = "gameover";
     vi.advanceTimersByTime(2000);
     expect(onComplete).not.toHaveBeenCalled();
+  });
+
+  it("calls onComplete when state is paused when timer fires", () => {
+    showLevelAnnouncement({ level: 1, screenId, onComplete });
+    mockGameState.state = "paused";
+    vi.advanceTimersByTime(2000);
+    expect(onComplete).toHaveBeenCalledOnce();
   });
 
   it("clears level pending after 2 seconds when state is playing", () => {
@@ -79,11 +86,20 @@ describe("showLevelAnnouncement", () => {
     });
   });
 
-  it("does not clear level pending if state changes before timer fires", () => {
+  it("does not clear level pending if state is gameover when timer fires", () => {
     showLevelAnnouncement({ level: 1, screenId, onComplete });
     mockGameState.state = "gameover";
     vi.advanceTimersByTime(2000);
     expect(mockChangeGameState).not.toHaveBeenCalledWith({
+      action: "clear level pending",
+    });
+  });
+
+  it("clears level pending when state is paused when timer fires", () => {
+    showLevelAnnouncement({ level: 1, screenId, onComplete });
+    mockGameState.state = "paused";
+    vi.advanceTimersByTime(2000);
+    expect(mockChangeGameState).toHaveBeenCalledWith({
       action: "clear level pending",
     });
   });

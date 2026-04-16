@@ -1,6 +1,5 @@
 import { GamePhase } from "../types.ts";
 import { onEnter, onExit, setUpLevel } from "../events/events.ts";
-import { removeFromScreen } from "../render/dom-render.ts";
 import Viewport from "../entities/viewport.ts";
 
 export function handleStateTransition(
@@ -12,7 +11,7 @@ export function handleStateTransition(
   switch (currentState) {
     case "start":
       if (previousState !== "start") {
-        if (previousState === "gameover") removeFromScreen("endScreen");
+        if (previousState === "gameover") onExit("gameover", gameScreen);
         onEnter("start", gameScreen);
       }
       break;
@@ -31,11 +30,13 @@ export function handleStateTransition(
       break;
     case "paused":
       if (previousState === "playing") {
+        onExit("playing", gameScreen);
         onEnter("paused", gameScreen);
       }
       break;
     case "gameover":
       if (previousState === "playing") {
+        onExit("playing", gameScreen);
         onEnter("gameover", gameScreen);
       }
       break;

@@ -5,16 +5,11 @@ import Viewport from "../entities/viewport.ts";
 const mockOnEnter = vi.hoisted(() => vi.fn());
 const mockOnExit = vi.hoisted(() => vi.fn());
 const mockSetUpLevel = vi.hoisted(() => vi.fn());
-const mockRemoveFromScreen = vi.hoisted(() => vi.fn());
 
 vi.mock("../events/events.ts", () => ({
   onEnter: mockOnEnter,
   onExit: mockOnExit,
   setUpLevel: mockSetUpLevel,
-}));
-
-vi.mock("../render/dom-render.ts", () => ({
-  removeFromScreen: mockRemoveFromScreen,
 }));
 
 const gameScreen = new Viewport("gameScreen", 800, 400);
@@ -30,23 +25,25 @@ describe("start state", () => {
     expect(mockOnEnter).toHaveBeenCalledWith("start", gameScreen);
   });
 
-  it("calls onEnter('start') when entering from gameover and removes end screen", () => {
-    handleStateTransition("start", "gameover", gameScreen, onResetTimer);
-    expect(mockRemoveFromScreen).toHaveBeenCalledWith("endScreen");
-    expect(mockOnEnter).toHaveBeenCalledWith("start", gameScreen);
-  });
-
-  it("removes end screen before calling onEnter when coming from gameover", () => {
+  it("calls onExit('gameover') then onEnter('start') when coming from gameover", () => {
     const callOrder: string[] = [];
-    mockRemoveFromScreen.mockImplementation(() => callOrder.push("removeFromScreen"));
+    mockOnExit.mockImplementation(() => callOrder.push("onExit"));
     mockOnEnter.mockImplementation(() => callOrder.push("onEnter"));
     handleStateTransition("start", "gameover", gameScreen, onResetTimer);
-    expect(callOrder).toEqual(["removeFromScreen", "onEnter"]);
+    expect(mockOnExit).toHaveBeenCalledWith("gameover", gameScreen);
+    expect(mockOnEnter).toHaveBeenCalledWith("start", gameScreen);
+    expect(callOrder).toEqual(["onExit", "onEnter"]);
   });
 
-  it("does not call onEnter when already in start state", () => {
+  it("does not call onExit when entering from empty state", () => {
+    handleStateTransition("start", "", gameScreen, onResetTimer);
+    expect(mockOnExit).not.toHaveBeenCalled();
+  });
+
+  it("does nothing when already in start state", () => {
     handleStateTransition("start", "start", gameScreen, onResetTimer);
     expect(mockOnEnter).not.toHaveBeenCalled();
+    expect(mockOnExit).not.toHaveBeenCalled();
   });
 
   it("does not reset the timer", () => {
@@ -57,11 +54,16 @@ describe("start state", () => {
 
 describe("playing state", () => {
   it("calls onExit, setUpLevel, onEnter and resets timer when coming from start", () => {
+    const callOrder: string[] = [];
+    mockOnExit.mockImplementation(() => callOrder.push("onExit"));
+    mockSetUpLevel.mockImplementation(() => callOrder.push("setUpLevel"));
+    mockOnEnter.mockImplementation(() => callOrder.push("onEnter"));
     handleStateTransition("playing", "start", gameScreen, onResetTimer);
     expect(mockOnExit).toHaveBeenCalledWith("start", gameScreen);
     expect(mockSetUpLevel).toHaveBeenCalledWith(gameScreen);
     expect(mockOnEnter).toHaveBeenCalledWith("playing", gameScreen);
     expect(onResetTimer).toHaveBeenCalled();
+    expect(callOrder).toEqual(["onExit", "setUpLevel", "onEnter"]);
   });
 
   it("calls onExit, onEnter and resets timer when resuming from paused — no setUpLevel", () => {
@@ -72,16 +74,15 @@ describe("playing state", () => {
     expect(mockSetUpLevel).not.toHaveBeenCalled();
   });
 
-  it("calls onExit before setUpLevel before onEnter when coming from start", () => {
+  it("calls onExit before onEnter when resuming from paused", () => {
     const callOrder: string[] = [];
     mockOnExit.mockImplementation(() => callOrder.push("onExit"));
-    mockSetUpLevel.mockImplementation(() => callOrder.push("setUpLevel"));
     mockOnEnter.mockImplementation(() => callOrder.push("onEnter"));
-    handleStateTransition("playing", "start", gameScreen, onResetTimer);
-    expect(callOrder).toEqual(["onExit", "setUpLevel", "onEnter"]);
+    handleStateTransition("playing", "paused", gameScreen, onResetTimer);
+    expect(callOrder).toEqual(["onExit", "onEnter"]);
   });
 
-  it("does nothing when coming from playing", () => {
+  it("does nothing when already in playing state", () => {
     handleStateTransition("playing", "playing", gameScreen, onResetTimer);
     expect(mockOnEnter).not.toHaveBeenCalled();
     expect(mockOnExit).not.toHaveBeenCalled();
@@ -91,9 +92,14 @@ describe("playing state", () => {
 });
 
 describe("paused state", () => {
-  it("calls onEnter('paused') when coming from playing", () => {
+  it("calls onExit('playing') then onEnter('paused') when coming from playing", () => {
+    const callOrder: string[] = [];
+    mockOnExit.mockImplementation(() => callOrder.push("onExit"));
+    mockOnEnter.mockImplementation(() => callOrder.push("onEnter"));
     handleStateTransition("paused", "playing", gameScreen, onResetTimer);
+    expect(mockOnExit).toHaveBeenCalledWith("playing", gameScreen);
     expect(mockOnEnter).toHaveBeenCalledWith("paused", gameScreen);
+    expect(callOrder).toEqual(["onExit", "onEnter"]);
   });
 
   it("does not reset the timer", () => {
@@ -101,16 +107,22 @@ describe("paused state", () => {
     expect(onResetTimer).not.toHaveBeenCalled();
   });
 
-  it("does nothing when not coming from playing", () => {
+  it("does nothing when already in paused state", () => {
     handleStateTransition("paused", "paused", gameScreen, onResetTimer);
     expect(mockOnEnter).not.toHaveBeenCalled();
+    expect(mockOnExit).not.toHaveBeenCalled();
   });
 });
 
 describe("gameover state", () => {
-  it("calls onEnter('gameover') when coming from playing", () => {
+  it("calls onExit('playing') then onEnter('gameover') when coming from playing", () => {
+    const callOrder: string[] = [];
+    mockOnExit.mockImplementation(() => callOrder.push("onExit"));
+    mockOnEnter.mockImplementation(() => callOrder.push("onEnter"));
     handleStateTransition("gameover", "playing", gameScreen, onResetTimer);
+    expect(mockOnExit).toHaveBeenCalledWith("playing", gameScreen);
     expect(mockOnEnter).toHaveBeenCalledWith("gameover", gameScreen);
+    expect(callOrder).toEqual(["onExit", "onEnter"]);
   });
 
   it("does not reset the timer", () => {
@@ -118,8 +130,9 @@ describe("gameover state", () => {
     expect(onResetTimer).not.toHaveBeenCalled();
   });
 
-  it("does nothing when not coming from playing", () => {
+  it("does nothing when already in gameover state", () => {
     handleStateTransition("gameover", "gameover", gameScreen, onResetTimer);
     expect(mockOnEnter).not.toHaveBeenCalled();
+    expect(mockOnExit).not.toHaveBeenCalled();
   });
 });
