@@ -12,7 +12,8 @@ function hideCursor(screenId: string) {
       el.style.cursor = "none";
     }, 2000);
   };
-  // delay attaching mousemove so the click that triggered this doesn't immediately show the cursor again
+  // delay attaching mousemove — the browser synthesises a mousemove after a button click,
+  // which would immediately re-show the cursor. 100ms clears the click event pipeline.
   setTimeout(() => el.addEventListener("mousemove", mouseMoveHandler!), 100);
 }
 
