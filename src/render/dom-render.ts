@@ -1,4 +1,8 @@
-import { RockSize } from "../config/game-entity-specs.ts";
+import Rock from "../entities/rock.ts";
+import Ship from "../entities/ship.ts";
+import Bullet from "../entities/bullet.ts";
+import Gun from "../entities/gun.ts";
+import { asteroidsSVG, shipSVG } from "../assets/graphics.ts";
 
 // change position and rotation to element already on screen
 // TODO maybe provide additonalCLass property which could be used for examples such as ships thrust
@@ -52,22 +56,23 @@ export function createElement(
   return divElement;
 }
 
-export function createRockElement({
-  id,
-  r,
-  asteroidImage,
-  size,
-}: {
-  id: string;
-  r: number;
-  asteroidImage: string;
-  size: RockSize;
-}): HTMLElement {
-  let rockStyle = `height:${2 * r}px; width:${2 * r}px; margin-left:-${r}px; margin-top:-${r}px;`;
-  const rockClass = size === "small" ? "rock" : "rock glow";
+export function createRock(rock: Rock): HTMLElement {
+  const rockSVG = asteroidsSVG[rock.index % asteroidsSVG.length];
+  const rockStyle = `height:${2 * rock.r}px; width:${2 * rock.r}px; margin-left:-${rock.r}px; margin-top:-${rock.r}px;`;
+  const rockClass = rock.size === "small" ? "rock" : "rock glow";
+  return createElement(rock.id, rockClass, rockStyle, rockSVG);
+}
 
-  const el = createElement(id, rockClass, rockStyle, asteroidImage);
-  return el;
+export function createShip(ship: Ship): HTMLElement {
+  return createElement(ship.id, "ship", null, shipSVG());
+}
+
+export function createBullet(bullet: Bullet): HTMLElement {
+  return createElement(bullet.id, "bullet", null, null);
+}
+
+export function createGun(gun: Gun): HTMLElement {
+  return createElement(gun.id, "gun", null, null);
 }
 
 export function removeFromScreen(elId: string) {

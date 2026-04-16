@@ -7,21 +7,21 @@
 import { Bullets, Rocks } from "../state/game-state.ts";
 import Ship from "../entities/ship.ts";
 import Rock from "../entities/rock.ts";
-import Gun from "../entities/gun.ts";
 
 import {
   addToScreen,
   removeFromScreen,
-  createElement,
   redrawOnScreen,
   renderThrust,
-  createRockElement,
+  createRock,
+  createShip,
+  createBullet,
+  createGun,
 } from "./dom-render.ts";
 
 import { displayScore } from "../render/score-render.ts";
 import { playSound } from "./sound-render.ts";
 
-import { asteroidsSVG, shipSVG } from "../assets/graphics.ts";
 import { GameState } from "../state/game-state.ts";
 import { debug, renderConfig } from "../config/config.ts";
 
@@ -67,14 +67,13 @@ function skipRenderForThisFrame(): boolean {
   return false;
 }
 
-function displayNewShips(newShipIds: Set<string>, screenId: string) {
-  newShipIds.forEach((shipId) => {
-    const shipEl = createElement(shipId, "ship", null, shipSVG());
-    addToScreen(shipEl, screenId);
+function displayNewShips(newShipIds: Set<string>, screenId: string, ship: Ship | undefined) {
+  if (!ship) return;
+  newShipIds.forEach(() => {
+    addToScreen(createShip(ship), screenId);
     // these lines are for testing - adds the ship's gun muzzle to check it's position is correct
-    if (debug.showGunMuzzle) {
-      const gunEl = createElement("gun0", "gun", null, null);
-      addToScreen(gunEl, screenId);
+    if (debug.showGunMuzzle && ship.gun) {
+      addToScreen(createGun(ship.gun), screenId);
     }
   });
 }
@@ -87,8 +86,7 @@ function displayNewBullets(
   newBulletIds.forEach((bulletId: string) => {
     const bullet = bullets[bulletId];
     if (bullet) {
-      const el = createElement(bulletId, "bullet", null, null);
-      addToScreen(el, screenId);
+      addToScreen(createBullet(bullet), screenId);
       playSound("shoot");
     } else {
       console.error("bulletId doesn't exist in bullets", bulletId);
@@ -104,14 +102,7 @@ function displayNewRocks(
   newRockIds.forEach((rockId: string) => {
     const rock = rocks[rockId];
     if (rock) {
-      const graphicIndex = rock.index % asteroidsSVG.length;
-      const el = createRockElement({
-        id: rockId,
-        r: rock.r,
-        asteroidImage: asteroidsSVG[graphicIndex],
-        size: rock.size,
-      });
-      addToScreen(el, screenId);
+      addToScreen(createRock(rock), screenId);
     } else {
       console.error("rockId doesn't exist in rocks", rockId);
     }
@@ -143,7 +134,7 @@ function redrawShip(ship: Ship) {
 
   // these lines are for testing - updates the ship's gun muzzle to check it's position is correct
   if (debug.showGunMuzzle) {
-    const gun: Gun = ship!.gun!;
+    const gun = ship.gun!;
     redrawOnScreen(gun.id, gun.muzzlePosition.x, gun.muzzlePosition.y);
   }
 }
@@ -213,7 +204,7 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
   );
 
   // DISPLAY NEW ITEMS
-  displayNewShips(newShipIds, screenId);
+  displayNewShips(newShipIds, screenId, ship);
   displayNewBullets(newBulletIds, screenId, bullets);
   displayNewRocks(newRockIds, screenId, rocks);
 
