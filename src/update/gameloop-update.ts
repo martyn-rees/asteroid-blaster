@@ -135,7 +135,7 @@ export function gameLoopUpdate(gameScreen: Viewport, dt: number) {
     startLevel({
       level: gameState.level,
       screenId: gameScreen.id,
-      screenSize: gameScreen.dimensions,
+      screenSize: gameScreen.size,
     });
   }
 

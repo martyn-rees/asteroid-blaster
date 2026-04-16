@@ -54,7 +54,7 @@ function addedRocks() {
 }
 
 describe("spawnRocks", () => {
-  const screenSize = { screenWidth: 800, screenHeight: 600 };
+  const screenSize = { width: 800, height: 600 };
 
   beforeEach(() => {
     mockGetRandomEdgePosition.mockReturnValue({ x: 0, y: 0 });

@@ -45,7 +45,7 @@ function setUpLevel(gameScreen: Viewport) {
   startLevel({
     level: gameState.level,
     screenId: gameScreen.id,
-    screenSize: gameScreen.dimensions,
+    screenSize: gameScreen.size,
   });
 }
 

@@ -1,3 +1,5 @@
+import { Size } from "../types.ts";
+
 export default class Viewport {
   public id: string;
   public width: number;
@@ -19,13 +21,13 @@ export default class Viewport {
     }
   }
 
-  set dimensions({ w, h }: { w: number; h: number }) {
-    this.width = w;
-    this.height = h;
+  set size({ width, height }: Size) {
+    this.width = width;
+    this.height = height;
   }
 
-  get dimensions(): { screenWidth: number; screenHeight: number } {
-    return { screenWidth: this.width, screenHeight: this.height };
+  get size(): Size {
+    return { width: this.width, height: this.height };
   }
 
   get centre(): { x: number; y: number } {
@@ -48,9 +50,9 @@ export default class Viewport {
   }
 
   private matchElementSize(element: HTMLElement) {
-    this.dimensions = {
-      w: element.offsetWidth,
-      h: element.offsetHeight,
+    this.size = {
+      width: element.offsetWidth,
+      height: element.offsetHeight,
     };
   }
 }

@@ -1,10 +1,11 @@
 import { showLevelAnnouncement } from "./level-announcement.ts";
 import { spawnRocks } from "../entities/rock-factory.ts";
+import { Size } from "../types.ts";
 
 type LevelStartParams = {
   level: number;
   screenId: string;
-  screenSize: { screenWidth: number; screenHeight: number };
+  screenSize: Size;
 };
 
 export function startLevel({ level, screenId, screenSize }: LevelStartParams) {
