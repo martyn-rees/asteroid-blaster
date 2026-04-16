@@ -5,6 +5,7 @@ import { displayHiScore, displayScore } from "../render/score-render.ts";
 import { addNewShip } from "../entities/ship-factory.ts";
 import { startLevel } from "../ui/level-start.ts";
 import { resetRenderer } from "../render/gameloop-render.ts";
+import { resumeFPS } from "../render/fps.ts";
 import { createStartScreen } from "../ui/startscreen.ts";
 import { createEndScreen } from "../ui/endscreen.ts";
 import { hideCursor, showCursor } from "./cursor-events.ts";
@@ -41,6 +42,7 @@ function onEnterStart(gameScreen: Viewport) {
 }
 
 function onEnterPlaying(gameScreen: Viewport) {
+  resumeFPS();
   addPauseButton(gameScreen.id);
   hideCursor(gameScreen.id);
 }

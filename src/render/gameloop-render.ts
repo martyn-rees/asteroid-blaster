@@ -21,6 +21,7 @@ import {
 
 import { displayScore } from "../render/score-render.ts";
 import { playSound } from "./sound-render.ts";
+import { resetFPS } from "./fps.ts";
 
 import { GameState } from "../state/game-state.ts";
 import { debug, renderConfig } from "../config/config.ts";
@@ -46,6 +47,7 @@ export function resetRenderer() {
   previousRender.shipIds.forEach((id) => removeFromScreen(id));
   previousRender.rockIds.forEach((id) => removeFromScreen(id));
   previousRender.bulletIds.forEach((id) => removeFromScreen(id));
+  resetFPS();
   previousRender = {
     shipIds: new Set<string>(),
     rockIds: new Set<string>(),
