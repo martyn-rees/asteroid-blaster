@@ -1,6 +1,6 @@
 import Rock from "./rock.ts";
 import { changeGameState } from "../state/game-state.ts";
-import { EdgeSide, Position } from "../types.ts";
+import { EdgeSide, Position, Size } from "../types.ts";
 import { RockSize } from "../assets/game-entity-specs.ts";
 import { getRandomRockProps } from "./rock-randomizer.ts";
 import { getRandomEdgePosition } from "../utils/random-generators.ts";
@@ -26,7 +26,7 @@ function spawnRockBatch({
 }: {
   rocksToAdd: number;
   rockSize: RockSize;
-  screenSize: { screenWidth: number; screenHeight: number };
+  screenSize: Size;
 }) {
   for (let i = 0; i < rocksToAdd; i++) {
     const borders: EdgeSide[] = ["top", "right", "bottom", "left"];
@@ -41,7 +41,7 @@ export function spawnRocks({
   screenSize,
 }: {
   level: number;
-  screenSize: { screenWidth: number; screenHeight: number };
+  screenSize: Size;
 }) {
   const { largeRocks, mediumRocks, smallRocks } = getLevelConfig(level);
   spawnRockBatch({ rocksToAdd: largeRocks, rockSize: "large", screenSize });

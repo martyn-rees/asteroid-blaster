@@ -26,6 +26,11 @@ export type Circle = {
   r: number;
 };
 
+export type Size = {
+  width: number;
+  height: number;
+};
+
 export interface GameEntity {
   id: string;
   update(transformPosition?: PositionTransform, dt?: number): void;

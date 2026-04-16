@@ -1,4 +1,4 @@
-import { EdgeSide } from "../types.ts";
+import { EdgeSide, Size } from "../types.ts";
 
 export const getRandomInt = (n: number): number =>
   Math.floor(Math.random() * (n + 1));
@@ -9,22 +9,22 @@ export function getRandomNumberInRange(min: number, max: number): number {
 
 export function getRandomEdgePosition(
   edge: EdgeSide,
-  screenSize: { screenWidth: number; screenHeight: number },
+  screenSize: Size,
 ): { x: number; y: number } {
   switch (edge) {
     case "top":
-      return { x: getRandomInt(screenSize.screenWidth), y: 0 };
+      return { x: getRandomInt(screenSize.width), y: 0 };
     case "right":
       return {
-        x: screenSize.screenWidth,
-        y: getRandomInt(screenSize.screenHeight),
+        x: screenSize.width,
+        y: getRandomInt(screenSize.height),
       };
     case "bottom":
       return {
-        x: getRandomInt(screenSize.screenWidth),
-        y: screenSize.screenHeight,
+        x: getRandomInt(screenSize.width),
+        y: screenSize.height,
       };
     case "left":
-      return { x: 0, y: getRandomInt(screenSize.screenHeight) };
+      return { x: 0, y: getRandomInt(screenSize.height) };
   }
 }
