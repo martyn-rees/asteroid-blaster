@@ -55,7 +55,6 @@ function onEnterPaused(gameScreen: Viewport) {
 function onEnterGameOver(gameScreen: Viewport) {
   changeGameState({ action: "state", payload: "gameover" });
   changeGameState({ action: "update hi-score" });
-  showCursor(gameScreen.id);
   endScreenTimer = setTimeout(() => {
     endScreenTimer = null;
     if (gameState.state === "gameover") {
@@ -95,10 +94,10 @@ function onExit(screen: GamePhase, gameScreen: Viewport) {
       break;
     case "playing":
       removeFromScreen("pauseButton");
+      showCursor(gameScreen.id);
       break;
     case "paused":
       removeFromScreen("resumeButton");
-      showCursor(gameScreen.id);
       break;
     case "gameover":
       removeFromScreen("endScreen");
