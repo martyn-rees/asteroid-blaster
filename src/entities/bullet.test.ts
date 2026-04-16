@@ -1,9 +1,13 @@
 import { beforeEach, expect, test } from "vitest";
-import Bullet from "./bullet.ts";
+import Bullet, { resetBulletIDCounter } from "./bullet.ts";
 import { PositionTransform } from "../types.ts";
 
 // left hand cartesian coords reverse y-axis
 // directions: east 0, south Math.PI/2, west Math.PI, north 1.5 * Math.PI
+
+beforeEach(() => {
+  resetBulletIDCounter();
+});
 
 function setUp(x: number = 100, y: number = 100): Bullet {
   return new Bullet({
@@ -16,11 +20,6 @@ function setUp(x: number = 100, y: number = 100): Bullet {
     },
   });
 }
-
-beforeEach(() => {
-  // reset the static variable that creates a unique ID before each test
-  Bullet.bulletIDCounter = 0;
-});
 
 test("create new Bullets", () => {
   const bullet1 = setUp();

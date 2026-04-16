@@ -5,8 +5,13 @@ import { PositionTransform } from "../types.ts";
 import { Circle, GameEntity, Position, Velocity } from "../types.ts";
 import { RockSize } from "../config/game-entity-specs.ts";
 
+let rockIDCounter = 0;
+
+export function resetRockIDCounter() {
+  rockIDCounter = 0;
+}
+
 export default class Rock implements GameEntity {
-  static rockIDCounter = 0;
   public index: number;
   public id: string;
   public size: RockSize;
@@ -30,7 +35,7 @@ export default class Rock implements GameEntity {
     rotationRate: number;
   }) {
     // constant values for life of this rock
-    this.index = Rock.rockIDCounter++;
+    this.index = rockIDCounter++;
     this.id = "rock" + this.index;
     this.size = size;
     this.r = r;

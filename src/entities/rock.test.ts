@@ -1,9 +1,12 @@
-import { expect, test } from "vitest";
-import Rock from "./rock.ts";
+import { beforeEach, expect, test } from "vitest";
+import Rock, { resetRockIDCounter } from "./rock.ts";
 import { PositionTransform } from "../types.ts";
 
+beforeEach(() => {
+  resetRockIDCounter();
+});
+
 function setUp(direction: number = 0): Rock {
-  Rock.rockIDCounter = 0;
   return new Rock({
     initialPosition: { x: 100, y: 100 },
     initialVelocity: { speed: 1, direction },

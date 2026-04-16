@@ -15,8 +15,13 @@ export type BulletSpec = {
 
 // left hand cartesian coords reverse y-asix
 // directions: east 0, south Math.PI/2, west Math.PI, north 1.5 * Math.PI
+let bulletIDCounter = 0;
+
+export function resetBulletIDCounter() {
+  bulletIDCounter = 0;
+}
+
 export default class Bullet implements GameEntity {
-  static bulletIDCounter = 0;
   public id: string;
   public bulletPower: number;
   public velocity: Velocity;
@@ -33,8 +38,8 @@ export default class Bullet implements GameEntity {
     velocity: Velocity;
     bulletSpecs: BulletSpec;
   }) {
-    Bullet.bulletIDCounter++;
-    this.id = "bullet" + Bullet.bulletIDCounter;
+    bulletIDCounter++;
+    this.id = "bullet" + bulletIDCounter;
     this.bulletPower = bulletSpecs.power;
     this.velocity = velocity;
     this.position = initialPosition;
