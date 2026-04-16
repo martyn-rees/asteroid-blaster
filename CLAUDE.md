@@ -65,6 +65,13 @@ changeGameState({ action: "score", payload: 100 });
 
 All mutations are logged to `stateHistory[]` (capped at 10,000 entries) for debugging.
 
+### Reading state: two intentional patterns
+
+There are two ways state is read across the codebase — do not unify them, they serve different purposes:
+
+- **`getState: () => GameState` callback** — used in `update/` functions (`gameLoopUpdate`, `processCollisions`, `checkLevelComplete`). State mutates mid-frame (e.g. bullets are deleted during collision iteration), so each read must be fresh. The callback is also what makes these functions testable in isolation.
+- **Direct `gameState` import** — used in `events.ts`. Lifecycle hooks (`onEnter`/`onExit`) run once per state transition, not in a hot loop, so a module-level reference is correct and simpler here. Threading `getState` as a parameter into `events.ts` would add complexity with no benefit.
+
 ---
 
 ## State Machine
