@@ -62,9 +62,9 @@ export default class Rock implements GameEntity {
     };
   }
 
-  update(transformPosition?: PositionTransform, dt: number = 1) {
-    const newPosition = getNewPosition(this.position, this.velocity, dt);
-    this.rotation += this.rotationRate * dt;
+  update(transformPosition?: PositionTransform, deltaTime: number = 1) {
+    const newPosition = getNewPosition(this.position, this.velocity, deltaTime);
+    this.rotation += this.rotationRate * deltaTime;
     this.position = transformPosition
       ? transformPosition(newPosition)
       : newPosition;

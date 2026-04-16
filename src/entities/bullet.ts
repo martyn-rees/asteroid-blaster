@@ -1,4 +1,10 @@
-import { Circle, GameEntity, Position, PositionTransform, Velocity } from "../types.ts";
+import {
+  Circle,
+  GameEntity,
+  Position,
+  PositionTransform,
+  Velocity,
+} from "../types.ts";
 import { getNewPosition } from "../utils/physics.ts";
 import { transform } from "../utils/maths.ts";
 
@@ -56,15 +62,12 @@ export default class Bullet implements GameEntity {
   }
 
   // change endurance, bulletPower and position
-  update(
-    transformPosition?: PositionTransform,
-    dt: number = 1,
-  ) {
-    const newPosition = getNewPosition(this.position, this.velocity, dt);
+  update(transformPosition?: PositionTransform, deltaTime: number = 1) {
+    const newPosition = getNewPosition(this.position, this.velocity, deltaTime);
     const screenPosition = transform(newPosition, transformPosition);
 
     this.position = screenPosition;
-    this.endurance -= dt;
+    this.endurance -= deltaTime;
     if (this.endurance <= 0) {
       this.bulletPower = 0;
     }

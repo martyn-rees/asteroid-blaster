@@ -12,9 +12,14 @@ let previousTimestamp = 0;
 // GAME loop code
 function step(timestamp: number) {
   // handle state transitions and reset gameloop timer on state change
-  handleStateTransition(gameState.state, gameState.previousState, gameScreen, () => {
-    previousTimestamp = 0;
-  });
+  handleStateTransition(
+    gameState.state,
+    gameState.previousState,
+    gameScreen,
+    () => {
+      previousTimestamp = 0;
+    },
+  );
 
   // also run during gameover so rocks continue animating in the background
   if (gameState.state === "playing" || gameState.state === "gameover")
@@ -28,8 +33,8 @@ function gameLoop(timestamp: number) {
   const elapsed =
     previousTimestamp === 0 ? TARGET_FRAME_MS : timestamp - previousTimestamp;
   previousTimestamp = timestamp;
-  const dt = Math.min(elapsed / TARGET_FRAME_MS, 3);
-  gameLoopUpdate(gameScreen, dt, () => gameState);
+  const deltaTime = Math.min(elapsed / TARGET_FRAME_MS, 3);
+  gameLoopUpdate(gameScreen, deltaTime, () => gameState);
   gameLoopRender(gameState, gameScreen.id);
 }
 

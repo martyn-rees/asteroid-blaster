@@ -73,13 +73,13 @@ export default class Gun {
   }
 
   // updates gun state not position.
-  update(shoot: boolean, dt: number = 1) {
+  update(shoot: boolean, deltaTime: number = 1) {
     if (shoot && this.state === "loaded") {
       this.state = "firing";
     }
 
     if (this.state === "reloading") {
-      this.gunReloadTimer -= dt;
+      this.gunReloadTimer -= deltaTime;
       if (this.gunReloadTimer <= 0) {
         this.state = "loaded";
       }

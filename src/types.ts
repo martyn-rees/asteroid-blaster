@@ -33,6 +33,6 @@ export type Size = {
 
 export interface GameEntity {
   id: string;
-  update(transformPosition?: PositionTransform, dt?: number): void;
+  update(transformPosition?: PositionTransform, deltaTime?: number): void;
   boundary(): Circle;
 }

@@ -6,10 +6,10 @@ const round = (n: number): number => +n.toFixed(DECIMAL_PLACES);
 export function getNewPosition(
   position: Position,
   velocity: Velocity,
-  dt: number = 1,
+  deltaTime: number = 1,
 ): Position {
-  const dx = velocity.speed * Math.cos(velocity.direction) * dt;
-  const dy = velocity.speed * Math.sin(velocity.direction) * dt;
+  const dx = velocity.speed * Math.cos(velocity.direction) * deltaTime;
+  const dy = velocity.speed * Math.sin(velocity.direction) * deltaTime;
   let x = round(position.x + dx);
   let y = round(position.y + dy);
   return { x, y };

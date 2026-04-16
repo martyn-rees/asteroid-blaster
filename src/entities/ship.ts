@@ -6,7 +6,13 @@ import {
   getNewPosition,
 } from "../utils/physics.ts";
 import { transform, convertDegreesToRadians } from "../utils/maths.ts";
-import { Position, Velocity, MotionState, Circle, GameEntity } from "../types.ts";
+import {
+  Position,
+  Velocity,
+  MotionState,
+  Circle,
+  GameEntity,
+} from "../types.ts";
 
 export type ShipState = "active" | "exploding" | "destroyed";
 
@@ -105,9 +111,9 @@ export default class Ship implements GameEntity {
     this.isTriggerPressed = shoot;
   }
 
-  update(transformPosition?: PositionTransform, dt: number = 1) {
+  update(transformPosition?: PositionTransform, deltaTime: number = 1) {
     if (this.state === "exploding") {
-      this.explosionTimer -= dt;
+      this.explosionTimer -= deltaTime;
       if (this.explosionTimer <= 0) this.state = "destroyed";
       return;
     }
@@ -115,13 +121,13 @@ export default class Ship implements GameEntity {
 
     if (this.rotateDirection !== 0) {
       this.rotation = changeRotation(
-        this.rotateDirection * this.rotationSpeed * dt,
+        this.rotateDirection * this.rotationSpeed * deltaTime,
         this.rotation,
       );
     }
 
     const maxSpeed = this.speedMax;
-    let driftSpeed: number = this.velocity.speed - this.drag * dt;
+    let driftSpeed: number = this.velocity.speed - this.drag * deltaTime;
     if (driftSpeed < 0) driftSpeed = 0;
     const driftDirection = this.velocity.direction;
     const thrustDirection = this.rotation;
@@ -129,10 +135,10 @@ export default class Ship implements GameEntity {
     // update Motion State
     const newVelocity: Velocity = calculateNewVelocity(
       { speed: driftSpeed, direction: driftDirection },
-      { speed: this.thrustPower * dt, direction: thrustDirection },
+      { speed: this.thrustPower * deltaTime, direction: thrustDirection },
       maxSpeed,
     );
-    const newPosition = getNewPosition(this.position, newVelocity, dt);
+    const newPosition = getNewPosition(this.position, newVelocity, deltaTime);
     // use transforms to update position of rock on game screen
     // update x,y,velocity and direction of rotation
     this.position = transform(newPosition, transformPosition);
@@ -145,7 +151,7 @@ export default class Ship implements GameEntity {
         velocity: this.velocity,
         rotation: this.rotation,
       };
-      this.gun.update(this.isTriggerPressed, dt);
+      this.gun.update(this.isTriggerPressed, deltaTime);
     }
   }
 }

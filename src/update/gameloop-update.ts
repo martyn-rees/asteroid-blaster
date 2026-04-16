@@ -11,13 +11,16 @@ import { bulletSpecs, rockType } from "../config/game-entity-specs.ts";
 import { constrainNumber, testCollision } from "../utils/maths.ts";
 import { explodeRock } from "../entities/rock-factory.ts";
 import { startLevel } from "../ui/level-start.ts";
-import { getShipActions, removeShipControlEvents } from "../input/ship-actions.ts";
+import {
+  getShipActions,
+  removeShipControlEvents,
+} from "../input/ship-actions.ts";
 import Viewport from "../entities/viewport.ts";
 
 export function updateMotionStates(
   gameState: GameState,
   gameScreen: Viewport,
-  dt: number,
+  deltaTime: number,
 ) {
   const { ship, bullets, rocks } = gameState;
   // warpPosition wraps coordinates that go off one edge of the screen to the opposite edge
@@ -26,14 +29,14 @@ export function updateMotionStates(
     y: constrainNumber(y, 0, gameScreen.height),
   });
 
-  ship!.update(warpPosition, dt);
+  ship!.update(warpPosition, deltaTime);
 
   for (const bulletId in bullets) {
-    bullets[bulletId].update(warpPosition, dt);
+    bullets[bulletId].update(warpPosition, deltaTime);
   }
 
   for (const rockId in rocks) {
-    rocks[rockId].update(warpPosition, dt);
+    rocks[rockId].update(warpPosition, deltaTime);
   }
 }
 
@@ -128,7 +131,7 @@ export function checkLevelComplete(
 
 export function gameLoopUpdate(
   gameScreen: Viewport,
-  dt: number,
+  deltaTime: number,
   getState: () => GameState,
 ) {
   if (!getState().ship) {
@@ -139,7 +142,7 @@ export function gameLoopUpdate(
   if (ship.state === "active") {
     changeGameState({ action: "ship actions", payload: getShipActions() });
   }
-  updateMotionStates(getState(), gameScreen, dt);
+  updateMotionStates(getState(), gameScreen, deltaTime);
 
   // Snapshot bullets before expiry check so deletions don't affect iteration.
   // Runs before the destroyed check so bullets fired just before ship death
