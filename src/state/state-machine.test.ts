@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+import { vi, describe, it, expect, beforeEach } from "vitest";
 import { handleStateTransition } from "./state-machine.ts";
 import Viewport from "../entities/viewport.ts";
 

@@ -29,7 +29,7 @@ function gameLoop(timestamp: number) {
     previousTimestamp === 0 ? TARGET_FRAME_MS : timestamp - previousTimestamp;
   previousTimestamp = timestamp;
   const dt = Math.min(elapsed / TARGET_FRAME_MS, 3);
-  gameLoopUpdate(gameScreen, dt);
+  gameLoopUpdate(gameScreen, dt, () => gameState);
   gameLoopRender(gameState, gameScreen.id);
 }
 
