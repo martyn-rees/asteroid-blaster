@@ -4,8 +4,7 @@ import {
   removeFromScreen,
 } from "../render/dom-render.ts";
 import { changeGameState, gameState } from "../state/game-state.ts";
-
-const ANNOUNCEMENT_DELAY_MS = 2000;
+import { ANNOUNCEMENT_DELAY_MS } from "../config/config.ts";
 const ANNOUNCEMENT_ID = "levelAnnouncement";
 
 export function showLevelAnnouncement({

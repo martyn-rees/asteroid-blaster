@@ -3,7 +3,7 @@ import { PositionTransform } from "../types.ts";
 // use left-hand cartesian coords (standard screen coords with +ve y axis pointing down)
 // rotation angles: 0 - east, 90 - south, 180 - west, 270 - north
 import { Circle, GameEntity, Position, Velocity } from "../types.ts";
-import { RockSize } from "../assets/game-entity-specs.ts";
+import { RockSize } from "../config/game-entity-specs.ts";
 
 export default class Rock implements GameEntity {
   static rockIDCounter = 0;

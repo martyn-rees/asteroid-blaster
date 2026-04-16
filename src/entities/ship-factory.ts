@@ -1,6 +1,6 @@
 import Ship from "./ship.ts";
 import Gun from "./gun.ts";
-import { shipSpecs, gunSpec } from "../assets/game-entity-specs.ts";
+import { shipSpecs, gunSpec } from "../config/game-entity-specs.ts";
 import { changeGameState } from "../state/game-state.ts";
 import { addShipControlEvents } from "../input/ship-actions.ts";
 
