@@ -1,4 +1,4 @@
-import { RockSize } from "../assets/game-entity-specs.ts";
+import { RockSize } from "../config/game-entity-specs.ts";
 
 // change position and rotation to element already on screen
 // TODO maybe provide additonalCLass property which could be used for examples such as ships thrust

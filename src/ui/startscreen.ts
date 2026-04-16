@@ -1,4 +1,4 @@
-import { keyBindings } from "../assets/key-bindings.ts";
+import { keyBindings } from "../config/key-bindings.ts";
 
 function formatKey(code: string): string {
   const labels: Record<string, string> = {

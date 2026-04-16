@@ -23,6 +23,7 @@ import { playSound } from "./sound-render.ts";
 
 import { asteroidsSVG, shipSVG } from "../assets/graphics.ts";
 import { GameState } from "../state/game-state.ts";
+import { debug, renderConfig } from "../config/config.ts";
 
 function diffSets(current: Set<string>, previous: Set<string>) {
   return {
@@ -52,14 +53,6 @@ export function resetRenderer() {
     score: -1,
   };
 }
-
-// dev-only — shows a marker at the gun muzzle position to verify bullet alignment
-export const debug = { showGunMuzzle: false };
-
-// frameSkip: render every Nth update frame. 1 = render every frame (no throttle).
-// Values above 1 reduce render frequency, decoupling it from the update rate.
-// showFps: display current, min and max FPS on screen.
-export const renderConfig = { frameSkip: 2, showFps: true };
 
 let renderFrameCount = 0;
 

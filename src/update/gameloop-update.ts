@@ -7,7 +7,7 @@ import {
 } from "../state/game-state.ts";
 import Gun from "../entities/gun.ts";
 import Bullet from "../entities/bullet.ts";
-import { bulletSpecs, rockType } from "../assets/game-entity-specs.ts";
+import { bulletSpecs, rockType } from "../config/game-entity-specs.ts";
 import { constrainNumber, testCollision } from "../utils/maths.ts";
 import { explodeRock } from "../entities/rock-factory.ts";
 import { startLevel } from "../ui/level-start.ts";

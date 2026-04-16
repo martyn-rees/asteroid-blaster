@@ -19,8 +19,11 @@ vi.mock("../utils/random-generators.ts", () => ({
   getRandomEdgePosition: mockGetRandomEdgePosition,
 }));
 
-vi.mock("../assets/level-config.ts", () => ({
+vi.mock("../config/level-config.ts", () => ({
   getLevelConfig: mockGetLevelConfig,
+}));
+
+vi.mock("../config/game-entity-specs.ts", () => ({
   rockType: {
     large: {},
     medium: {},

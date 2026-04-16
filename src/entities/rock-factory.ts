@@ -1,11 +1,10 @@
 import Rock from "./rock.ts";
 import { changeGameState } from "../state/game-state.ts";
 import { EdgeSide, Position, Size } from "../types.ts";
-import { RockSize } from "../assets/game-entity-specs.ts";
+import { RockSize, rockType } from "../config/game-entity-specs.ts";
 import { getRandomRockProps } from "./rock-randomizer.ts";
 import { getRandomEdgePosition } from "../utils/random-generators.ts";
-import { rockType } from "../assets/game-entity-specs.ts";
-import { getLevelConfig } from "../assets/level-config.ts";
+import { getLevelConfig } from "../config/level-config.ts";
 
 function addRock(size: RockSize, pos: Position) {
   const { velocity, r, rotationRate } = getRandomRockProps(rockType[size]);

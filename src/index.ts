@@ -6,9 +6,7 @@ import { handleStateTransition } from "./state/state-machine.ts";
 import { gameLoopUpdate } from "./update/gameloop-update.ts";
 import { gameLoopRender } from "./render/gameloop-render.ts";
 import { updateFPS } from "./render/fps.ts";
-import { renderConfig } from "./render/gameloop-render.ts";
-
-const TARGET_FRAME_MS = 1000 / 60;
+import { renderConfig, TARGET_FRAME_MS } from "./config/config.ts";
 let previousTimestamp = 0;
 
 // GAME loop code
