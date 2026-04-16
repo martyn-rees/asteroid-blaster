@@ -10,7 +10,7 @@ import Bullet from "../entities/bullet.ts";
 import { bulletSpecs, rockType } from "../config/game-entity-specs.ts";
 import { constrainNumber, testCollision } from "../utils/maths.ts";
 import { explodeRock } from "../entities/rock-factory.ts";
-import { startLevel } from "../ui/level-start.ts";
+import { checkLevelComplete } from "./level.ts";
 import {
   getShipActions,
   removeShipControlEvents,
@@ -106,28 +106,6 @@ export function processCollisions(
   }
 }
 
-// Advance to the next level when all rocks are cleared. levelStartPending
-// prevents this firing again on subsequent frames before the new rocks spawn.
-export function checkLevelComplete(
-  ship: Ship,
-  gameScreen: Viewport,
-  getState: () => GameState,
-): void {
-  const state = getState();
-  if (
-    Object.keys(state.rocks).length === 0 &&
-    ship.state === "active" &&
-    state.state === "playing" &&
-    !state.levelStartPending
-  ) {
-    changeGameState({ action: "next level" });
-    startLevel({
-      level: getState().level,
-      screenId: gameScreen.id,
-      screenSize: gameScreen.size,
-    });
-  }
-}
 
 export function gameLoopUpdate(
   gameScreen: Viewport,
