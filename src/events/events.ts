@@ -30,7 +30,6 @@ function setUpLevel(gameScreen: Viewport) {
 }
 
 function onEnterStart(gameScreen: Viewport) {
-  changeGameState({ action: "state", payload: "start" });
   displayScore(gameState.score);
   displayHiScore(gameState.hiScore);
   addToScreen(
@@ -42,19 +41,15 @@ function onEnterStart(gameScreen: Viewport) {
 }
 
 function onEnterPlaying(gameScreen: Viewport) {
-  changeGameState({ action: "state", payload: "playing" });
   addPauseButton(gameScreen.id);
   hideCursor(gameScreen.id);
 }
 
 function onEnterPaused(gameScreen: Viewport) {
-  changeGameState({ action: "state", payload: "paused" });
   addResumeButton(gameScreen.id);
 }
 
 function onEnterGameOver(gameScreen: Viewport) {
-  changeGameState({ action: "state", payload: "gameover" });
-  changeGameState({ action: "update hi-score" });
   endScreenTimer = setTimeout(() => {
     endScreenTimer = null;
     if (gameState.state === "gameover") {
@@ -72,15 +67,20 @@ function onEnterGameOver(gameScreen: Viewport) {
 function onEnter(screen: GamePhase, gameScreen: Viewport) {
   switch (screen) {
     case "start":
+      changeGameState({ action: "state", payload: "start" });
       onEnterStart(gameScreen);
       break;
     case "playing":
+      changeGameState({ action: "state", payload: "playing" });
       onEnterPlaying(gameScreen);
       break;
     case "paused":
+      changeGameState({ action: "state", payload: "paused" });
       onEnterPaused(gameScreen);
       break;
     case "gameover":
+      changeGameState({ action: "state", payload: "gameover" });
+      changeGameState({ action: "update hi-score" });
       onEnterGameOver(gameScreen);
       break;
   }
