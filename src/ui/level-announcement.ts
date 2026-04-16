@@ -26,7 +26,7 @@ export function showLevelAnnouncement({
   addToScreen(announcement, screenId);
   setTimeout(() => {
     removeFromScreen(ANNOUNCEMENT_ID);
-    if (gameState.state === "playing") {
+    if (gameState.state === "playing" || gameState.state === "paused") {
       onComplete();
       changeGameState({ action: "clear level pending" });
     }
