@@ -5,8 +5,6 @@ import Gun from "../entities/gun.ts";
 import { asteroidsSVG, shipSVG } from "../assets/graphics.ts";
 
 // change position and rotation to element already on screen
-// TODO maybe provide additonalCLass property which could be used for examples such as ships thrust
-// could be Display.update
 export const redrawOnScreen = (
   id: string,
   x: number,

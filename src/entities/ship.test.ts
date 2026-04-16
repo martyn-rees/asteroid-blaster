@@ -173,7 +173,6 @@ test("ship doesn't move beyond its max speed", () => {
   expect(ship.velocity.speed).toBe(4);
 });
 
-// TODO: this is implementation details so don't really want this test
 test("ships rotation resets after 360 degrees", () => {
   const ship = setUp();
   expect(ship.rotation).toBe(1.5 * Math.PI);

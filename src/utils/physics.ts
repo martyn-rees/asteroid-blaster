@@ -72,7 +72,6 @@ export function calculateNewVelocity(
   return { speed: speed, direction: radians };
 }
 
-//TODO: this provides direction basded on change of movement along x and y axis but it could also return speed as well therefore returning velocity
 export function getDirectionRadians(dx: number, dy: number): number {
   let radians = 0;
 
