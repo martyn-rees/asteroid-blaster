@@ -60,7 +60,8 @@ type GameStateAction =
   | { action: "update hi-score" }
   | { action: "next level" }
   | { action: "clear level pending" }
-  | { action: "reset game" };
+  | { action: "reset game" }
+  | { action: "sync transition" };
 
 // Pure state dispatcher — updates gameState only. No side effects (input, DOM,
 // audio, timers) belong here. Callers are responsible for any lifecycle work
@@ -149,11 +150,15 @@ export function changeGameState(change: GameStateAction) {
       gameState = { ...gameState, levelStartPending: false };
       break;
 
+    case "sync transition":
+      gameState = { ...gameState, previousState: gameState.state };
+      break;
+
     case "reset game":
       clearStateHistory();
       gameState = {
-        state: "",
-        previousState: "",
+        state: gameState.state,
+        previousState: gameState.previousState,
         score: 0,
         hiScore: gameState.hiScore,
         level: 1,

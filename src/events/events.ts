@@ -69,19 +69,15 @@ function onEnterGameOver(gameScreen: Viewport) {
 function onEnter(screen: GamePhase, gameScreen: Viewport) {
   switch (screen) {
     case "start":
-      changeGameState({ action: "state", payload: "start" });
       onEnterStart(gameScreen);
       break;
     case "playing":
-      changeGameState({ action: "state", payload: "playing" });
       onEnterPlaying(gameScreen);
       break;
     case "paused":
-      changeGameState({ action: "state", payload: "paused" });
       onEnterPaused(gameScreen);
       break;
     case "gameover":
-      changeGameState({ action: "state", payload: "gameover" });
       changeGameState({ action: "update hi-score" });
       onEnterGameOver(gameScreen);
       break;
