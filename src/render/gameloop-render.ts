@@ -48,6 +48,7 @@ export function resetRenderer() {
   previousRender.rockIds.forEach((id) => removeFromScreen(id));
   previousRender.bulletIds.forEach((id) => removeFromScreen(id));
   resetFPS();
+  resetRenderFrameCount();
   previousRender = {
     shipIds: new Set<string>(),
     rockIds: new Set<string>(),
@@ -57,6 +58,10 @@ export function resetRenderer() {
 }
 
 let renderFrameCount = 0;
+
+function resetRenderFrameCount() {
+  renderFrameCount = 0;
+}
 
 function skipRenderForThisFrame(): boolean {
   if (renderConfig.frameSkip > 1) {
