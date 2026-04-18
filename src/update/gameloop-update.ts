@@ -5,7 +5,6 @@ import {
   Bullets,
 } from "../state/game-state.ts";
 import Ship from "../entities/ship.ts";
-import Gun from "../entities/gun.ts";
 import Bullet from "../entities/bullet.ts";
 import { bulletSpecs, rockType } from "../config/game-entity-specs.ts";
 import { constrainNumber, testCollision } from "../utils/maths.ts";
@@ -50,16 +49,18 @@ export function expireOldBullets(bullets: Bullets): void {
 }
 
 export function spawnBulletIfFiring(ship: Ship): void {
-  const shipGun: Gun | null = ship.gun;
-  if (ship.state === "active" && shipGun && shipGun.state === "firing") {
-    const { bulletPosition, bulletVelocity } =
-      shipGun.getInitialMotionStateOfBullet();
-    const bullet = new Bullet({
-      initialPosition: bulletPosition,
-      velocity: bulletVelocity,
-      bulletSpecs,
-    });
-    changeGameState({ action: "add bullet", payload: bullet });
+  if (ship.state !== "active") return;
+  for (const gun of ship.guns) {
+    if (gun.state === "firing") {
+      const { bulletPosition, bulletVelocity } =
+        gun.getInitialMotionStateOfBullet();
+      const bullet = new Bullet({
+        initialPosition: bulletPosition,
+        velocity: bulletVelocity,
+        bulletSpecs,
+      });
+      changeGameState({ action: "add bullet", payload: bullet });
+    }
   }
 }
 

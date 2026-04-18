@@ -38,7 +38,7 @@ export default class Ship implements GameEntity {
   public rotation: number;
   public thrustPower: number;
   public velocity: Velocity;
-  public gun: Gun | null;
+  public guns: Gun[];
   public isTriggerPressed: boolean;
   private explosionTimer: number;
   private rotateDirection: -1 | 0 | 1;
@@ -59,8 +59,7 @@ export default class Ship implements GameEntity {
     this.thrustPower = 0;
     // velocity // point North
     this.velocity = { speed: 0, direction: 1.5 * Math.PI };
-    // gun specifications - this can be passed in for different gunpower and position. Need to use array if more than one gun
-    this.gun = null;
+    this.guns = [];
     this.isTriggerPressed = false;
     this.explosionTimer = 0;
     this.rotateDirection = 0;
@@ -71,8 +70,8 @@ export default class Ship implements GameEntity {
     this.explosionTimer = EXPLOSION_DURATION;
   }
 
-  attachGun(gun: Gun) {
-    this.gun = gun;
+  attachGuns(guns: Gun[]) {
+    this.guns = guns;
   }
 
   get motionState(): MotionState {
@@ -144,14 +143,13 @@ export default class Ship implements GameEntity {
     this.position = transform(newPosition, transformPosition);
     this.velocity = newVelocity;
 
-    // update gun state
-    if (this.gun !== null) {
-      this.gun.motionState = {
+    for (const gun of this.guns) {
+      gun.motionState = {
         position: this.position,
         velocity: this.velocity,
         rotation: this.rotation,
       };
-      this.gun.update(this.isTriggerPressed, deltaTime);
+      gun.update(this.isTriggerPressed, deltaTime);
     }
   }
 }

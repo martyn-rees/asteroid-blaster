@@ -12,12 +12,15 @@ export const shipSpecs = {
   rotationSpeed: 2,
 };
 
-// using offset to position gun muzzle on ship when it is facing East (ship rotation 0)
-export const gunSpec = {
-  muzzleOffset: { x: 10, y: 0 },
-  muzzleSpeed: 6,
-  reloadTime: 12,
-};
+// using offset to position gun muzzles on ship when it is facing East (ship rotation 0)
+export const gunSpecsSingle = [
+  { muzzleOffset: { x: 10, y: 0 }, muzzleSpeed: 6, reloadTime: 12 },
+];
+
+export const gunSpecs = [
+  { muzzleOffset: { x: -4, y: -7 }, muzzleSpeed: 6, reloadTime: 12 },
+  { muzzleOffset: { x: -4, y: 7 }, muzzleSpeed: 6, reloadTime: 12 },
+];
 
 type Range = { min: number; max: number };
 

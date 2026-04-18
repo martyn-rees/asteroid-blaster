@@ -59,7 +59,7 @@ test("create a new ship", () => {
     rotation: 1.5 * Math.PI,
     thrustPower: 0,
     velocity: { speed: 0, direction: 1.5 * Math.PI },
-    gun: null,
+    guns: [],
     isTriggerPressed: false,
     explosionTimer: 0,
     rotateDirection: 0,
@@ -80,14 +80,14 @@ test("get motion state", () => {
   });
 });
 
-test("attach a gun to ship and fire it", () => {
+test("attach guns to ship and fire them", () => {
   const ship = setUp();
   const gun = setUpGun();
-  ship.attachGun(gun);
-  expect(ship.gun).not.toBe(null);
+  ship.attachGuns([gun]);
+  expect(ship.guns).toHaveLength(1);
   ship.setInput(newActions({ shoot: true }));
   ship.update();
-  expect(ship.gun!.update).toBeCalled();
+  expect(ship.guns[0].update).toBeCalled();
 });
 
 test("thrust ship North for 1 frame", () => {
@@ -107,7 +107,7 @@ test("thrust ship North for 1 frame", () => {
     rotation: 1.5 * Math.PI,
     thrustPower: 1,
     velocity: { speed: 1, direction: 1.5 * Math.PI },
-    gun: null,
+    guns: [],
     isTriggerPressed: false,
     explosionTimer: 0,
     rotateDirection: 0,

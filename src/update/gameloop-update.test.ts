@@ -81,7 +81,7 @@ function makeShip(state: "active" | "exploding" | "destroyed" = "active") {
   return {
     state,
     boundary: vi.fn(() => ({ x: 0, y: 0, r: 10 })),
-    gun: null,
+    guns: [],
   } as unknown as Ship;
 }
 
@@ -93,13 +93,15 @@ describe("spawnBulletIfFiring", () => {
   function makeShipWithFiringGun() {
     return {
       state: "active",
-      gun: {
-        state: "firing",
-        getInitialMotionStateOfBullet: vi.fn(() => ({
-          bulletPosition: { x: 100, y: 100 },
-          bulletVelocity: { speed: 6, direction: 0 },
-        })),
-      },
+      guns: [
+        {
+          state: "firing",
+          getInitialMotionStateOfBullet: vi.fn(() => ({
+            bulletPosition: { x: 100, y: 100 },
+            bulletVelocity: { speed: 6, direction: 0 },
+          })),
+        },
+      ],
     } as unknown as Ship;
   }
 
@@ -119,13 +121,13 @@ describe("spawnBulletIfFiring", () => {
   });
 
   it("does not spawn when ship state is not active", () => {
-    const ship = { state: "exploding", gun: { state: "firing" } } as unknown as Ship;
+    const ship = { state: "exploding", guns: [{ state: "firing" }] } as unknown as Ship;
     spawnBulletIfFiring(ship);
     expect(mockChangeGameState).not.toHaveBeenCalled();
   });
 
-  it("does not spawn when ship has no gun", () => {
-    const ship = { state: "active", gun: null } as unknown as Ship;
+  it("does not spawn when ship has no guns", () => {
+    const ship = { state: "active", guns: [] } as unknown as Ship;
     spawnBulletIfFiring(ship);
     expect(mockChangeGameState).not.toHaveBeenCalled();
   });
@@ -133,7 +135,7 @@ describe("spawnBulletIfFiring", () => {
   it("does not spawn when gun is not firing", () => {
     const ship = {
       state: "active",
-      gun: { state: "loaded" },
+      guns: [{ state: "loaded" }],
     } as unknown as Ship;
     spawnBulletIfFiring(ship);
     expect(mockChangeGameState).not.toHaveBeenCalled();

@@ -82,9 +82,8 @@ function displayNewShips(
   if (!ship) return;
   newShipIds.forEach(() => {
     addToScreen(createShip(ship), screenId);
-    // these lines are for testing - adds the ship's gun muzzle to check it's position is correct
-    if (debug.showGunMuzzle && ship.gun) {
-      addToScreen(createGun(ship.gun), screenId);
+    if (debug.showGunMuzzle) {
+      ship.guns.forEach((gun) => addToScreen(createGun(gun), screenId));
     }
   });
 }
@@ -143,10 +142,10 @@ function redrawShip(ship: Ship) {
   redrawOnScreen(ship.id, ship.position.x, ship.position.y, ship.rotation);
   renderThrust(ship.id + "-thrust", ship.thrustPower);
 
-  // these lines are for testing - updates the ship's gun muzzle to check it's position is correct
   if (debug.showGunMuzzle) {
-    const gun = ship.gun!;
-    redrawOnScreen(gun.id, gun.muzzlePosition.x, gun.muzzlePosition.y);
+    ship.guns.forEach((gun) =>
+      redrawOnScreen(gun.id, gun.muzzlePosition.x, gun.muzzlePosition.y),
+    );
   }
 }
 
