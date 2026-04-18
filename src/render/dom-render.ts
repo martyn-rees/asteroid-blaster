@@ -19,9 +19,9 @@ export const redrawOnScreen = (
   }
 };
 
-export const renderThrust = (thrustPower: number) => {
-  const thrustStyle = thrustPower > 0 ? "block" : "none";
-  document.getElementById("thrust")!.style.display = thrustStyle;
+export const renderThrust = (thrustId: string, thrustPower: number) => {
+  const thrustClass = thrustPower > 0 ? "thrust--active" : "thrust--inactive";
+  document.getElementById(thrustId)!.setAttribute("class", thrustClass);
 };
 
 // DOM functions
@@ -62,7 +62,7 @@ export function createRock(rock: Rock): HTMLElement {
 }
 
 export function createShip(ship: Ship): HTMLElement {
-  return createElement(ship.id, "ship", null, shipSVG());
+  return createElement(ship.id, "ship", null, shipSVG(ship.id + "-thrust"));
 }
 
 export function createBullet(bullet: Bullet): HTMLElement {

@@ -18,9 +18,9 @@ const asteroid3SVG = `
 
 export const asteroidsSVG = [asteroid1SVG, asteroid2SVG, asteroid3SVG];
 
-export const shipSVG = () => `
+export const shipSVG = (thrustId: string = "ship-thrust") => `
 <svg viewBox="0 0 12 12" version="1.1">
 	<path d="M12,6 L0,12 L6,6 L0,0 L12,6 Z"></path>
-	<path id="thrust" d="M4,6 L0,5 L0,7 L4,6 Z"></path>
+	<path id="${thrustId}" d="M4,6 L0,5 L0,7 L4,6 Z"></path>
 </svg>
 `;

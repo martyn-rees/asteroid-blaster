@@ -61,10 +61,7 @@ function makeBullet(): Bullet {
 
 describe("gameloop-render", () => {
   beforeEach(() => {
-    document.body.innerHTML = `
-      <div id="${SCREEN_ID}"></div>
-      <div id="thrust"></div>
-    `;
+    document.body.innerHTML = `<div id="${SCREEN_ID}"></div>`;
     renderConfig.frameSkip = 1;
     vi.clearAllMocks();
     resetRockIDCounter();
@@ -128,6 +125,26 @@ describe("gameloop-render", () => {
         gameLoopRender(makeGameState({ ship }), SCREEN_ID);
 
         expect(document.getElementById(ship.id)).toBeNull();
+      });
+
+      it("creates a thrust element with the correct id inside the ship element", () => {
+        const ship = makeShip();
+        gameLoopRender(makeGameState({ ship }), SCREEN_ID);
+        expect(document.getElementById(`${ship.id}-thrust`)).not.toBeNull();
+      });
+
+      it("gives the thrust element thrust--active class when thrustPower is greater than zero", () => {
+        const ship = makeShip();
+        ship.thrustPower = 1;
+        gameLoopRender(makeGameState({ ship }), SCREEN_ID);
+        expect(document.getElementById(`${ship.id}-thrust`)!.getAttribute("class")).toBe("thrust--active");
+      });
+
+      it("gives the thrust element thrust--inactive class when thrustPower is zero", () => {
+        const ship = makeShip();
+        ship.thrustPower = 0;
+        gameLoopRender(makeGameState({ ship }), SCREEN_ID);
+        expect(document.getElementById(`${ship.id}-thrust`)!.getAttribute("class")).toBe("thrust--inactive");
       });
 
       it("removes the shipExplosion element when the ship reaches destroyed", () => {
@@ -305,7 +322,7 @@ describe("gameloop-render", () => {
       resetRenderer();
 
       // Rebuild the screen after resetRenderer removed it
-      document.body.innerHTML = `<div id="${SCREEN_ID}"></div><div id="thrust"></div>`;
+      document.body.innerHTML = `<div id="${SCREEN_ID}"></div>`;
       gameLoopRender(makeGameState({ rocks }), SCREEN_ID);
 
       expect(document.getElementById(rock.id)).not.toBeNull();

@@ -74,7 +74,11 @@ function skipRenderForThisFrame(): boolean {
   return false;
 }
 
-function displayNewShips(newShipIds: Set<string>, screenId: string, ship: Ship | undefined) {
+function displayNewShips(
+  newShipIds: Set<string>,
+  screenId: string,
+  ship: Ship | undefined,
+) {
   if (!ship) return;
   newShipIds.forEach(() => {
     addToScreen(createShip(ship), screenId);
@@ -137,7 +141,7 @@ function removeOldRocks(oldRockIds: Set<string>) {
 
 function redrawShip(ship: Ship) {
   redrawOnScreen(ship.id, ship.position.x, ship.position.y, ship.rotation);
-  renderThrust(ship.thrustPower);
+  renderThrust(ship.id + "-thrust", ship.thrustPower);
 
   // these lines are for testing - updates the ship's gun muzzle to check it's position is correct
   if (debug.showGunMuzzle) {
