@@ -12,15 +12,27 @@ export const shipSpecs = {
   rotationSpeed: 2,
 };
 
-// using offset to position gun muzzles on ship when it is facing East (ship rotation 0)
-export const gunSpecsSingle = [
-  { muzzleOffset: { x: 10, y: 0 }, muzzleSpeed: 6, reloadTime: 12 },
-];
+// muzzle offsets assume ship is facing East (rotation 0)
+export type GunSpec = {
+  muzzleOffset: { x: number; y: number };
+  muzzleSpeed: number;
+  reloadTime: number;
+};
 
-export const gunSpecs = [
-  { muzzleOffset: { x: -4, y: -7 }, muzzleSpeed: 6, reloadTime: 12 },
-  { muzzleOffset: { x: -4, y: 7 }, muzzleSpeed: 6, reloadTime: 12 },
-];
+export const gunSpecs = {
+  single: [{ muzzleOffset: { x: 10, y: 0 }, muzzleSpeed: 6, reloadTime: 12 }],
+  double: [
+    { muzzleOffset: { x: -4, y: -7 }, muzzleSpeed: 6, reloadTime: 12 },
+    { muzzleOffset: { x: -4, y: 7 }, muzzleSpeed: 6, reloadTime: 12 },
+  ],
+  triple: [
+    { muzzleOffset: { x: 10, y: 0 }, muzzleSpeed: 6, reloadTime: 12 },
+    { muzzleOffset: { x: -4, y: -7 }, muzzleSpeed: 6, reloadTime: 24 },
+    { muzzleOffset: { x: -4, y: 7 }, muzzleSpeed: 6, reloadTime: 24 },
+  ],
+} satisfies Record<string, GunSpec[]>;
+
+export type GunLoadoutName = keyof typeof gunSpecs;
 
 type Range = { min: number; max: number };
 
