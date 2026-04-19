@@ -66,7 +66,7 @@ test("bullet movement after 2 frames with transform", () => {
   const transformCallback: PositionTransform = () => ({ x: 10, y: 10 });
   const bullet = setUp();
   bullet.update();
-  bullet.update(transformCallback);
+  bullet.update({ onExitBounds: transformCallback });
   expect(bullet.position.x).toBe(10);
   expect(bullet.position.y).toBe(10);
 });

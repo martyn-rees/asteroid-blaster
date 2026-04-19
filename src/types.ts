@@ -31,8 +31,13 @@ export type Size = {
   height: number;
 };
 
+export type UpdateOptions = {
+  onExitBounds?: PositionTransform;
+  deltaTime?: number;
+};
+
 export interface GameEntity {
   id: string;
-  update(transformPosition?: PositionTransform, deltaTime?: number): void;
+  update(options?: UpdateOptions): void;
   boundary(): Circle;
 }

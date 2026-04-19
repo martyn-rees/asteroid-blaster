@@ -28,14 +28,14 @@ export function updateMotionStates(
     y: constrainNumber(y, 0, gameScreen.height),
   });
 
-  ship!.update(warpPosition, deltaTime);
+  ship!.update({ onExitBounds: warpPosition, deltaTime });
 
   for (const bulletId in bullets) {
-    bullets[bulletId].update(warpPosition, deltaTime);
+    bullets[bulletId].update({ deltaTime });
   }
 
   for (const rockId in rocks) {
-    rocks[rockId].update(warpPosition, deltaTime);
+    rocks[rockId].update({ onExitBounds: warpPosition, deltaTime });
   }
 }
 
@@ -106,7 +106,6 @@ export function processCollisions(
     }
   }
 }
-
 
 export function gameLoopUpdate(
   gameScreen: Viewport,

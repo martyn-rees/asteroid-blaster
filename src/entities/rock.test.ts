@@ -80,6 +80,6 @@ test("rock movement after 2 frames with transform", () => {
   const transformCallback: PositionTransform = () => ({ x: 10, y: 10 });
   const rock = setUp();
   rock.update();
-  rock.update(transformCallback);
+  rock.update({ onExitBounds: transformCallback });
   expect(rock.rockPosition).toStrictEqual({ x: 10, y: 10 });
 });

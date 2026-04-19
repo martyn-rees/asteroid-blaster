@@ -1,5 +1,4 @@
 import Gun from "./gun.ts";
-import { PositionTransform } from "../types.ts";
 import {
   calculateNewVelocity,
   changeRotation,
@@ -8,6 +7,7 @@ import {
 import { transform, convertDegreesToRadians } from "../utils/maths.ts";
 import {
   Position,
+  UpdateOptions,
   Velocity,
   MotionState,
   Circle,
@@ -110,7 +110,7 @@ export default class Ship implements GameEntity {
     this.isTriggerPressed = shoot;
   }
 
-  update(transformPosition?: PositionTransform, deltaTime: number = 1) {
+  update({ onExitBounds, deltaTime = 1 }: UpdateOptions = {}) {
     if (this.state === "exploding") {
       this.explosionTimer -= deltaTime;
       if (this.explosionTimer <= 0) this.state = "destroyed";
@@ -131,16 +131,13 @@ export default class Ship implements GameEntity {
     const driftDirection = this.velocity.direction;
     const thrustDirection = this.rotation;
 
-    // update Motion State
     const newVelocity: Velocity = calculateNewVelocity(
       { speed: driftSpeed, direction: driftDirection },
       { speed: this.thrustPower * deltaTime, direction: thrustDirection },
       maxSpeed,
     );
     const newPosition = getNewPosition(this.position, newVelocity, deltaTime);
-    // use transforms to update position of rock on game screen
-    // update x,y,velocity and direction of rotation
-    this.position = transform(newPosition, transformPosition);
+    this.position = transform(newPosition, onExitBounds);
     this.velocity = newVelocity;
 
     for (const gun of this.guns) {

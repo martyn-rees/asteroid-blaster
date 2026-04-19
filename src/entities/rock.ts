@@ -1,5 +1,5 @@
 import { getNewPosition } from "../utils/physics.ts";
-import { PositionTransform } from "../types.ts";
+import { UpdateOptions } from "../types.ts";
 // use left-hand cartesian coords (standard screen coords with +ve y axis pointing down)
 // rotation angles: 0 - east, 90 - south, 180 - west, 270 - north
 import { Circle, GameEntity, Position, Velocity } from "../types.ts";
@@ -62,11 +62,9 @@ export default class Rock implements GameEntity {
     };
   }
 
-  update(transformPosition?: PositionTransform, deltaTime: number = 1) {
+  update({ onExitBounds, deltaTime = 1 }: UpdateOptions = {}) {
     const newPosition = getNewPosition(this.position, this.velocity, deltaTime);
     this.rotation += this.rotationRate * deltaTime;
-    this.position = transformPosition
-      ? transformPosition(newPosition)
-      : newPosition;
+    this.position = onExitBounds ? onExitBounds(newPosition) : newPosition;
   }
 }

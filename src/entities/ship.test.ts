@@ -188,6 +188,6 @@ test("ship movement after 2 frames with transform", () => {
   const transformCallback: PositionTransform = () => ({ x: 10, y: 10 });
   const ship = setUp();
   ship.setInput(newActions({ thrust: true }));
-  ship.update(transformCallback);
+  ship.update({ onExitBounds: transformCallback });
   expect(ship.position).toStrictEqual({ x: 10, y: 10 });
 });
