@@ -95,20 +95,25 @@ function removeOldGuns(oldGunIds: Set<string>) {
   oldGunIds.forEach((id) => removeFromScreen(id));
 }
 
+// play shoot sound once per frame for any new bulets fired
+// regardless of how many bullets were added —
+// prevents overlapping audio when multiple guns fire simultaneously.
 function displayNewBullets(
   newBulletIds: Set<string>,
   screenId: string,
   bullets: Bullets,
 ) {
+  let anyBulletAdded = false;
   newBulletIds.forEach((bulletId: string) => {
     const bullet = bullets[bulletId];
     if (bullet) {
       addToScreen(createBullet(bullet), screenId);
-      playSound("shoot");
+      anyBulletAdded = true;
     } else {
       console.error("bulletId doesn't exist in bullets", bulletId);
     }
   });
+  if (anyBulletAdded) playSound("shoot");
 }
 
 function displayNewRocks(
