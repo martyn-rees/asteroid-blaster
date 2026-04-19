@@ -35,6 +35,7 @@ function diffSets(current: Set<string>, previous: Set<string>) {
 
 let previousRender = {
   shipIds: new Set<string>(),
+  gunIds: new Set<string>(),
   rockIds: new Set<string>(),
   bulletIds: new Set<string>(),
   score: -1,
@@ -45,12 +46,14 @@ let previousRender = {
 // would never see old elements as removed, leaving them frozen on screen.
 export function resetRenderer() {
   previousRender.shipIds.forEach((id) => removeFromScreen(id));
+  previousRender.gunIds.forEach((id) => removeFromScreen(id));
   previousRender.rockIds.forEach((id) => removeFromScreen(id));
   previousRender.bulletIds.forEach((id) => removeFromScreen(id));
   resetFPS();
   resetRenderFrameCount();
   previousRender = {
     shipIds: new Set<string>(),
+    gunIds: new Set<string>(),
     rockIds: new Set<string>(),
     bulletIds: new Set<string>(),
     score: -1,
@@ -86,6 +89,10 @@ function displayNewShips(
       ship.guns.forEach((gun) => addToScreen(createGun(gun), screenId));
     }
   });
+}
+
+function removeOldGuns(oldGunIds: Set<string>) {
+  oldGunIds.forEach((id) => removeFromScreen(id));
 }
 
 function displayNewBullets(
@@ -172,7 +179,7 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
   // this line can force this rendering to be skipped for a designated number of frames
   if (skipRenderForThisFrame()) return false;
 
-  // ship is only in currentShipIds when active — going non-active removes it from the DOM
+  // ship and guns are only tracked while active — going non-active removes them from the DOM
   const currentShipIds = new Set(
     ship && ship.state === "active" ? [ship.id] : [],
   );
@@ -180,6 +187,13 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
     currentShipIds,
     previousRender.shipIds,
   );
+
+  const currentGunIds = new Set(
+    debug.showGunMuzzle && ship && ship.state === "active"
+      ? ship.guns.map((gun) => gun.id)
+      : [],
+  );
+  const { removed: oldGunIds } = diffSets(currentGunIds, previousRender.gunIds);
 
   // ship just transitioned to exploding this frame — add explosion element
   if (
@@ -220,6 +234,7 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
 
   // REMOVE OLD ITEMS
   removeOldShips(oldShipIds);
+  removeOldGuns(oldGunIds);
   removeOldBullets(oldBulletIds);
   removeOldRocks(oldRockIds);
 
@@ -236,6 +251,7 @@ export function gameLoopRender(gameState: GameState, screenId: string) {
 
   previousRender = {
     shipIds: currentShipIds,
+    gunIds: currentGunIds,
     rockIds: currentRockIds,
     bulletIds: currentBulletIds,
     score,
