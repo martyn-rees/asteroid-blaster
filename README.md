@@ -1,6 +1,6 @@
 # Asteroid Blaster
 
-A browser-based Asteroids game built with TypeScript and Vite — architected with React and Redux patterns to demonstrate how those frameworks model state and rendering under the hood.
+An Asteroids-inspired browser game built with TypeScript and Vite — architected with React and Redux patterns, with no framework involved.
 
 **[Play the game →](https://www.supercube.co.uk/asteroids)**
 
@@ -22,9 +22,9 @@ Rocks spawn in increasing numbers each level. The game ends when your ship is de
 
 ## Why This Project
 
-React's virtual DOM reconciler was directly inspired by game engine architecture — the idea that you separate _computing what changed_ from _applying those changes to the screen_. This project reverses that inspiration: a browser game intentionally architected with React and Redux patterns, with no framework involved.
+React's virtual DOM reconciler was directly inspired by game engine architecture — the idea that you separate _computing what changed_ from _applying those changes to the screen_. This project reverses that inspiration: a browser game intentionally architected with React and Redux patterns.
 
-The goal was to build something where the architectural decisions are visible and deliberate — a codebase a technical team can read and see how I think about state, rendering, and separation of concerns.
+It began as a JavaScript port of an earlier Shockwave game. This TypeScript version is a complete rewrite — nothing remains of the original code — built as an opportunity to apply modern architecture patterns to a familiar problem.
 
 ---
 
@@ -129,7 +129,7 @@ This repo serves as the foundation for an extended version currently in private 
 
 ### State Reading: Two Intentional Patterns
 
-There are two ways state is read across the codebase — this is deliberate, not inconsistency:
+There are two ways state is read across the codebase — this is deliberate, not an inconsistency:
 
 - **`getState: () => GameState` callback** — used in `update/` functions. State mutates mid-frame (bullets are deleted during collision iteration), so each read must be fresh. The callback also makes these functions testable in isolation.
 - **Direct `gameState` import** — used in `events.ts`. Lifecycle hooks run once per transition, not in a hot loop, so a module-level reference is correct and simpler.
