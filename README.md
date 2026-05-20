@@ -2,7 +2,7 @@
 
 An Asteroids-inspired browser game built with TypeScript and Vite — architected with React and Redux patterns, with no framework involved.
 
-**[Play the game →](https://www.supercube.co.uk/asteroids)**
+**[Play the game →](https://www.supercube.co.uk/asteroid-blaster)**
 
 ---
 
@@ -17,6 +17,8 @@ Pilot a ship through waves of asteroids. Shoot to destroy them — large rocks s
 | `S`     | Shoot  |
 
 Rocks spawn in increasing numbers each level. The game ends when your ship is destroyed.
+
+The game scales to fill the browser window. Screen size is a gameplay variable — a small window tightens the space and forces close-quarters play, while a large window spreads rocks further apart and makes shooting harder. Resize to suit your preference.
 
 ---
 

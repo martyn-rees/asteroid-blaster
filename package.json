@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --base=/asteroids/",
+    "build": "vite build --base=/asteroid-blaster/",
     "preview": "vite preview",
     "test": "vitest run --coverage"
   },
@@ -14,7 +14,7 @@
   "author": "Martyn Rees",
   "repository": {
     "type": "git",
-    "url": "https://github.com/martyn-rees/asteroids"
+    "url": "https://github.com/martyn-rees/asteroid-blaster.git"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.18",
