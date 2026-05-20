@@ -1,16 +1,21 @@
 {
   "name": "asteroid-blaster",
   "version": "1.1.0",
-  "description": "recreate asteroids using es6",
-  "private": true,
+  "description": "An Asteroids-inspired browser game built with TypeScript — architected with React and Redux patterns, with no framework involved.",
+  "private": false,
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --base=/asteroids/",
+    "build": "vite build --base=/asteroid-blaster/",
     "preview": "vite preview",
     "test": "vitest run --coverage"
   },
+  "license": "MIT",
   "author": "Martyn Rees",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/martyn-rees/asteroid-blaster.git"
+  },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.18",
     "happy-dom": "^9.20.3",
