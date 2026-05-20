@@ -206,7 +206,7 @@ Runs all unit tests with coverage via Vitest.
 npm run build
 ```
 
-Output is written to `dist/`. Configured for deployment at the `/asteroids/` base path.
+Output is written to `dist/`. Configured for deployment at the `/asteroid-blaster/` base path.
 
 ### Preview production build
 
